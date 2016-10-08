@@ -1,0 +1,14 @@
+lupa
+Flask
+flask-sijax
+
+pyglet
+transitions
+
+psutil
+memory_profiler
+pympler
+pydevd
+
+pyserial
+minimalmodbus

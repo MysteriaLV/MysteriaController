@@ -1,0 +1,25 @@
+<!doctype html>
+<html>
+<head>
+    <script type="text/javascript" src="/static/js/jquery.min.js"></script>
+    <script type="text/javascript" src="/static/js/sijax/sijax.js"></script>
+    <script type="text/javascript">        {{ g.sijax.get_js()|safe }}    </script>
+</head>
+
+<body>
+<a href="javascript://" onclick="Sijax.request('sayHi');">Say Hi!</a>
+
+<H1>State machines</H1>
+{% for fsm in state.fsms %}
+<div id="fsm.{{ fsm }}">
+    <span class="fsm.name">{{ fsm }}</span>
+    <ul>
+        {% for event in state.fsms[fsm] %}
+        <li>{{ event }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endfor %}
+
+</body>
+</html>
