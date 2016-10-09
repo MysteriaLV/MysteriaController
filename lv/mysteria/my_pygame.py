@@ -23,7 +23,12 @@ logging.basicConfig(
 
 window = pyglet.window.Window(width=1280, height=720)
 player_main = pyglet.media.Player()
-
+#
+# screen = pyglet.window.get_platform().get_default_display().get_screens()[2]
+# window2 = pyglet.window.Window(screen=screen, fullscreen=True)
+# player_window2 = pyglet.media.load("test_evil.wmv").play()
+# player_window2._set_eos_action = player_window2.EOS_LOOP
+#
 
 class CleanupSourceGroup(pyglet.media.SourceGroup):
     def _advance(self):
@@ -119,7 +124,7 @@ video_fsm = Machine(
 
 @window.event
 def on_draw():
-    window.clear()
+    # window.clear()
 
     p = static_state.get_player()
 
@@ -127,6 +132,16 @@ def on_draw():
         p.get_texture().blit(0, 0)
     else:
         print("nothing to play")
+
+#
+# @window2.event
+# def on_draw():
+#     p = player_window2
+#
+#     if p.source and p.source.video_format:
+#         p.get_texture().blit(0, 0)
+#     else:
+#         print("nothing to play")
 
 
 # @window.event
@@ -164,38 +179,6 @@ player_main.play()
 pyglet.clock.schedule_interval(add_static, 5)
 pyglet.clock.schedule_interval(auto_distort_main, 0.1)
 
-system_running = True
 
+HUD = pyglet.app
 
-def modbus():
-    minimalmodbus.BAUDRATE = 57600
-    # minimalmodbus.TIMEOUT = 0.5
-    instrument = minimalmodbus.Instrument('COM3', 1)  # port name, slave address (in decimal)
-    # instrument.debug = True
-
-    a = int(time.time())
-    count = 0
-    while system_running:
-        if a < int(time.time()):
-            logging.debug(count)
-            count = 0
-            a = int(time.time())
-
-        count += 1
-
-        try:
-            button1 = instrument.read_registers(0, 4)
-        except IOError as e:
-            pass
-            # print button1
-
-            # instrument.write_register(3, button1, functioncode=6)
-
-
-t_modbus = threading.Thread(name='modbus', target=modbus)
-
-t_modbus.start()
-pyglet.app.run()
-
-# noinspection PyRedeclaration
-system_running = False

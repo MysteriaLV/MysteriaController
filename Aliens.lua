@@ -1,6 +1,7 @@
 local machine = require('statemachine')
 local rs485_node = require('rs485_node')
 
+--noinspection UnusedDef
 quest = machine.create({
     events = {
         { name = 'start', from = 'preparation', to = 'room1' },
@@ -39,9 +40,27 @@ quest = machine.create({
 })
 REGISTER_STATES("main_quest", quest)
 
+alien_arm = rs485_node.create({
+    name = 'alien_arm',
+    slave_id = 1,
+    actions = {
+        { name = 'activate', action_id = 1 },
+        { name = 'deactivate', action_id = 2 },
+        { name = 'reset', action_id = 3 },
+    },
+    events = {
+        { name = 'complete', register_id = 1 }
+    },
+    callbacks = {
+        on_complete = function(self)
+            quest:unlocked_door()
+        end
+    }
+})
+
 lights = rs485_node.create({
     name = 'lights',
-    slave_id = 1,
+    slave_id = 10,
     actions = {
         { name = 'full_lights', action_id = 1 },
         { name = 'ambient_lights', action_id = 2 },
@@ -61,7 +80,9 @@ door = rs485_node.create({
         { name = 'door_was_unlocked', register_id = 101 }
     },
     callbacks = {
-        on_door_was_unlocked = quest:unlocked_door,
+        on_door_was_unlocked = function(self)
+            quest:unlocked_door()
+        end
     }
 })
 
@@ -77,7 +98,9 @@ destruction_code_panel = rs485_node.create({
         { name = 'incorrect_code_entered', register_id = 102 }
     },
     callbacks = {
-        on_correct_code_entered = quest:entered_code,
+        on_correct_code_entered = function(self)
+            quest:entered_code()
+        end,
         on_incorrect_code_entered = function(self)
             --TODO play sound
         end,
