@@ -28,7 +28,7 @@ quest = machine.create({
         end,
     }
 })
--- REGISTER_STATES("main_quest", quest)
+REGISTER_STATES("main_quest", quest)
 
 alien_arm = rs485_node.create({
     name = 'alien_arm',
@@ -37,7 +37,7 @@ alien_arm = rs485_node.create({
     events = {
         { name = 'activate', action_id = 1, from = 'inactive', to = 'active' },
         { name = 'deactivate', action_id = 2, from = { 'active', 'completed' }, to = 'inactive' },
-        { name = 'complete', action_id = 3, triggered_by_register = 1, from = 'active', to = 'completed' },
+        { name = 'complete', triggered_by_register = 1, from = 'active', to = 'completed' },
         { name = 'reset', action_id = 4, from = '*', to = 'active' },
     },
     callbacks = {
@@ -48,5 +48,3 @@ alien_arm = rs485_node.create({
 --Fire off main initialization machine
 quest:restart()
 
---quest:start()
---alien_arm:complete()

@@ -7,7 +7,6 @@
 </head>
 
 <body>
-<a href="javascript://" onclick="Sijax.request('sayHi');">Say Hi!</a>
 
 <H1>State machines</H1>
 {% for fsm_name in state.fsms %}
@@ -16,7 +15,7 @@
     <span class="fsm.name">{{ fsm_name }} : {{ fsm.current  }}</span>
     <ul>
         {% for event in fsm.events %}
-        <li>{{ event }}</li>
+        <li><a onclick="Sijax.request('fire_event_fsm', ['{{ fsm_name }}', '{{ event }}'])"> {{ event }}</a></li>
         {% endfor %}
     </ul>
 </div>
@@ -26,10 +25,15 @@
 {% for slave_id in state.modbus.slaves %}
 {% set slave = state.modbus.slaves[slave_id] %}
 <div id="slave.{{ slave_id }}">
-    <span class="slave.name">{{ slave.name }} : {{ slave.current }}</span>
+    <span class="slave.name">{{ slave.name }} : {{ slave.fsm.current }}</span>
     <span class="slave.errors">Remote errors: {{ state.modbus.get_remote_errors(slave) }} </span>
     <span class="slave.errors">Local errors: {{ slave.errors }} </span>
 </div>
+<ul>
+    {% for event in slave.fsm.events %}
+    <li><a onclick="Sijax.request('fire_event_modbus_fsm', ['{{ slave_id }}', '{{ event }}'])"> {{ event }}</a></li>
+    {% endfor %}
+</ul>
 {% endfor %}
 
 </body>
