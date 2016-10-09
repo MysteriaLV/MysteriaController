@@ -16,10 +16,7 @@ pyglet.lib.load_library('avbin')
 pyglet.have_avbin = True
 # pyglet.options['debug_media'] = True
 
-logging.basicConfig(
-    level=logging.DEBUG,
-    format='(%(threadName)-10s) %(message)s',
-)
+
 
 window = pyglet.window.Window(width=1280, height=720)
 player_main = pyglet.media.Player()

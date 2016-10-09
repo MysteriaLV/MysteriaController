@@ -11,6 +11,7 @@
           <option value="lv.mysteria.my_pygame.StaticState.distort" />
           <option value="lv.mysteria.my_pygame.StaticState.*" />
           <option value="lv.mysteria.my_pygame.VideoState.*" />
+          <option value="lupa.*" />
         </list>
       </option>
     </inspection_tool>

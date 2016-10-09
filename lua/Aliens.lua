@@ -1,5 +1,5 @@
-local machine = require('statemachine')
-local rs485_node = require('rs485_node')
+local machine = require('lua/statemachine')
+local rs485_node = require('lua/rs485_node')
 
 --noinspection UnusedDef
 quest = machine.create({
