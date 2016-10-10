@@ -11,12 +11,11 @@ function rs485.create(options)
 
     REGISTER_MODBUS_SLAVE(my_node)
 
-    -- TODO add callbacks
+    -- TODO add callbacks, save triggers etc
     for _, event in ipairs(options.events or {}) do
         if event.action_id then
             my_node["on_" .. event.name] = function()
                 MODBUS_ACTION(my_node.slave_id, event.action_id)
-                print ("AdAA")
             end
         end
     end

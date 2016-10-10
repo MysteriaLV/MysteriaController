@@ -95,6 +95,7 @@ function machine.create(options)
         fsm[name] = fsm[name] or create_transition(name)
         fsm.events[name] = fsm.events[name] or { map = {} }
         add_to_map(fsm.events[name].map, event)
+        fsm.events[name].config = event
     end
 
     for name, callback in pairs(options.callbacks or {}) do

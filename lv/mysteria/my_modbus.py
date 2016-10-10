@@ -5,14 +5,13 @@ from collections import namedtuple
 
 import minimalmodbus
 
-ACTION_REGISTER = 1
+ACTION_REGISTER = 0
 
 
 class ModBus(object):
     def __init__(self, port='COM3'):
         self.port = port
         minimalmodbus.BAUDRATE = 57600
-        # instrument.debug = True
 
         self.slaves = {}
         self.running = True
@@ -23,6 +22,13 @@ class ModBus(object):
                 slave.last_data = slave.current_data
                 try:
                     slave.current_data = slave.modbus.read_registers(0, slave.reg_count)
+                    if slave.last_data:
+                        for i in slave.fsm['events'].values():
+                            if i.config.triggered_by_register:
+                                if slave.last_data[i.config.triggered_by_register] != \
+                                        slave.current_data[i.config.triggered_by_register]:
+                                    # We got a value change on a register we monitor
+                                    slave.fsm['on_' + i.config.name]()
                 except IOError:
                     logging.warn("Timeout for {}".format(slave.name))
                     slave.errors += 1
@@ -36,7 +42,7 @@ class ModBus(object):
         slave.name = lua_slave['name'] or 'Slave {}'.format(slave_id)
         slave.modbus = minimalmodbus.Instrument(self.port, slave_id)
         slave.reg_count = sum(
-            1 for i in lua_slave['events'] if i is 'triggered_by_register') + 2  # ACTIONS and TOTAL_ERRORS
+            1 for i in lua_slave['events'].values() if i.config.triggered_by_register) + 2  # ACTIONS and TOTAL_ERRORS
         slave.errors = 0
         slave.fsm = lua_slave
         slave.last_data = slave.current_data = []
