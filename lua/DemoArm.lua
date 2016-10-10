@@ -23,8 +23,6 @@ quest = machine.create({
             print('Arm solved, thanks')
 
             alien_arm:deactivate()
-
-            --TODO timer lights:ambient_lights()
         end,
     }
 })

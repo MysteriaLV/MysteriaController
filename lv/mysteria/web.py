@@ -3,7 +3,6 @@ import os
 import flask_sijax
 from flask import Flask, render_template, g
 
-
 app = Flask(__name__)
 app.game_state = None
 
@@ -27,3 +26,8 @@ def index():
         return g.sijax.process_request()
 
     return render_template('page.html', state=app.game_state)
+
+
+def eternal_flask_app(**kwargs):
+    while True:
+        app.run(**kwargs)

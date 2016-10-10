@@ -3,7 +3,7 @@ import threading
 
 from my_modbus import ModBus
 from state import GameState
-from web import app as Flask
+from web import app as flask, eternal_flask_app
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -12,12 +12,11 @@ logging.basicConfig(
 
 
 def main():
-    flask = Flask
     modbus = ModBus()
     # hud = HUD
     flask.game_state = GameState(modbus)
     t_modbus = threading.Thread(name='modbus', target=modbus.processor)
-    t_flask = threading.Thread(name='flask', target=flask.run,
+    t_flask = threading.Thread(name='flask', target=eternal_flask_app,
                                kwargs={'port': 5555, 'debug': True, 'use_reloader': False})
     t_modbus.start()
     t_flask.start()

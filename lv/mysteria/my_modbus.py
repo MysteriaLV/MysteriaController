@@ -25,10 +25,10 @@ class ModBus(object):
                     if slave.last_data:
                         for i in slave.fsm['events'].values():
                             if i.config.triggered_by_register:
-                                if slave.last_data[i.config.triggered_by_register] != \
-                                        slave.current_data[i.config.triggered_by_register]:
-                                    # We got a value change on a register we monitor
-                                    slave.fsm['on_' + i.config.name]()
+                                if slave.current_data[i.config.triggered_by_register] and \
+                                        not slave.last_data[i.config.triggered_by_register]:
+                                    # We got a value change to TRUE on a register we monitor
+                                    slave.fsm['on_' + i.config.name](slave.current_data[i.config.triggered_by_register])
                 except IOError:
                     logging.warn("Timeout for {}".format(slave.name))
                     slave.errors += 1

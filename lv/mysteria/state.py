@@ -1,6 +1,5 @@
 import logging
 
-import lupa
 from lupa import LuaRuntime
 
 lua = LuaRuntime(unpack_returned_tuples=True)
@@ -14,7 +13,7 @@ class GameState(object):
         lua.globals()['REGISTER_STATES'] = self.register_fsm
         lua.globals()['REGISTER_MODBUS_SLAVE'] = self.register_slave_lua
         lua.globals()['MODBUS_ACTION'] = self.modbus.send_action
-        lua.globals()['print'] = logging.info
+        lua.globals()['print'] = logging.getLogger('lua').info
         lua.execute(open('lua/DemoArm.lua', 'r').read())
 
         # lua.execute('alien_arm.complete()')
@@ -28,5 +27,4 @@ class GameState(object):
         self.fsms[name] = fsm
 
     def fire_event(self, fsm_name, event):
-        print lua.eval('alien_arm:on_activate()')
         return self.fsms[fsm_name][event](self.fsms[fsm_name])
