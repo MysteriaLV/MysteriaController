@@ -31,12 +31,12 @@ REGISTER_STATES("main_quest", quest)
 alien_arm = rs485_node.create({
     name = 'alien_arm',
     slave_id = 1,
-    initial = 'active',
+    initial = 'inactive',
     events = {
         { name = 'activate', action_id = 1, from = 'inactive', to = 'active' },
         { name = 'deactivate', action_id = 2, from = { 'active', 'completed' }, to = 'inactive' },
         { name = 'complete', triggered_by_register = 1, from = 'active', to = 'completed' },
-        { name = 'reset', action_id = 4, from = '*', to = 'active' },
+        { name = 'reset', action_id = 4, from = '*', to = 'inactive' },
     },
     callbacks = {
         on_complete = function() quest:solved_alien_arm() end
