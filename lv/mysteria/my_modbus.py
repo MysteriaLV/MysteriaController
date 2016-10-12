@@ -49,17 +49,23 @@ class ModBus(object):
         self.slaves[slave_id] = slave
 
     def send_action(self, slave_id, action_id):
+        slave = self.slaves[slave_id]
         try:
-            if not self.slaves[slave_id].current_data[ACTION_REGISTER] == 0:
+            if not slave.current_data[ACTION_REGISTER] == 0:
                 logging.warn(
                     "Sending action {} to {} while it apparently didn't finish processing previous action {}".format(
-                        action_id, slave_id, self.slaves[slave_id].current_data[ACTION_REGISTER]))
+                        action_id, slave_id, slave.current_data[ACTION_REGISTER]))
         except IndexError:
             pass
 
-        # self.slaves[slave_id].modbus.debug = True
-        self.slaves[slave_id].modbus.write_register(ACTION_REGISTER, action_id, functioncode=6)
-        # self.slaves[slave_id].modbus.debug = False
+        try:
+            # self.slaves[slave_id].modbus.debug = True
+            slave.modbus.write_register(ACTION_REGISTER, action_id, functioncode=6)
+            # self.slaves[slave_id].modbus.debug = False
+        except IOError:
+            # TODO add to retry queue?
+            logging.error("Cannot send {} to {}".format(action_id, slave.name))
+            slave.errors += 1
 
     @staticmethod
     def get_remote_errors(slave):
