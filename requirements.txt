@@ -5,10 +5,10 @@ flask-sijax
 pyglet
 transitions
 
-psutil
-memory_profiler
-pympler
-pydevd
+# psutil
+# memory_profiler
+# pympler
+# pydevd
 
 pyserial
 minimalmodbus
