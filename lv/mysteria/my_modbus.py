@@ -69,7 +69,8 @@ class ModBus(object):
 
     @staticmethod
     def get_remote_errors(slave):
-        return slave.current_data[slave.reg_count - 1]
+        if slave.current_data:
+            return slave.current_data[slave.reg_count - 1]
 
     def fire_event(self, slave_id, event):
         return self.slaves[slave_id].fsm[event](self.slaves[slave_id].fsm)

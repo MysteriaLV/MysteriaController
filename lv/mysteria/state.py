@@ -14,7 +14,7 @@ class GameState(object):
         lua.globals()['REGISTER_MODBUS_SLAVE'] = self.register_slave_lua
         lua.globals()['MODBUS_ACTION'] = self.modbus.send_action
         lua.globals()['print'] = logging.getLogger('lua').info
-        lua.execute(open('lua/DemoArm.lua', 'r').read())
+        lua.execute(open('lua/Aliens.lua', 'r').read())
 
         # lua.execute('alien_arm.complete()')
         # print lua.eval('quest')
