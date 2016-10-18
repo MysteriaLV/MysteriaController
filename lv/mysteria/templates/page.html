@@ -6,42 +6,46 @@
     <script type="text/javascript">        {{ g.sijax.get_js()|safe }}    </script>
     <style>
 body {
-    background-color: #fff;
-    font: 15px arial, sans-serif;
-    position: absolute;
-    text-align: center;
-    margin-left: 13%;
+	font-family: Times, sans-serif;
+	margin: 25px 25px;
 }
-
-h1 {
-    text-transform: uppercase;
-    padding: 100px 0px 25px;
-    font-size: 44px;
-}
-
 div {
-    border: 5px dotted #000;
-    border-bottom: hidden;
-    padding: 25px;
-    margin-top: 100px;
+    width: 100%;
+    height: 200px;
+	text-align: center;
 }
-
+div div {
+    width: 25%;
+    outline: hidden;
+    float: left;
+}
 span {
-    margin: 10px 5px;
-    display: block;
-    font-size: 16px;
+	display: block;
 }
-
 li {
-    background-color: #9a9aaf;
-    border-style: groove;
-    color: white;
-    padding: 10px 25px;
-    margin: 0px 30px;
+   border-top: 1px solid #1d1e1f;
+   background: #b5b5b5;
+   background: -webkit-gradient(linear, left top, left bottom, from(#778187), to(#b5b5b5));
+   background: -webkit-linear-gradient(top, #778187, #b5b5b5);
+   background: -moz-linear-gradient(top, #778187, #b5b5b5);
+   background: -ms-linear-gradient(top, #778187, #b5b5b5);
+   background: -o-linear-gradient(top, #778187, #b5b5b5);
+   padding: 6.5px 13px;
+   -webkit-border-radius: 40px;
+   -moz-border-radius: 40px;
+   border-radius: 40px;
+   -webkit-box-shadow: rgba(0,0,0,1) 0 1px 0;
+   -moz-box-shadow: rgba(0,0,0,1) 0 1px 0;
+   box-shadow: rgba(0,0,0,1) 0 1px 0;
+   text-shadow: rgba(0,0,0,.4) 0 1px 0;
+   color: #ffffff;
+   font-size: 12px;
+   font-family: Helvetica, Arial, Sans-Serif;
+   text-decoration: none;
+	margin-bottom: 5px;
     text-align: center;
-    text-shadow: 1px 1px 0 #000;
     display: inline-block;
-    font-size: 24px;
+    font-size: 12px;
 }
 
 
@@ -53,33 +57,37 @@ li {
 <body>
 
 <H1>State machines</H1>
-{% for fsm_name in state.fsms %}
-{% set fsm = state.fsms[fsm_name] %}
-<div id="fsm.{{ fsm }}">
-    <span class="fsm.name">{{ fsm_name }} : {{ fsm.current  }}</span>
-    <ul>
-        {% for event in fsm.events %}
-        <li><a onclick="Sijax.request('fire_event_fsm', ['{{ fsm_name }}', '{{ event }}'])"> {{ event }}</a></li>
-        {% endfor %}
-    </ul>
+<div>
+    {% for fsm_name in state.fsms %}
+    {% set fsm = state.fsms[fsm_name] %}
+    <div id="fsm.{{ fsm_name }}">
+        <span class="fsm.name">{{ fsm_name }} : {{ fsm.current  }}</span>
+        <ul>
+            {% for event in fsm.events %}
+            <li><a onclick="Sijax.request('fire_event_fsm', ['{{ fsm_name }}', '{{ event }}'])"> {{ event }}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endfor %}
 </div>
-{% endfor %}
 
 <H1>Peripherals</H1>
-{% for slave_id in state.modbus.slaves %}
-{% set slave = state.modbus.slaves[slave_id] %}
-<div id="slave.{{ slave_id }}">
-    <span class="slave.name">{{ slave.name }} : {{ slave.fsm.current }}</span>
-    <span class="slave.errors">Remote errors: {{ state.modbus.get_remote_errors(slave) }} </span>
-    <span class="slave.errors">Local errors: {{ slave.errors }} </span>
-    <span class="slave.data">Current data: {{ slave.current_data }} </span>
-</div>
-<ul>
-    {% for event in slave.fsm.events %}
-    <li><a onclick="Sijax.request('fire_event_modbus_fsm', ['{{ slave_id }}', '{{ event }}'])"> {{ event }}</a></li>
+<div>
+    {% for slave_id in state.modbus.slaves %}
+    {% set slave = state.modbus.slaves[slave_id] %}
+    <div id="slave.{{ slave_id }}">
+        <span class="slave.name">{{ slave.name }} : {{ slave.fsm.current }}</span>
+        <span class="slave.errors">Remote errors: {{ state.modbus.get_remote_errors(slave) }} </span>
+        <span class="slave.errors">Local errors: {{ slave.errors }} </span>
+        <span class="slave.data">Current data: {{ slave.current_data }} </span>
+        <ul>
+            {% for event in slave.fsm.events %}
+            <li><a onclick="Sijax.request('fire_event_modbus_fsm', ['{{ slave_id }}', '{{ event }}'])"> {{ event }}</a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
     {% endfor %}
-</ul>
-{% endfor %}
-
+</div>
 </body>
 </html>
