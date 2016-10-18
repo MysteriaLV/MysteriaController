@@ -61,7 +61,7 @@ li {
     {% for fsm_name in state.fsms %}
     {% set fsm = state.fsms[fsm_name] %}
     <div id="fsm.{{ fsm_name }}">
-        <span class="fsm.name">{{ fsm_name }} : {{ fsm.current  }}</span>
+        <span class="fsm.name">{{ fsm_name }}</span>: <span class="fsm.status"> {{ fsm.current  }}</span>
         <ul>
             {% for event in fsm.events %}
             <li><a onclick="Sijax.request('fire_event_fsm', ['{{ fsm_name }}', '{{ event }}'])"> {{ event }}</a></li>
@@ -76,7 +76,7 @@ li {
     {% for slave_id in state.modbus.slaves %}
     {% set slave = state.modbus.slaves[slave_id] %}
     <div id="slave.{{ slave_id }}">
-        <span class="slave.name">{{ slave.name }} : {{ slave.fsm.current }}</span>
+        <span class="slave.name">{{ slave.name }}</span>: <span class="slave.status">{{ slave.fsm.current }}</span>
         <span class="slave.errors">Remote errors: {{ state.modbus.get_remote_errors(slave) }} </span>
         <span class="slave.errors">Local errors: {{ slave.errors }} </span>
         <span class="slave.data">Current data: {{ slave.current_data }} </span>
