@@ -1,0 +1,85 @@
+<!doctype html>
+<html>
+<head>
+    <script type="text/javascript" src="/static/js/jquery.min.js"></script>
+    <script type="text/javascript" src="/static/js/sijax/sijax.js"></script>
+    <script type="text/javascript">        {{ g.sijax.get_js()|safe }}    </script>
+    <style>
+body {
+    background-color: #fff;
+    font: 15px arial, sans-serif;
+    position: absolute;
+    text-align: center;
+    margin-left: 13%;
+}
+
+h1 {
+    text-transform: uppercase;
+    padding: 100px 0px 25px;
+    font-size: 44px;
+}
+
+div {
+    border: 5px dotted #000;
+    border-bottom: hidden;
+    padding: 25px;
+    margin-top: 100px;
+}
+
+span {
+    margin: 10px 5px;
+    display: block;
+    font-size: 16px;
+}
+
+li {
+    background-color: #9a9aaf;
+    border-style: groove;
+    color: white;
+    padding: 10px 25px;
+    margin: 0px 30px;
+    text-align: center;
+    text-shadow: 1px 1px 0 #000;
+    display: inline-block;
+    font-size: 24px;
+}
+
+
+
+
+    </style>
+</head>
+
+<body>
+
+<H1>State machines</H1>
+{% for fsm_name in state.fsms %}
+{% set fsm = state.fsms[fsm_name] %}
+<div id="fsm.{{ fsm }}">
+    <span class="fsm.name">{{ fsm_name }} : {{ fsm.current  }}</span>
+    <ul>
+        {% for event in fsm.events %}
+        <li><a onclick="Sijax.request('fire_event_fsm', ['{{ fsm_name }}', '{{ event }}'])"> {{ event }}</a></li>
+        {% endfor %}
+    </ul>
+</div>
+{% endfor %}
+
+<H1>Peripherals</H1>
+{% for slave_id in state.modbus.slaves %}
+{% set slave = state.modbus.slaves[slave_id] %}
+<div id="slave.{{ slave_id }}">
+    <span class="slave.name">{{ slave.name }} : {{ slave.fsm.current }}</span>
+    <span class="slave.errors">Remote errors: {{ state.modbus.get_remote_errors(slave) }} </span>
+    <span class="slave.errors">Local errors: {{ slave.errors }} </span>
+    <span class="slave.data">Current data: {{ slave.current_data }} </span>
+</div>
+<ul>
+    {% for event in slave.fsm.events %}
+    <li><a onclick="Sijax.request('fire_event_modbus_fsm', ['{{ slave_id }}', '{{ event }}'])"> {{ event }}</a></li>
+    {% endfor %}
+</ul>
+{% endfor %}
+
+</body>
+</html>
