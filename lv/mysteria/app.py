@@ -5,9 +5,10 @@ from my_modbus import ModBus
 from state import GameState
 from web import app as flask, eternal_flask_app
 
+
 logging.basicConfig(
     level=logging.DEBUG,
-    format='(%(threadName)-10s) %(message)s',
+    format='(%(threadName)-10s) [%(levelname)-7s] %(message)s - %(funcName)s',
 )
 
 
@@ -28,4 +29,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

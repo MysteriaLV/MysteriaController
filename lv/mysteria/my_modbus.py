@@ -9,7 +9,7 @@ ACTION_REGISTER = 0
 
 
 class ModBus(object):
-    def __init__(self, port='COM3'):
+    def __init__(self, port='COM4'):
         self.port = port
         minimalmodbus.BAUDRATE = 57600
 
@@ -31,6 +31,9 @@ class ModBus(object):
                                     slave.fsm['on_' + i.config.name](slave.current_data[i.config.triggered_by_register])
                 except IOError:
                     logging.warn("Timeout for {}".format(slave.name))
+                    slave.errors += 1
+                except ValueError as e:
+                    logging.error("Exception {} for {}".format(e, slave.name))
                     slave.errors += 1
 
             time.sleep(1)

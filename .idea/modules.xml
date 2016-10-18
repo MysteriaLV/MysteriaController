@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/LuaTest.iml" filepath="$PROJECT_DIR$/LuaTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/MysteriaController.iml" filepath="$PROJECT_DIR$/.idea/MysteriaController.iml" />
     </modules>
   </component>
 </project>
