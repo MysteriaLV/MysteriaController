@@ -24,18 +24,36 @@ void process_actions() {
   switch (holdingRegs[ACTIONS]) {
     case 1 : // Go_dim
       // Put here code for Go_dim
+      // gpioWrite(1, LED_BUILTIN);
       break;
     case 2 : // Go_normal
       // Put here code for Go_normal
+      // gpioWrite(1, LED_BUILTIN);
       break;
     case 3 : // Go_alarms
       // Put here code for Go_alarms
+      // gpioWrite(1, LED_BUILTIN);
       break;
     }
 
   // Signal that action was processed
   holdingRegs[ACTIONS] = 0;
 }
+
+// Just debug functions for easy testing. Won't be used probably
+/* Holds current button state in register */
+void buttonStatus(int reg, int pin) { // LOOP
+  holdingRegs[reg] = digitalRead(pin);
+}
+void buttonStatus_setup(int reg, int pin) { // SETUP
+  pinMode(pin, INPUT_PULLUP);
+}
+
+/* Outputs register value to pin */
+void gpioWrite(int reg, int pin) {
+  digitalWrite(pin, holdingRegs[reg]);
+}
+/////////////////////////////////////////////////////////////////
 
 void setup()
 {
@@ -47,7 +65,9 @@ void setup()
 
   modbus_configure(57600, 2, 3, TOTAL_REGS_SIZE);
   holdingRegs[ACTIONS] = 0;
-  }
+  // Debug sample calls
+  // buttonStatus_setup(, <buttonPin>);
+}
 
 
 void loop()
@@ -57,4 +77,7 @@ void loop()
 
   // Notify main console of local events
   
+
+  // Debug sample calls
+  // buttonStatus(, <buttonPin>);
 }

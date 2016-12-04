@@ -27,6 +27,7 @@ void process_actions() {
     {% for action_id, action in actions.items() -%}
     case {{ action_id }} : // {{ action }}
       // Put here code for {{ action }}
+      // gpioWrite(1, LED_BUILTIN);
       break;
     {% endfor -%}
   }
@@ -34,6 +35,21 @@ void process_actions() {
   // Signal that action was processed
   holdingRegs[ACTIONS] = 0;
 }
+
+// Just debug functions for easy testing. Won't be used probably
+/* Holds current button state in register */
+void buttonStatus(int reg, int pin) { // LOOP
+  holdingRegs[reg] = digitalRead(pin);
+}
+void buttonStatus_setup(int reg, int pin) { // SETUP
+  pinMode(pin, INPUT_PULLUP);
+}
+
+/* Outputs register value to pin */
+void gpioWrite(int reg, int pin) {
+  digitalWrite(pin, holdingRegs[reg]);
+}
+/////////////////////////////////////////////////////////////////
 
 void setup()
 {
@@ -48,6 +64,9 @@ void setup()
   {% for event_id, event in events.items() -%}
   holdingRegs[{{ event }}] = 0;
   {% endfor -%}
+
+  // Debug sample calls
+  // buttonStatus_setup({{ events[1] }}, <buttonPin>);
 }
 
 
@@ -60,4 +79,7 @@ void loop()
   {% for event_id, event in events.items() -%}
   // holdingRegs[{{ event }}] = <data>;
   {% endfor %}
+
+  // Debug sample calls
+  // buttonStatus({{ events[1] }}, <buttonPin>);
 }

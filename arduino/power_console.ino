@@ -26,15 +26,32 @@ void process_actions() {
   switch (holdingRegs[ACTIONS]) {
     case 1 : // Reset
       // Put here code for Reset
+      // gpioWrite(1, LED_BUILTIN);
       break;
     case 2 : // Connect
       // Put here code for Connect
+      // gpioWrite(1, LED_BUILTIN);
       break;
     }
 
   // Signal that action was processed
   holdingRegs[ACTIONS] = 0;
 }
+
+// Just debug functions for easy testing. Won't be used probably
+/* Holds current button state in register */
+void buttonStatus(int reg, int pin) { // LOOP
+  holdingRegs[reg] = digitalRead(pin);
+}
+void buttonStatus_setup(int reg, int pin) { // SETUP
+  pinMode(pin, INPUT_PULLUP);
+}
+
+/* Outputs register value to pin */
+void gpioWrite(int reg, int pin) {
+  digitalWrite(pin, holdingRegs[reg]);
+}
+/////////////////////////////////////////////////////////////////
 
 void setup()
 {
@@ -48,7 +65,9 @@ void setup()
   holdingRegs[ACTIONS] = 0;
   holdingRegs[CONNECT] = 0;
   holdingRegs[POWER_ON] = 0;
-  }
+  // Debug sample calls
+  // buttonStatus_setup(CONNECT, <buttonPin>);
+}
 
 
 void loop()
@@ -60,4 +79,7 @@ void loop()
   // holdingRegs[CONNECT] = <data>;
   // holdingRegs[POWER_ON] = <data>;
   
+
+  // Debug sample calls
+  // buttonStatus(CONNECT, <buttonPin>);
 }

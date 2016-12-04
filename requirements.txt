@@ -11,4 +11,5 @@ transitions
 # pydevd
 
 pyserial
-minimalmodbus
+pymodbus
+# minimalmodbus

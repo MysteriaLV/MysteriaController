@@ -25,12 +25,28 @@ void process_actions() {
   switch (holdingRegs[ACTIONS]) {
     case 1 : // Reset
       // Put here code for Reset
+      // gpioWrite(1, LED_BUILTIN);
       break;
     }
 
   // Signal that action was processed
   holdingRegs[ACTIONS] = 0;
 }
+
+// Just debug functions for easy testing. Won't be used probably
+/* Holds current button state in register */
+void buttonStatus(int reg, int pin) { // LOOP
+  holdingRegs[reg] = digitalRead(pin);
+}
+void buttonStatus_setup(int reg, int pin) { // SETUP
+  pinMode(pin, INPUT_PULLUP);
+}
+
+/* Outputs register value to pin */
+void gpioWrite(int reg, int pin) {
+  digitalWrite(pin, holdingRegs[reg]);
+}
+/////////////////////////////////////////////////////////////////
 
 void setup()
 {
@@ -43,7 +59,9 @@ void setup()
   modbus_configure(57600, 8, 3, TOTAL_REGS_SIZE);
   holdingRegs[ACTIONS] = 0;
   holdingRegs[COMPLETE] = 0;
-  }
+  // Debug sample calls
+  // buttonStatus_setup(COMPLETE, <buttonPin>);
+}
 
 
 void loop()
@@ -54,4 +72,7 @@ void loop()
   // Notify main console of local events
   // holdingRegs[COMPLETE] = <data>;
   
+
+  // Debug sample calls
+  // buttonStatus(COMPLETE, <buttonPin>);
 }
