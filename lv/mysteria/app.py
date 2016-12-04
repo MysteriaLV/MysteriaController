@@ -7,7 +7,7 @@ from web import app as flask, eternal_flask_app
 
 logging.basicConfig(
     level=logging.DEBUG,
-    format='(%(threadName)-10s) %(message)s',
+    format='(%(threadName)-10s) [%(name)s] %(message)s',
 )
 
 
