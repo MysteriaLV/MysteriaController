@@ -1,9 +1,6 @@
 import logging
 import random
-import threading
-import time
 
-import minimalmodbus
 import pyglet
 from pympler import tracker
 
@@ -20,7 +17,8 @@ pyglet.have_avbin = True
 
 window = pyglet.window.Window(width=1280, height=720)
 player_main = pyglet.media.Player()
-#
+player_main.volume = 0
+
 # screen = pyglet.window.get_platform().get_default_display().get_screens()[2]
 # window2 = pyglet.window.Window(screen=screen, fullscreen=True)
 # player_window2 = pyglet.media.load("test_evil.wmv").play()
@@ -39,13 +37,17 @@ class CleanupSourceGroup(pyglet.media.SourceGroup):
             del old_source
 
 
-v1 = pyglet.media.load("idle/1{}.mp4".format(random.randint(1, 4)))
+VID_SOURCE = "idle/1{}.mp4"
+
+v1 = pyglet.media.load(VID_SOURCE.format(random.randint(1, 4)))
 idle_sourcegroup = CleanupSourceGroup(v1.audio_format, v1.video_format)
+# idle_sourcegroup = CleanupSourceGroup(None, v1.video_format)
 del v1
 
 player_of_static = pyglet.media.Player()
 player_of_static.queue(pyglet.media.load("static720.avi"))
 
+player_music = pyglet.media.Player()
 
 # noinspection PyMethodMayBeStatic
 class StaticState(object):
@@ -164,7 +166,7 @@ def add_static(dt):
 ################################
 @player_main.event('on_eos')
 def queue_next_idle_video():
-    idle_sourcegroup.queue(pyglet.media.load("idle/{}.mp4".format(random.randint(1, 4))))
+    idle_sourcegroup.queue(pyglet.media.load(VID_SOURCE.format(random.randint(1, 4))))
 
 
 player_main.queue(idle_sourcegroup)
@@ -173,9 +175,13 @@ queue_next_idle_video()
 
 player_main.play()
 
-pyglet.clock.schedule_interval(add_static, 5)
-pyglet.clock.schedule_interval(auto_distort_main, 0.1)
+# pyglet.clock.schedule_interval(add_static, 5)
+# pyglet.clock.schedule_interval(auto_distort_main, 0.1)
 
+player_music.queue(pyglet.media.load("idle/music1_left.mp3"))
+player_music.play()
 
 HUD = pyglet.app
 
+if __name__ == '__main__':
+    HUD.run()
