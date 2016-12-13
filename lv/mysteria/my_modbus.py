@@ -3,7 +3,7 @@ import logging
 from collections import namedtuple
 
 import time
-from pymodbus.client.sync import ModbusSerialClient, ModbusUdpClient
+from pymodbus.client.sync import ModbusSerialClient, ModbusTcpClient
 from pymodbus.exceptions import ConnectionException
 
 ACTION_REGISTER = 0
@@ -18,7 +18,7 @@ class ModBus(object):
         # minimalmodbus.BAUDRATE = 57600
 
         self.serialModbus = ModbusSerialClient('rtu', timeout=0.2, port=port, baudrate=57600)
-        self.udpModbus = ModbusUdpClient('localhost', port=502)
+        self.udpModbus = ModbusTcpClient('192.168.118.56', port=502)
         # https://github.com/andresarmento/modbus-esp8266/  TCP
 
         self.slaves = {}
