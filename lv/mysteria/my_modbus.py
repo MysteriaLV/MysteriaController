@@ -4,6 +4,7 @@ from collections import namedtuple
 
 import time
 from pymodbus.client.sync import ModbusSerialClient, ModbusUdpClient
+from pymodbus.exceptions import ConnectionException
 
 ACTION_REGISTER = 0
 
@@ -28,7 +29,12 @@ class ModBus(object):
             for slave in self.slaves.values():
                 slave.last_data = slave.current_data
 
-                slave.current_data = self.serialModbus.read_holding_registers(0, slave.reg_count, unit=slave.slave_id)
+                try:
+                    slave.current_data = self.serialModbus.read_holding_registers(0, slave.reg_count,
+                                                                                  unit=slave.slave_id)
+                except ConnectionException:
+                    slave.current_data = None
+
                 if slave.current_data:
                     if slave.last_data:
                         for i in slave.fsm['events'].values():
@@ -70,7 +76,7 @@ class ModBus(object):
 
         try:
             self.serialModbus.write_register(ACTION_REGISTER, action_id, unit=slave.slave_id)
-        except IOError:
+        except ConnectionException:
             # TODO add to retry queue?
             logging.error("Cannot send {} to {}".format(action_id, slave.name))
             slave.errors += 1
