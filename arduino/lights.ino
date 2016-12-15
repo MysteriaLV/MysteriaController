@@ -22,16 +22,16 @@ void process_actions() {
     return;
 
   switch (holdingRegs[ACTIONS]) {
-    case 1 : // Go_dim
-      // Put here code for Go_dim
+    case 1 : // Put here code for Go_dim
+      Serial.println("[Go_dim] action fired");
       // gpioWrite(1, LED_BUILTIN);
       break;
-    case 2 : // Go_normal
-      // Put here code for Go_normal
+    case 2 : // Put here code for Go_normal
+      Serial.println("[Go_normal] action fired");
       // gpioWrite(1, LED_BUILTIN);
       break;
-    case 3 : // Go_alarms
-      // Put here code for Go_alarms
+    case 3 : // Put here code for Go_alarms
+      Serial.println("[Go_alarms] action fired");
       // gpioWrite(1, LED_BUILTIN);
       break;
     }
@@ -57,6 +57,9 @@ void gpioWrite(int reg, int pin) {
 
 void setup()
 {
+  Serial.begin(115200);
+  Serial.println("Serial ModBus Slave LIGHTS:2 for lua/Aliens.lua");
+
   /* parameters(long baudrate,
                 unsigned char ID,
                 unsigned char transmit enable pin,    (RX: 10, TX: 11 hardcoded in code)
@@ -65,7 +68,7 @@ void setup()
 
   modbus_configure(57600, 2, 3, TOTAL_REGS_SIZE);
   holdingRegs[ACTIONS] = 0;
-  // Debug sample calls
+  // Sample calls
   // buttonStatus_setup(, <buttonPin>);
 }
 
@@ -78,6 +81,6 @@ void loop()
   // Notify main console of local events
   
 
-  // Debug sample calls
+  // Sample calls
   // buttonStatus(, <buttonPin>);
 }

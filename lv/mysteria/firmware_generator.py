@@ -1,10 +1,14 @@
 import os
 
+import ipaddress
 import jinja2
 import lupa
 from lupa import LuaRuntime
 
 from state import LUA_SCENARIO
+
+TEMPLATE_SERIAL = 'arduino/_template_serial.ino.j2'
+TEMPLATE_TCP = 'arduino/_template_tcp.ino.j2'
 
 
 def render(tpl_path, context):
@@ -32,11 +36,22 @@ def register_slave_lua(slave):
 
     # TODO basic validation for identical event/action ids
     with open('arduino/{}.ino'.format(slave.name.lower()), 'w') as f:
-        f.write(render('arduino/_template.ino.j2', {
-            'name': slave.name.upper(),
+        def get_template(slave_id):
+            if type(slave_id) is int:
+                return TEMPLATE_SERIAL
+
+            assert ipaddress.ip_address(slave_id)
+            return TEMPLATE_TCP
+
+        f.write(render(get_template(slave.slave_id), {
+            'game': LUA_SCENARIO,
+            'slave_name': slave.name.upper(),
             'slave_id': slave.slave_id,
             'events': events,
             'actions': actions,
+
+            'wifi_sid': os.environ.get('WIFI_SID', 'ENTER_WIFI_SID'),
+            'wifi_pass': os.environ.get('WIFI_PASS', 'ENTER_WIFI_PASS')
         }))
 
 

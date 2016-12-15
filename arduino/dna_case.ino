@@ -1,5 +1,7 @@
-#include <SoftwareSerial.h>
-#include <SimpleModbusSlaveSoftwareSerial.h>
+#define USE_HOLDING_REGISTERS_ONLY
+#include <ESP8266WiFi.h>
+#include <Modbus.h>
+#include <ModbusIP_ESP8266.h>
 
 //////////////// registers of DNA_CASE ///////////////////
 enum
@@ -14,29 +16,29 @@ enum
   TOTAL_REGS_SIZE   // INTERNAL: total number of registers for function 3 and 16 share the same register array
 };
 
-unsigned int holdingRegs[TOTAL_REGS_SIZE]; // function 3 and 16 register array
-////////////////////////////////////////////////////////////
+//ModbusIP object
+ModbusIP mb;
 
 // Action handler. Add all your actions mapped by action_id in rs485_node of Lua script
 void process_actions() {
-  if (holdingRegs[ACTIONS] == 0)
+  if (mb.Hreg(ACTIONS) == 0)
     return;
 
-  switch (holdingRegs[ACTIONS]) {
-    case 1 : // Reset
-      // Put here code for Reset
+  switch (mb.Hreg(ACTIONS)) {
+    case 1 : // Put here code for Reset
+      Serial.println("[Reset] action fired");
       // gpioWrite(1, LED_BUILTIN);
       break;
     }
 
   // Signal that action was processed
-  holdingRegs[ACTIONS] = 0;
+  mb.Hreg(ACTIONS, 0);
 }
 
 // Just debug functions for easy testing. Won't be used probably
 /* Holds current button state in register */
 void buttonStatus(int reg, int pin) { // LOOP
-  holdingRegs[reg] = digitalRead(pin);
+  mb.Hreg(reg, pin);
 }
 void buttonStatus_setup(int reg, int pin) { // SETUP
   pinMode(pin, INPUT_PULLUP);
@@ -44,35 +46,50 @@ void buttonStatus_setup(int reg, int pin) { // SETUP
 
 /* Outputs register value to pin */
 void gpioWrite(int reg, int pin) {
-  digitalWrite(pin, holdingRegs[reg]);
+  digitalWrite(pin, mb.Hreg(reg));
 }
 /////////////////////////////////////////////////////////////////
 
 void setup()
 {
-  /* parameters(long baudrate,
-                unsigned char ID,
-                unsigned char transmit enable pin,    (RX: 10, TX: 11 hardcoded in code)
-                unsigned int holding registers size)
-  */
+  Serial.begin(115200);
+  Serial.println("TCP ModBus Slave DNA_CASE:192.168.118.56 for lua/Aliens.lua");
 
-  modbus_configure(57600, 5, 3, TOTAL_REGS_SIZE);
-  holdingRegs[ACTIONS] = 0;
-  holdingRegs[DELIVER_DNA] = 0;
-  // Debug sample calls
+  mb.config("MT29501119", "ENTER_WIFI_PASS");
+  WiFi.config(IPAddress(192, 168, 118, 56), IPAddress(), IPAddress(), IPAddress(), IPAddress());
+
+  Serial.print("Connecting to MT29501119 ");
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+ 
+  Serial.println(" CONNECTED!");
+  Serial.print("IP address: ");
+  Serial.println(WiFi.localIP());
+
+  Serial.print("Netmask: ");
+  Serial.println(WiFi.subnetMask());
+
+  Serial.print("Gateway: ");
+  Serial.println(WiFi.gatewayIP());
+
+  mb.addHreg(ACTIONS, 0);
+  mb.addHreg(DELIVER_DNA, 0);
+  // Sample calls
   // buttonStatus_setup(DELIVER_DNA, <buttonPin>);
 }
 
 
 void loop()
 {
-  holdingRegs[TOTAL_ERRORS] = modbus_update(holdingRegs);
+  mb.task();              // not implemented yet: mb.Hreg(TOTAL_ERRORS, mb.task());
   process_actions();
 
   // Notify main console of local events
-  // holdingRegs[DELIVER_DNA] = <data>;
+  // mb.Hreg(DELIVER_DNA, 1);
   
 
-  // Debug sample calls
+  // Sample calls
   // buttonStatus(DELIVER_DNA, <buttonPin>);
 }

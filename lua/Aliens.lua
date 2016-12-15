@@ -146,7 +146,7 @@ smoke_machine = rs485_node.create({
 ------------------------------- ROOM 2 -----------------------------------------------
 dna_case = rs485_node.create({
     name = 'dna_case',
-    slave_id = 5,
+    slave_id = '192.168.118.56',
     events = {
         { name = 'reset', action_id = 1, from = '*', to = 'active' },
         { name = 'deliver_dna', triggered_by_register = 1, from = 'active', to = 'completed' },

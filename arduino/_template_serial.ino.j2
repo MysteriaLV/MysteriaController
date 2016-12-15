@@ -1,7 +1,7 @@
 #include <SoftwareSerial.h>
 #include <SimpleModbusSlaveSoftwareSerial.h>
 
-//////////////// registers of {{ name }} ///////////////////
+//////////////// registers of {{ slave_name }} ///////////////////
 enum
 {
   // The first register starts at address 0
@@ -25,8 +25,8 @@ void process_actions() {
 
   switch (holdingRegs[ACTIONS]) {
     {% for action_id, action in actions.items() -%}
-    case {{ action_id }} : // {{ action }}
-      // Put here code for {{ action }}
+    case {{ action_id }} : // Put here code for {{ action }}
+      Serial.println("[{{ action }}] action fired");
       // gpioWrite(1, LED_BUILTIN);
       break;
     {% endfor -%}
@@ -53,6 +53,9 @@ void gpioWrite(int reg, int pin) {
 
 void setup()
 {
+  Serial.begin(115200);
+  Serial.println("Serial ModBus Slave {{ slave_name }}:{{ slave_id }} for {{ game }}");
+
   /* parameters(long baudrate,
                 unsigned char ID,
                 unsigned char transmit enable pin,    (RX: 10, TX: 11 hardcoded in code)
@@ -65,7 +68,7 @@ void setup()
   holdingRegs[{{ event }}] = 0;
   {% endfor -%}
 
-  // Debug sample calls
+  // Sample calls
   // buttonStatus_setup({{ events[1] }}, <buttonPin>);
 }
 
@@ -77,9 +80,9 @@ void loop()
 
   // Notify main console of local events
   {% for event_id, event in events.items() -%}
-  // holdingRegs[{{ event }}] = <data>;
+  // holdingRegs[{{ event }}] = 1;
   {% endfor %}
 
-  // Debug sample calls
+  // Sample calls
   // buttonStatus({{ events[1] }}, <buttonPin>);
 }

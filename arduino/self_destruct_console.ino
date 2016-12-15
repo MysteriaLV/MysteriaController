@@ -23,12 +23,12 @@ void process_actions() {
     return;
 
   switch (holdingRegs[ACTIONS]) {
-    case 1 : // Reset
-      // Put here code for Reset
+    case 1 : // Put here code for Reset
+      Serial.println("[Reset] action fired");
       // gpioWrite(1, LED_BUILTIN);
       break;
-    case 2 : // Open
-      // Put here code for Open
+    case 2 : // Put here code for Open
+      Serial.println("[Open] action fired");
       // gpioWrite(1, LED_BUILTIN);
       break;
     }
@@ -54,6 +54,9 @@ void gpioWrite(int reg, int pin) {
 
 void setup()
 {
+  Serial.begin(115200);
+  Serial.println("Serial ModBus Slave SELF_DESTRUCT_CONSOLE:6 for lua/Aliens.lua");
+
   /* parameters(long baudrate,
                 unsigned char ID,
                 unsigned char transmit enable pin,    (RX: 10, TX: 11 hardcoded in code)
@@ -63,7 +66,7 @@ void setup()
   modbus_configure(57600, 6, 3, TOTAL_REGS_SIZE);
   holdingRegs[ACTIONS] = 0;
   holdingRegs[SOLVE] = 0;
-  // Debug sample calls
+  // Sample calls
   // buttonStatus_setup(SOLVE, <buttonPin>);
 }
 
@@ -74,9 +77,9 @@ void loop()
   process_actions();
 
   // Notify main console of local events
-  // holdingRegs[SOLVE] = <data>;
+  // holdingRegs[SOLVE] = 1;
   
 
-  // Debug sample calls
+  // Sample calls
   // buttonStatus(SOLVE, <buttonPin>);
 }

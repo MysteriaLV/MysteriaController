@@ -24,12 +24,12 @@ void process_actions() {
     return;
 
   switch (holdingRegs[ACTIONS]) {
-    case 1 : // Reset
-      // Put here code for Reset
+    case 1 : // Put here code for Reset
+      Serial.println("[Reset] action fired");
       // gpioWrite(1, LED_BUILTIN);
       break;
-    case 2 : // Connect
-      // Put here code for Connect
+    case 2 : // Put here code for Connect
+      Serial.println("[Connect] action fired");
       // gpioWrite(1, LED_BUILTIN);
       break;
     }
@@ -55,6 +55,9 @@ void gpioWrite(int reg, int pin) {
 
 void setup()
 {
+  Serial.begin(115200);
+  Serial.println("Serial ModBus Slave POWER_CONSOLE:1 for lua/Aliens.lua");
+
   /* parameters(long baudrate,
                 unsigned char ID,
                 unsigned char transmit enable pin,    (RX: 10, TX: 11 hardcoded in code)
@@ -65,7 +68,7 @@ void setup()
   holdingRegs[ACTIONS] = 0;
   holdingRegs[CONNECT] = 0;
   holdingRegs[POWER_ON] = 0;
-  // Debug sample calls
+  // Sample calls
   // buttonStatus_setup(CONNECT, <buttonPin>);
 }
 
@@ -76,10 +79,10 @@ void loop()
   process_actions();
 
   // Notify main console of local events
-  // holdingRegs[CONNECT] = <data>;
-  // holdingRegs[POWER_ON] = <data>;
+  // holdingRegs[CONNECT] = 1;
+  // holdingRegs[POWER_ON] = 1;
   
 
-  // Debug sample calls
+  // Sample calls
   // buttonStatus(CONNECT, <buttonPin>);
 }

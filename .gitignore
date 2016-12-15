@@ -177,3 +177,4 @@ ENV/
 # Rope project settings
 .ropeproject
 
+/arduino/*.ino

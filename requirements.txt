@@ -12,4 +12,4 @@ transitions
 
 pyserial
 pymodbus
-# minimalmodbus
+ipaddress

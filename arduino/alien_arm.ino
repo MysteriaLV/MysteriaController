@@ -23,8 +23,8 @@ void process_actions() {
     return;
 
   switch (holdingRegs[ACTIONS]) {
-    case 1 : // Reset
-      // Put here code for Reset
+    case 1 : // Put here code for Reset
+      Serial.println("[Reset] action fired");
       // gpioWrite(1, LED_BUILTIN);
       break;
     }
@@ -50,6 +50,9 @@ void gpioWrite(int reg, int pin) {
 
 void setup()
 {
+  Serial.begin(115200);
+  Serial.println("Serial ModBus Slave ALIEN_ARM:8 for lua/Aliens.lua");
+
   /* parameters(long baudrate,
                 unsigned char ID,
                 unsigned char transmit enable pin,    (RX: 10, TX: 11 hardcoded in code)
@@ -59,7 +62,7 @@ void setup()
   modbus_configure(57600, 8, 3, TOTAL_REGS_SIZE);
   holdingRegs[ACTIONS] = 0;
   holdingRegs[COMPLETE] = 0;
-  // Debug sample calls
+  // Sample calls
   // buttonStatus_setup(COMPLETE, <buttonPin>);
 }
 
@@ -70,9 +73,9 @@ void loop()
   process_actions();
 
   // Notify main console of local events
-  // holdingRegs[COMPLETE] = <data>;
+  // holdingRegs[COMPLETE] = 1;
   
 
-  // Debug sample calls
+  // Sample calls
   // buttonStatus(COMPLETE, <buttonPin>);
 }

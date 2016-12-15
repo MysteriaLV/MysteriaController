@@ -15,11 +15,9 @@ pymodbus_logger.setLevel(logging.INFO)
 class ModBus(object):
     def __init__(self, port='COM3'):
         self.port = port
-        # minimalmodbus.BAUDRATE = 57600
 
         self.serialModbus = ModbusSerialClient('rtu', timeout=0.2, port=port, baudrate=57600)
         self.udpModbus = ModbusTcpClient('192.168.118.56', port=502)
-        # https://github.com/andresarmento/modbus-esp8266/  TCP
 
         self.slaves = {}
         self.running = True
