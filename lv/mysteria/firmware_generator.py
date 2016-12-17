@@ -35,7 +35,8 @@ def register_slave_lua(slave):
                for i in slave['events'].values() if i.config.action_id}
 
     # TODO basic validation for identical event/action ids
-    with open('arduino/{}.ino'.format(slave.name.lower()), 'w') as f:
+    os.mkdir('arduino/{}'.format(slave.name.lower()))
+    with open('arduino/{0}/{0}.ino'.format(slave.name.lower()), 'w') as f:
         def get_template(slave_id):
             if type(slave_id) is int:
                 return TEMPLATE_SERIAL
