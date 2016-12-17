@@ -2,8 +2,10 @@
 import logging
 from collections import namedtuple
 
+import ipaddress
 import time
 from pymodbus.client.sync import ModbusSerialClient, ModbusTcpClient
+from pymodbus.constants import Defaults
 from pymodbus.exceptions import ConnectionException
 
 ACTION_REGISTER = 0
@@ -16,11 +18,32 @@ class ModBus(object):
     def __init__(self, port='COM3'):
         self.port = port
 
-        self.serialModbus = ModbusSerialClient('rtu', timeout=0.2, port=port, baudrate=57600)
+        Defaults.Timeout = 0.2
+        self.serialModbus = ModbusSerialClient('rtu', port=port, baudrate=57600)
         self.udpModbus = ModbusTcpClient('192.168.118.56', port=502)
 
         self.slaves = {}
         self.running = True
+
+    def read_registers(self, slave):
+        if type(slave.slave_id) is int:
+            return self.serialModbus.read_holding_registers(0, slave.reg_count, unit=slave.slave_id)
+
+        assert ipaddress.ip_address(slave.slave_id)
+        self.udpModbus.close()
+        self.udpModbus.host = slave.slave_id
+        self.udpModbus.connect()
+        return self.udpModbus.read_holding_registers(0, slave.reg_count)
+
+    def write_action_register(self, value, slave):
+        if type(slave.slave_id) is int:
+            self.serialModbus.write_register(ACTION_REGISTER, value, unit=slave.slave_id)
+
+        assert ipaddress.ip_address(slave.slave_id)
+        self.udpModbus.close()
+        self.udpModbus.host = slave.slave_id
+        self.udpModbus.connect()
+        self.udpModbus.write_register(ACTION_REGISTER, value)
 
     def processor(self):
         while self.running:
@@ -28,8 +51,7 @@ class ModBus(object):
                 slave.last_data = slave.current_data
 
                 try:
-                    slave.current_data = self.serialModbus.read_holding_registers(0, slave.reg_count,
-                                                                                  unit=slave.slave_id)
+                    slave.current_data = self.read_registers(slave)
                 except ConnectionException:
                     slave.current_data = None
 
@@ -73,7 +95,7 @@ class ModBus(object):
             pass
 
         try:
-            self.serialModbus.write_register(ACTION_REGISTER, action_id, unit=slave.slave_id)
+            self.write_action_register(action_id, slave)
         except ConnectionException:
             # TODO add to retry queue?
             logging.error("Cannot send {} to {}".format(action_id, slave.name))
