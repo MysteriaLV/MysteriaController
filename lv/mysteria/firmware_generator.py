@@ -35,7 +35,9 @@ def register_slave_lua(slave):
                for i in slave['events'].values() if i.config.action_id}
 
     # TODO basic validation for identical event/action ids
-    os.mkdir('arduino/{}'.format(slave.name.lower()))
+    if not os.path.exists('arduino/{}'.format(slave.name.lower())):
+        os.mkdir('arduino/{}'.format(slave.name.lower()))
+
     with open('arduino/{0}/{0}.ino'.format(slave.name.lower()), 'w') as f:
         def get_template(slave_id):
             if type(slave_id) is int:
@@ -52,7 +54,9 @@ def register_slave_lua(slave):
             'actions': actions,
 
             'wifi_sid': os.environ.get('WIFI_SID', 'ENTER_WIFI_SID'),
-            'wifi_pass': os.environ.get('WIFI_PASS', 'ENTER_WIFI_PASS')
+            'wifi_pass': os.environ.get('WIFI_PASS', 'ENTER_WIFI_PASS'),
+
+            'ESP8266_DEBUG': os.environ.get('ESP8266_DEBUG', False),
         }))
 
 

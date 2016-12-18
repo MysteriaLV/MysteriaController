@@ -29,7 +29,9 @@ void process_actions() {
     {% for action_id, action in actions.items() -%}
     case {{ action_id }} : // Put here code for {{ action }}
       Serial.println("[{{ action }}] action fired");
-      // digitalWrite(LED_BUILTIN, {{ 'LOW' if action_id==1 else 'HIGH' }});
+      {%- if ESP8266_DEBUG %}
+      digitalWrite(LED_BUILTIN, {{ 'HIGH' if action_id==1 else 'LOW' }});
+      {% endif -%}
       break;
     {% endfor -%}
     }
@@ -38,7 +40,7 @@ void process_actions() {
   mb.Hreg(ACTIONS, 0);
 }
 
-// Just debug functions for easy testing. Won't be used probably
+{%- if ESP8266_DEBUG %}
 /* Holds current button state in register */
 void buttonStatus(int reg, int pin) { // LOOP
   mb.Hreg(reg, !digitalRead(pin));
@@ -52,6 +54,7 @@ void gpioWrite(int reg, int pin) {
   digitalWrite(pin, mb.Hreg(reg));
 }
 /////////////////////////////////////////////////////////////////
+{% endif -%}
 
 void setup()
 {
@@ -81,9 +84,14 @@ void setup()
   {% for event_id, event in events.items() -%}
   mb.addHreg({{ event }}, 0);
   {% endfor %}
-  // ESP8266 Sample setup
-  /* buttonStatus_setup({{ events[1] }}, D6);
+
+  {%- if ESP8266_DEBUG -%}
+  {%- if events[1] -%}
+  buttonStatus_setup({{ events[1] }}, D6);
+  {% endif -%}
+  {%- if events[2] -%}
   buttonStatus_setup({{ events[2] }}, D7);
+  {% endif %}
 
   pinMode(LED_BUILTIN, OUTPUT);     // Initialize the LED_BUILTIN pin as an output (D4)
 
@@ -92,7 +100,7 @@ void setup()
   digitalWrite(D0, 0);
   pinMode(D5, OUTPUT);
   digitalWrite(D5, 0);
-  */
+  {% endif %}
 }
 
 
@@ -106,7 +114,13 @@ void loop()
   // mb.Hreg({{ event }}, 1);
   {% endfor %}
 
-  // Sample calls
-  // buttonStatus({{ events[1] }}, D6);
-  // buttonStatus({{ events[2] }}, D7);
+  {%- if ESP8266_DEBUG %}
+  {%- if events[1] -%}
+  buttonStatus({{ events[1] }}, D6);
+  {% endif -%}
+
+  {%- if events[2] -%}
+  buttonStatus({{ events[2] }}, D7);
+  {% endif -%}
+  {% endif %}
 }

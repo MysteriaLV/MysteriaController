@@ -5,12 +5,11 @@ from collections import namedtuple
 import ipaddress
 import time
 from pymodbus.client.sync import ModbusSerialClient, ModbusTcpClient
-from pymodbus.constants import Defaults
 from pymodbus.exceptions import ConnectionException
 
 ACTION_REGISTER = 0
 
-pymodbus_logger = logging.getLogger('pymodbus.transaction')
+pymodbus_logger = logging.getLogger('pymodbus')
 pymodbus_logger.setLevel(logging.INFO)
 
 
@@ -18,9 +17,8 @@ class ModBus(object):
     def __init__(self, port='COM3'):
         self.port = port
 
-        Defaults.Timeout = 0.2
-        self.serialModbus = ModbusSerialClient('rtu', port=port, baudrate=57600)
-        self.udpModbus = ModbusTcpClient('192.168.118.56', port=502)
+        # Defaults.Timeout = 1
+        self.serialModbus = ModbusSerialClient('rtu', timeout=0.2, port=port, baudrate=57600)
 
         self.slaves = {}
         self.running = True
@@ -30,20 +28,18 @@ class ModBus(object):
             return self.serialModbus.read_holding_registers(0, slave.reg_count, unit=slave.slave_id)
 
         assert ipaddress.ip_address(slave.slave_id)
-        self.udpModbus.close()
-        self.udpModbus.host = slave.slave_id
-        self.udpModbus.connect()
-        return self.udpModbus.read_holding_registers(0, slave.reg_count)
+        tcpModbus = ModbusTcpClient(slave.slave_id)
+        tcpModbus.connect()
+        return tcpModbus.read_holding_registers(0, slave.reg_count)
 
     def write_action_register(self, value, slave):
         if type(slave.slave_id) is int:
             self.serialModbus.write_register(ACTION_REGISTER, value, unit=slave.slave_id)
 
         assert ipaddress.ip_address(slave.slave_id)
-        self.udpModbus.close()
-        self.udpModbus.host = slave.slave_id
-        self.udpModbus.connect()
-        self.udpModbus.write_register(ACTION_REGISTER, value)
+        tcpModbus = ModbusTcpClient(slave.slave_id)
+        tcpModbus.connect()
+        tcpModbus.write_register(ACTION_REGISTER, value)
 
     def processor(self):
         while self.running:
@@ -69,7 +65,7 @@ class ModBus(object):
                     slave.errors += 1
 
             # TODO maybe remove for faster reactions
-            time.sleep(1)
+            time.sleep(5)
 
     def register_slave(self, lua_slave):
         slave_id = lua_slave['slave_id']

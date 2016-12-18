@@ -17,7 +17,7 @@ def index():
             obj_response.alert('{} {} fired'.format(fsm, event))
 
     def fire_event_modbus_fsm(obj_response, slave_id, event):
-        if app.game_state.modbus.fire_event(int(slave_id), event):
+        if app.game_state.modbus.fire_event(slave_id, event):
             obj_response.alert('{} {} fired'.format(slave_id, event))
 
     if g.sijax.is_sijax_request:

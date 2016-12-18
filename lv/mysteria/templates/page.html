@@ -73,7 +73,7 @@ li {
     <span class="slave.name">{{ slave.name }} : {{ slave.fsm.current }}</span>
     <span class="slave.errors">Remote errors: {{ state.modbus.get_remote_errors(slave) }} </span>
     <span class="slave.errors">Local errors: {{ slave.errors }} </span>
-    <span class="slave.data">Current data: {{ slave.current_data }} </span>
+    <span class="slave.data">Current data: {{ slave.current_data.registers }} </span>
 </div>
 <ul>
     {% for event in slave.fsm.events %}
