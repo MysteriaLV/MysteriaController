@@ -47,7 +47,8 @@ del v1
 player_of_static = pyglet.media.Player()
 player_of_static.queue(pyglet.media.load("static720.avi"))
 
-player_music = pyglet.media.Player()
+player_background = pyglet.media.Player()
+player_voice = pyglet.media.Player()
 
 # noinspection PyMethodMayBeStatic
 class StaticState(object):
@@ -178,8 +179,8 @@ player_main.play()
 # pyglet.clock.schedule_interval(add_static, 5)
 # pyglet.clock.schedule_interval(auto_distort_main, 0.1)
 
-player_music.queue(pyglet.media.load("idle/music1_left.mp3"))
-player_music.play()
+player_background.queue(pyglet.media.load("idle/bg_slow_L.mp3"))
+player_background.play()
 
 HUD = pyglet.app
 

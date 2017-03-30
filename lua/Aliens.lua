@@ -81,7 +81,7 @@ REGISTER_STATES("main_quest", quest)
 
 power_console = rs485_node.create({
     name = 'power_console',
-    slave_id = '192.168.118.11',
+    slave_id = '192.168.14.11',
     events = {
         { name = 'reset', action_id = 1, from = '*', to = 'disconnected' },
         { name = 'connect', triggered_by_register = 1, action_id = 2, from = 'disconnected', to = 'powered_off' },
@@ -94,7 +94,7 @@ power_console = rs485_node.create({
 
 lights = rs485_node.create({
     name = 'lights',
-    slave_id = '192.168.118.12',
+    slave_id = '192.168.14.12',
     events = {
         { name = 'go_dim', action_id = 1, from = '*', to = 'dimmed' },
         { name = 'go_normal', action_id = 2, from = '*', to = 'normal' },
@@ -104,7 +104,7 @@ lights = rs485_node.create({
 
 magnetic_panel = rs485_node.create({
     name = 'magnetic_panel',
-    slave_id = '192.168.118.17',
+    slave_id = '192.168.14.17',
     events = {
         { name = 'reset', action_id = 1, from = '*', to = 'powered_off' },
         { name = 'power_on', action_id = 2, from = 'powered_off', to = 'empty' },
@@ -120,7 +120,7 @@ magnetic_panel = rs485_node.create({
 
 lab_door = rs485_node.create({
     name = 'room2_door',
-    slave_id = '192.168.118.13',
+    slave_id = '192.168.14.13',
     events = {
         { name = 'reset', action_id = 1, from = '*', to = 'locked' },
         { name = 'validate_card', action_id = 2, from = 'empty', to = 'card_validated' },
@@ -135,7 +135,7 @@ lab_door = rs485_node.create({
 
 smoke_machine = rs485_node.create({
     name = 'smoke_machine',
-    slave_id = '192.168.118.14',
+    slave_id = '192.168.14.14',
     events = {
         { name = 'reset', action_id = 1, from = '*', to = 'off' },
         { name = 'turn_on', action_id = 2, from = 'off', to = 'on' },
@@ -146,7 +146,7 @@ smoke_machine = rs485_node.create({
 ------------------------------- ROOM 2 -----------------------------------------------
 dna_case = rs485_node.create({
     name = 'dna_case',
-    slave_id = '192.168.118.15',
+    slave_id = '192.168.14.15',
     events = {
         { name = 'reset', action_id = 1, from = '*', to = 'active' },
         { name = 'deliver_dna', triggered_by_register = 1, from = 'active', to = 'completed' },
@@ -160,7 +160,7 @@ dna_case = rs485_node.create({
 
 self_destruct_console = rs485_node.create({
     name = 'self_destruct_console',
-    slave_id = '192.168.118.16',
+    slave_id = '192.168.14.16',
     events = {
         { name = 'reset', action_id = 1, from = '*', to = 'closed' },
         { name = 'open', action_id = 2, from = 'closed', to = 'open' },
@@ -175,7 +175,7 @@ self_destruct_console = rs485_node.create({
 
 alien_arm = rs485_node.create({
     name = 'alien_arm',
-    slave_id = '192.168.118.18',
+    slave_id = '192.168.14.18',
     events = {
         { name = 'reset', action_id = 1, from = '*', to = 'active' },
         { name = 'complete', triggered_by_register = 1, from = 'active', to = 'completed' },
