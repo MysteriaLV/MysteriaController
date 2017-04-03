@@ -12,4 +12,5 @@ transitions
 
 pyserial
 pymodbus
+pyusb
 ipaddress

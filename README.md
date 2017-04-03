@@ -1,6 +1,6 @@
 General Windows10 setup
 ===
-choco install -y chocolatey notepadplusplus.install git.install launchy opera speccy far bitdefenderavfree pycharm-community  python2-x86_32 vcpython27 windowsessentials vlc geforce-experience 7zip.install classic-shell arduino
+choco install -y chocolatey notepadplusplus.install git.install launchy opera speccy far bitdefenderavfree intellijidea-community python2-x86_32 vcpython27 windowsessentials vlc geforce-experience 7zip.install classic-shell arduino zadig
 
 git clone https://github.com/W4RH4WK/Debloat-Windows-10.git
 
