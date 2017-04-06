@@ -1,5 +1,6 @@
 local machine = require('lua/statemachine')
 local rs485_node = require('lua/rs485_node')
+local SECONDS_BETWEEN_HINTS = 10
 
 --noinspection UnusedDef
 quest = machine.create({
@@ -26,7 +27,7 @@ quest = machine.create({
             dna_case:reset()
             self_destruct_console:reset()
             alien_arm:reset()
-
+            hints:reset()
         end,
         on_intro = function(self)
             print('People are entering the room')
@@ -54,7 +55,6 @@ quest = machine.create({
 
             lights:go_alarms()
             -- TODO sounds:countdown()
-
         end,
         on_ready_to_self_destruct = function(self)
             print('Self desctuct active')
@@ -182,6 +182,27 @@ alien_arm = rs485_node.create({
     },
 })
 
+hints = machine.create({
+    events = {
+        { name = 'reset', from = '*', to = 'idle' },
+        { name = 'ready_for_input', from = '*', to = 'idle' },
+        { name = 'code_14', from = 'idle', to = 'alien_arm_1' },
+        { name = 'code_15', from = 'idle', to = 'alien_arm_2' },
+        { name = 'code_16', from = 'idle', to = 'alien_arm_3' }
+    },
+    callbacks = {
+        on_code_14 = function(self)
+            self.time_alien_arm_1 = self.time_alien_arm_1 or os.clock()
+        end,
+        onbeforecode_15 = function(self)
+            if (os.clock() - self.time_alien_arm_1) < SECONDS_BETWEEN_HINTS then return false end
+            self.time_alien_arm_2 = self.time_alien_arm_2 or os.clock()
+        end,
+        onbeforecode_16 = function(self)
+            if (os.clock() - self.time_alien_arm_2) < SECONDS_BETWEEN_HINTS then return false end
+        end,
+    }
+})
+
 --Fire off main initialization machine
 quest:restart()
-

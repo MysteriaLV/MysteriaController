@@ -5,12 +5,14 @@ import usb
 
 
 class TouchPanel(object):
+    # Calibration data
     MIN = (75, 125)
     MAX = (1980, 1935)
 
-    def __init__(self, rows=3, columns=2):
-        self.x_interval = (TouchPanel.MAX[0] - TouchPanel.MIN[0]) / rows
-        self.y_interval = (TouchPanel.MAX[1] - TouchPanel.MIN[1]) / columns
+    def __init__(self, rows=2, columns=3):
+        self.x_interval = (TouchPanel.MAX[0] - TouchPanel.MIN[0]) / columns
+        self.y_interval = (TouchPanel.MAX[1] - TouchPanel.MIN[1]) / rows
+        self.columns = columns
 
         self.touches = Queue()
         self.running = True
@@ -45,11 +47,13 @@ class TouchPanel(object):
 
                 mapped_x, mapped_y = int((x - TouchPanel.MIN[0]) / self.x_interval), \
                                      int((y - TouchPanel.MIN[1]) / self.y_interval)
+                absolute = mapped_y * self.columns + mapped_x + 1
 
                 logging.debug(
-                    "x={0}, y={1}, keypress={2}, mapped to ({3}, {4})".format(x, y, data[0], mapped_x, mapped_y))
+                    "x={0}, y={1}, keypress={2}, mapped to ({3}, {4})={5}".format(x, y, data[0],
+                                                                                  mapped_x, mapped_y, absolute))
 
-                self.touches.put((mapped_x, mapped_y))
+                self.touches.put((mapped_x, mapped_y, absolute))
                 pressed = True
 
             except usb.core.USBError as e:
