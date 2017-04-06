@@ -29,3 +29,10 @@ http://avbin.github.io/AVbin/Download.html
 
 COM drivers
 ---
+
+
+TouchPanel
+---
+Run Zadig (as Admin?)
+Find device with idVendor=0x0eef, idProduct=0x0001
+Install/Replace driver with libusb-win32 (original drivers should be removed)
