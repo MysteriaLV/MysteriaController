@@ -203,6 +203,8 @@ hints = machine.create({
         end,
     }
 })
+-- name, VAR, code length, timeout
+REGISTER_CODE_PANEL("cryobox", hints, 2, 10)
 
 --Fire off main initialization machine
 quest:restart()

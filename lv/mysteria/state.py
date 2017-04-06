@@ -8,12 +8,14 @@ lua = LuaRuntime(unpack_returned_tuples=True)
 
 
 class GameState(object):
-    def __init__(self, modbus):
+    def __init__(self, modbus, touchpanel):
+        self.touchpanel = touchpanel
         self.modbus = modbus
         self.fsms = {}
 
         lua.globals()['REGISTER_STATES'] = self.register_fsm
         lua.globals()['REGISTER_MODBUS_SLAVE'] = self.register_slave_lua
+        lua.globals()['REGISTER_CODE_PANEL'] = self.touchpanel.register_code_panel_lua
         lua.globals()['MODBUS_ACTION'] = self.modbus.send_action
         lua.globals()['print'] = logging.getLogger('lua').info
         lua.execute(open(LUA_SCENARIO, 'r').read())
