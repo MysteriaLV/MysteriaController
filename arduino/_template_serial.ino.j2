@@ -1,5 +1,9 @@
-#include <SoftwareSerial.h>
-#include <SimpleModbusSlaveSoftwareSerial.h>
+#include <SimpleModbusSlave.h>
+
+extern void modbus_setup();
+extern void modbus_loop();
+extern unsigned int holdingRegs[];
+
 
 //////////////// registers of {{ slave_name }} ///////////////////
 enum
@@ -51,7 +55,7 @@ void gpioWrite(int reg, int pin) {
 }
 /////////////////////////////////////////////////////////////////
 
-void setup()
+void modbus_setup()
 {
   Serial.begin(115200);
   Serial.println("Serial ModBus Slave {{ slave_name }}:{{ slave_id }} for {{ game }}");
@@ -73,7 +77,7 @@ void setup()
 }
 
 
-void loop()
+void modbus_loop()
 {
   holdingRegs[TOTAL_ERRORS] = modbus_update(holdingRegs);
   process_actions();
