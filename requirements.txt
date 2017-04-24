@@ -14,5 +14,7 @@ pyserial
 git+https://github.com/Cougar/pymodbus.git@devel
 pyusb
 
+python-vlc
+
 ipaddress
 dotmap

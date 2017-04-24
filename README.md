@@ -1,12 +1,14 @@
 General Windows10 setup
 ===
-choco install -y chocolatey notepadplusplus.install git.install launchy opera speccy far bitdefenderavfree intellijidea-community python2-x86_32 vcpython27 windowsessentials vlc geforce-experience 7zip.install classic-shell arduino zadig
+choco install -y chocolatey notepadplusplus.install git.install launchy opera speccy far bitdefenderavfree intellijidea-community python2-x86_32 vcpython27 windowsessentials geforce-experience 7zip.install classic-shell arduino zadig pygtk-all-in-one_win32_py2.7
+
+Install VLC-Win32: http://download.videolan.org/pub/videolan/vlc/2.2.4/win32/vlc-2.2.4-win32.exe
 
 git clone https://github.com/W4RH4WK/Debloat-Windows-10.git
 
 Install Lupa
 ---
-c:\tools\python2-x86_32\Scripts\easy_install.exe dist_lupa\lupa-1.3-py2.7-win32.egg
+c:\tools\python2-x86_32\Scripts\easy_install.exe dist\lupa-1.3-py2.7-win32.egg
 
 
 OR build Lupa
