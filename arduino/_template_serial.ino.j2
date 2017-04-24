@@ -31,9 +31,10 @@ void process_actions() {
     {% for action_id, action in actions.items() -%}
     case {{ action_id }} : // Put here code for {{ action }}
       Serial.println("[{{ action }}] action fired");
-      // gpioWrite(1, LED_BUILTIN);
+      // digitalWrite(LED_BUILTIN, {{ 'LOW' if action_id == 1 else 'HIGH' }});
       break;
     {% endfor -%}
+	default:break;
   }
 
   // Signal that action was processed
@@ -42,37 +43,33 @@ void process_actions() {
 
 // Just debug functions for easy testing. Won't be used probably
 /* Holds current button state in register */
-void buttonStatus(int reg, int pin) { // LOOP
-  holdingRegs[reg] = digitalRead(pin);
-}
-void buttonStatus_setup(int reg, int pin) { // SETUP
-  pinMode(pin, INPUT_PULLUP);
+void buttonStatus(int reg, uint8_t pin) { // LOOP
+	holdingRegs[reg] = digitalRead(pin) ? 1 : 0;
 }
 
-/* Outputs register value to pin */
-void gpioWrite(int reg, int pin) {
-  digitalWrite(pin, holdingRegs[reg]);
+void buttonStatus_setup(int reg, uint8_t pin) { // SETUP
+	pinMode(pin, INPUT_PULLUP);
 }
 /////////////////////////////////////////////////////////////////
 
 void modbus_setup()
 {
-  Serial.begin(115200);
   Serial.println("Serial ModBus Slave {{ slave_name }}:{{ slave_id }} for {{ game }}");
 
   /* parameters(long baudrate,
                 unsigned char ID,
-                unsigned char transmit enable pin,    (RX: 10, TX: 11 hardcoded in code)
+                unsigned char transmit enable pin,
                 unsigned int holding registers size)
   */
 
-  modbus_configure(57600, {{ slave_id }}, 3, TOTAL_REGS_SIZE);
+  modbus_configure(57600, {{ slave_id }}, SSerialTxControl, TOTAL_REGS_SIZE);
   holdingRegs[ACTIONS] = 0;
   {% for event_id, event in events.items() -%}
   holdingRegs[{{ event }}] = 0;
   {% endfor -%}
 
   // Sample calls
+  // pinMode(LED_BUILTIN, OUTPUT);
   // buttonStatus_setup({{ events[1] }}, <buttonPin>);
 }
 
@@ -89,4 +86,14 @@ void modbus_loop()
 
   // Sample calls
   // buttonStatus({{ events[1] }}, <buttonPin>);
+}
+
+void setup()
+{
+  Serial.begin(115200);
+  modbus_setup();
+}
+
+void loop() {
+  modbus_loop();
 }
