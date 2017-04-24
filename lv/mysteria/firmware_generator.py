@@ -37,7 +37,7 @@ def register_slave_lua(slave):
     if not os.path.exists('arduino/{}'.format(slave.name.lower())):
         os.mkdir('arduino/{}'.format(slave.name.lower()))
 
-    with open('arduino/{0}/{0}.ino'.format(slave.name.lower()), 'w') as f:
+    with open('arduino/{0}/{0}_modbus.ino'.format(slave.name.lower()), 'w') as f:
         def get_template(slave_id):
             if type(slave_id) is int:
                 return TEMPLATE_SERIAL

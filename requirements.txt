@@ -11,6 +11,8 @@ transitions
 # pydevd
 
 pyserial
-pymodbus
+git+https://github.com/Cougar/pymodbus.git@devel
 pyusb
+
 ipaddress
+dotmap

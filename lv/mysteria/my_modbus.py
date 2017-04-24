@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 import logging
+import time
 from collections import namedtuple
 
 import ipaddress
-import time
 from pymodbus.client.sync import ModbusSerialClient, ModbusTcpClient
 from pymodbus.exceptions import ConnectionException
 
@@ -18,7 +18,7 @@ class ModBus(object):
         self.port = port
 
         # Defaults.Timeout = 1
-        self.serialModbus = ModbusSerialClient('rtu', timeout=0.2, port=port, baudrate=57600)
+        self.serialModbus = ModbusSerialClient('rtu', timeout=0.5, port=port, baudrate=57600)
 
         self.slaves = {}
         self.running = True
@@ -35,11 +35,11 @@ class ModBus(object):
     def write_action_register(self, value, slave):
         if type(slave.slave_id) is int:
             self.serialModbus.write_register(ACTION_REGISTER, value, unit=slave.slave_id)
-
-        assert ipaddress.ip_address(slave.slave_id)
-        tcpModbus = ModbusTcpClient(slave.slave_id)
-        tcpModbus.connect()
-        tcpModbus.write_register(ACTION_REGISTER, value)
+        else:
+            assert ipaddress.ip_address(slave.slave_id)
+            tcpModbus = ModbusTcpClient(slave.slave_id)
+            tcpModbus.connect()
+            tcpModbus.write_register(ACTION_REGISTER, value)
 
     def processor(self):
         while self.running:

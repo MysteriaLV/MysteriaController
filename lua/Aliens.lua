@@ -94,11 +94,22 @@ power_console = rs485_node.create({
 
 lights = rs485_node.create({
     name = 'lights',
-    slave_id = '192.168.14.12',
+    slave_id = 1,
     events = {
         { name = 'go_dim', action_id = 1, from = '*', to = 'dimmed' },
         { name = 'go_normal', action_id = 2, from = '*', to = 'normal' },
         { name = 'go_alarms', action_id = 3, from = '*', to = 'alarms' },
+    },
+})
+
+boxes = rs485_node.create({
+    name = 'boxes',
+    slave_id = 2,
+    events = {
+        { name = 'reset', action_id = 1, from = '*', to = 'idle' },
+        { name = 'minor_failure', triggered_by_register = 1, from = 'idle', to = 'idle' },
+        { name = 'major_failure', triggered_by_register = 2, from = 'idle', to = 'idle' },
+        { name = 'complete', triggered_by_register = 3, action_id = 2, from = '*', to = 'completed' },
     },
 })
 
