@@ -41,7 +41,7 @@ import vlc
 from gettext import gettext as _
 
 # Create a single vlc.Instance() to be shared by (possible) multiple players.
-instance = vlc.Instance()
+instance = vlc.Instance('--fullscreen')
 
 
 class VLCWidget(gtk.DrawingArea):
