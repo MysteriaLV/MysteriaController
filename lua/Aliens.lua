@@ -2,6 +2,8 @@ local machine = require('lua/statemachine')
 local rs485_node = require('lua/rs485_node')
 local SECONDS_BETWEEN_HINTS = 10
 
+sampler = REGISTER_SAMPLER()
+
 --noinspection UnusedDef
 quest = machine.create({
     events = {
@@ -19,6 +21,7 @@ quest = machine.create({
         on_preparation = function(self)
             print('Resetting everything to inital states, walking around cleaning etc')
 
+            sampler.play('bg_slow_L')
             power_console:reset()
             lights:go_normal()
             magnetic_panel:reset()

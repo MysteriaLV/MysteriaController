@@ -61,6 +61,7 @@ def register_slave_lua(slave):
 
 lua.globals()['REGISTER_STATES'] = _dummy
 lua.globals()['REGISTER_CODE_PANEL'] = _dummy
+lua.globals()['REGISTER_SAMPLER'] = _dummy
 lua.globals()['REGISTER_MODBUS_SLAVE'] = register_slave_lua
 lua.globals()['MODBUS_ACTION'] = _dummy
 lua.execute(open(LUA_SCENARIO, 'r').read())
