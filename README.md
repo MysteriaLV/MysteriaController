@@ -1,6 +1,6 @@
 General Windows10 setup
 ===
-choco install -y chocolatey notepadplusplus.install git.install launchy opera speccy far bitdefenderavfree intellijidea-community python2-x86_32 vcpython27 windowsessentials geforce-experience 7zip.install classic-shell arduino zadig pygtk-all-in-one_win32_py2.7
+choco install -y chocolatey notepadplusplus.install git.install launchy opera speccy far bitdefenderavfree intellijidea-community python2-x86_32 vcpython27 windowsessentials geforce-experience 7zip.install classic-shell arduino zadig
 
 Install VLC-Win32: http://download.videolan.org/pub/videolan/vlc/2.2.4/win32/vlc-2.2.4-win32.exe
 

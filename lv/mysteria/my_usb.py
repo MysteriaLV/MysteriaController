@@ -22,6 +22,11 @@ class TouchPanel(object):
         self.touches = deque()
         self.running = True
         self.device = usb.core.find(idVendor=0x0eef, idProduct=0x0001)
+
+        if not self.device:
+            logging.error("No USB touch panel was found")
+            return
+
         # use the first/default configuration
         self.device.set_configuration()
         logging.info("Found TouchPanel {} {}, split {}x{}".format(self.device.manufacturer, self.device.product,

@@ -17,7 +17,10 @@ class ModBus(object):
     def __init__(self, port='COM3'):
         self.port = port
 
-        # Defaults.Timeout = 1
+        from pymodbus.constants import Defaults
+        Defaults.Timeout = 0.1
+        Defaults.Retries = 1
+
         self.serialModbus = ModbusSerialClient('rtu', timeout=0.5, port=port, baudrate=57600)
 
         self.slaves = {}

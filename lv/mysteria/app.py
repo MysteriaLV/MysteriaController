@@ -1,6 +1,7 @@
 import logging
 import threading
 
+from my_hud import HUD
 from my_modbus import ModBus
 from my_usb import TouchPanel
 from state import GameState
@@ -15,9 +16,10 @@ logging.basicConfig(
 def main():
     modbus = ModBus()
     touchpanel = TouchPanel()
-    # hud = HUD
+    hud = HUD()
     flask.game_state = GameState(modbus, touchpanel)
     t_modbus = threading.Thread(name='modbus', target=modbus.processor)
+    t_hud = threading.Thread(name='HUD', target=hud.processor)
     t_touchpanel = threading.Thread(name='touchpanel', target=touchpanel.processor)
     t_flask = threading.Thread(name='flask', target=eternal_flask_app,
                                kwargs={'port': 5555, 'host': '0.0.0.0', 'debug': True, 'use_reloader': False})
@@ -25,7 +27,7 @@ def main():
     t_modbus.start()
     t_touchpanel.start()
     t_flask.start()
-    # HUD.run()
+    t_hud.start()
 
     # noinspection PyRedeclaration
     # modbus.running = False
