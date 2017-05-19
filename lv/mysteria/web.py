@@ -1,6 +1,5 @@
-import os
-
 import flask_sijax
+import os
 from flask import Flask, render_template, g
 
 app = Flask(__name__)
@@ -17,6 +16,11 @@ def index():
             obj_response.alert('{} {} fired'.format(fsm, event))
 
     def fire_event_modbus_fsm(obj_response, slave_id, event):
+        try:
+            slave_id = int(slave_id)
+        except:
+            pass
+
         if app.game_state.modbus.fire_event(slave_id, event):
             obj_response.alert('{} {} fired'.format(slave_id, event))
 
