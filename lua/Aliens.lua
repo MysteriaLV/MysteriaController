@@ -21,7 +21,7 @@ quest = machine.create({
         on_preparation = function(self)
             print('Resetting everything to inital states, walking around cleaning etc')
 
-            sampler.play('bg_slow_L')
+            --            sampler.play('bg_slow_L')
             power_console:reset()
             lights:go_normal()
             magnetic_panel:reset()
@@ -113,6 +113,17 @@ boxes = rs485_node.create({
         { name = 'minor_failure', triggered_by_register = 1, from = 'idle', to = 'idle' },
         { name = 'major_failure', triggered_by_register = 2, from = 'idle', to = 'idle' },
         { name = 'complete', triggered_by_register = 3, action_id = 2, from = '*', to = 'completed' },
+    },
+})
+
+
+gestures = rs485_node.create({
+    name = 'gestures',
+    slave_id = 3,
+    events = {
+        { name = 'reset', action_id = 1, from = '*', to = 'active' },
+        { name = 'something_else', action_id = 2, from = '*', to = 'active' },
+        { name = 'solve', triggered_by_register = 1, from = 'active', to = 'completed' },
     },
 })
 

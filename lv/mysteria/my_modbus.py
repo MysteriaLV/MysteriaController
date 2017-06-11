@@ -14,7 +14,7 @@ pymodbus_logger.setLevel(logging.INFO)
 
 
 class ModBus(object):
-    def __init__(self, port='COM3'):
+    def __init__(self, port='COM5'):
         self.port = port
 
         from pymodbus.constants import Defaults
