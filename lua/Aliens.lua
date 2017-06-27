@@ -21,24 +21,24 @@ quest = machine.create({
         on_preparation = function(self)
             print('Resetting everything to inital states, walking around cleaning etc')
 
-            --            sampler.play('bg_slow_L')
+            lights:go_max() -- includes floor lights and maybe colbi
+            relay_box:unlock_exit_door();
+            relay_box:enable_top_lights1();
+            relay_box:enable_top_lights2();
             power_console:reset()
-            lights:go_normal()
-            magnetic_panel:reset()
-            lab_door:reset()
-            smoke_machine:reset()
-            dna_case:reset()
-            self_destruct_console:reset()
-            alien_arm:reset()
+            boxes:reset()
             hints:reset()
         end,
         on_intro = function(self)
             print('People are entering the room')
 
             lights:go_dim()
+            relay_box:disable_top_lights1();
+            relay_box:disable_top_lights2();
         end,
         on_start = function(self)
             print('Game is ON!')
+            relay_box:lock_exit_door();
 
             -- TODO start timer
         end,
@@ -46,35 +46,7 @@ quest = machine.create({
             print('Lights and machinery are on now')
 
             lights:go_normal()
-            magnetic_panel:power_on()
-        end,
-        on_open_door = function(self)
-            print('Opening the door')
-
-            smoke_machine:turn_on()
-        end,
-        on_aliens_coming = function(self)
-            print('Alarm! Aliens are coming!')
-
-            lights:go_alarms()
-            -- TODO sounds:countdown()
-        end,
-        on_ready_to_self_destruct = function(self)
-            print('Self desctuct active')
-
-            -- TODO sounds:countdown_with_self_desctruct()
-        end,
-        on_game_lost = function(self)
-            print('Aliens are feasting on your corpses')
-
-            lights:go_dim()
-            -- TODO sounds:explosion()
-        end,
-        on_game_won = function(self)
-            print('Aliens are found their death in fire')
-
-            lights:go_dim()
-            -- TODO sounds:happy_explosion()
+            relay_box:unlock_exit_door();
         end,
     }
 })
@@ -102,6 +74,8 @@ lights = rs485_node.create({
         { name = 'go_dim', action_id = 1, from = '*', to = 'dimmed' },
         { name = 'go_normal', action_id = 2, from = '*', to = 'normal' },
         { name = 'go_alarms', action_id = 3, from = '*', to = 'alarms' },
+        { name = 'go_off', action_id = 4, from = '*', to = 'off' },
+        { name = 'go_max', action_id = 5, from = '*', to = 'normal' },
     },
 })
 
@@ -116,96 +90,20 @@ boxes = rs485_node.create({
     },
 })
 
-
-gestures = rs485_node.create({
-    name = 'gestures',
-    slave_id = 3,
+relay_box = rs485_node.create({
+    name = 'relay_box',
+    slave_id = 4,
     events = {
-        { name = 'reset', action_id = 1, from = '*', to = 'active' },
-        { name = 'something_else', action_id = 2, from = '*', to = 'active' },
-        { name = 'solve', triggered_by_register = 1, from = 'active', to = 'completed' },
+        { name = 'reset', action_id = 1, from = '*', to = 'idle' },
+        { name = 'enable_top_lights1',  action_id = 2, from = '*', to = 'idle' },
+        { name = 'enable_top_lights2',  action_id = 3, from = '*', to = 'idle' },
+        { name = 'disable_top_lights1', action_id = 4, from = '*', to = 'idle' },
+        { name = 'disable_top_lights2', action_id = 5, from = '*', to = 'idle' },
+        { name = 'unlock_exit_door', action_id = 6, from = '*', to = 'idle' },
+        { name = 'lock_exit_door',   action_id = 7, from = '*', to = 'idle' },
     },
 })
 
-magnetic_panel = rs485_node.create({
-    name = 'magnetic_panel',
-    slave_id = '192.168.14.17',
-    events = {
-        { name = 'reset', action_id = 1, from = '*', to = 'powered_off' },
-        { name = 'power_on', action_id = 2, from = 'powered_off', to = 'empty' },
-        { name = 'put_card', triggered_by_register = 1, from = 'empty', to = 'card_present' },
-        { name = 'enter_code', triggered_by_register = 2, from = 'card_present', to = 'completed' },
-    },
-    callbacks = {
-        on_completed = function()
-            lab_door:validate_card()
-        end
-    }
-})
-
-lab_door = rs485_node.create({
-    name = 'room2_door',
-    slave_id = '192.168.14.13',
-    events = {
-        { name = 'reset', action_id = 1, from = '*', to = 'locked' },
-        { name = 'validate_card', action_id = 2, from = 'empty', to = 'card_validated' },
-        { name = 'accept_card', triggered_by_register = 1, from = 'card_validated', to = 'completed' },
-    },
-    callbacks = {
-        on_completed = function()
-            quest:open_door()
-        end
-    }
-})
-
-smoke_machine = rs485_node.create({
-    name = 'smoke_machine',
-    slave_id = '192.168.14.14',
-    events = {
-        { name = 'reset', action_id = 1, from = '*', to = 'off' },
-        { name = 'turn_on', action_id = 2, from = 'off', to = 'on' },
-        { name = 'turn_off', action_id = 3, from = 'on', to = 'off' },
-    }
-})
-
-------------------------------- ROOM 2 -----------------------------------------------
-dna_case = rs485_node.create({
-    name = 'dna_case',
-    slave_id = '192.168.14.15',
-    events = {
-        { name = 'reset', action_id = 1, from = '*', to = 'active' },
-        { name = 'deliver_dna', triggered_by_register = 1, from = 'active', to = 'completed' },
-    },
-    callbacks = {
-        on_completed = function()
-            quest:deliver_dna()
-        end
-    }
-})
-
-self_destruct_console = rs485_node.create({
-    name = 'self_destruct_console',
-    slave_id = '192.168.14.16',
-    events = {
-        { name = 'reset', action_id = 1, from = '*', to = 'closed' },
-        { name = 'open', action_id = 2, from = 'closed', to = 'open' },
-        { name = 'solve', triggered_by_register = 1, from = 'open', to = 'completed' },
-    },
-    callbacks = {
-        on_completed = function()
-            quest:enable_self_destruct()
-        end
-    }
-})
-
-alien_arm = rs485_node.create({
-    name = 'alien_arm',
-    slave_id = '192.168.14.18',
-    events = {
-        { name = 'reset', action_id = 1, from = '*', to = 'active' },
-        { name = 'complete', triggered_by_register = 1, from = 'active', to = 'completed' },
-    },
-})
 
 hints = machine.create({
     events = {
