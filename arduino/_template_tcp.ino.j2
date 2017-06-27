@@ -29,7 +29,7 @@ void process_actions() {
     {% for action_id, action in actions.items() -%}
     case {{ action_id }} : // Put here code for {{ action }}
       Serial.println("[{{ action }}] action fired");
-      {%- if ESP8266_DEBUG %}
+      {%- if MODBUS_DEBUG %}
       digitalWrite(LED_BUILTIN, {{ 'HIGH' if action_id==1 else 'LOW' }});
       {% endif -%}
       break;
@@ -40,7 +40,7 @@ void process_actions() {
   mb.Hreg(ACTIONS, 0);
 }
 
-{%- if ESP8266_DEBUG %}
+{%- if MODBUS_DEBUG %}
 /* Holds current button state in register */
 void buttonStatus(int reg, int pin) { // LOOP
   mb.Hreg(reg, !digitalRead(pin));
@@ -56,9 +56,8 @@ void gpioWrite(int reg, int pin) {
 /////////////////////////////////////////////////////////////////
 {% endif -%}
 
-void setup()
+void modbus_setup()
 {
-  Serial.begin(115200);
   Serial.println("TCP ModBus Slave {{ slave_name }}:{{ slave_id }} for {{ game }}");
 
   mb.config("{{ wifi_sid }}", "{{ wifi_pass }}");
@@ -85,7 +84,7 @@ void setup()
   mb.addHreg({{ event }}, 0);
   {% endfor %}
 
-  {%- if ESP8266_DEBUG -%}
+  {%- if MODBUS_DEBUG -%}
   {%- if events[1] -%}
   buttonStatus_setup({{ events[1] }}, D6);
   {% endif -%}
@@ -114,7 +113,7 @@ void loop()
   // mb.Hreg({{ event }}, 1);
   {% endfor %}
 
-  {%- if ESP8266_DEBUG %}
+  {%- if MODBUS_DEBUG %}
   {%- if events[1] -%}
   buttonStatus({{ events[1] }}, D6);
   {% endif -%}

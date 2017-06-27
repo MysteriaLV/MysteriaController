@@ -55,7 +55,7 @@ def register_slave_lua(slave):
             'wifi_sid': os.environ.get('WIFI_SID', 'ENTER_WIFI_SID'),
             'wifi_pass': os.environ.get('WIFI_PASS', 'ENTER_WIFI_PASS'),
 
-            'ESP8266_DEBUG': os.environ.get('ESP8266_DEBUG', False),
+            'MODBUS_DEBUG': os.environ.get('MODBUS_DEBUG', False),
         }))
 
 
