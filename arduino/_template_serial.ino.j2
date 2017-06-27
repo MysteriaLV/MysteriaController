@@ -107,10 +107,7 @@ void modbus_setup()
 #ifndef USE_ESP8266_TCP
   mb.config(&RS485Serial, 57600, SSerialTxControl);
   mb.setSlaveId({{ slave_id }});
-#endif
-
-
-#ifdef USE_ESP8266_TCP
+#else
   mb.config("{{ wifi_sid }}", "{{ wifi_pass }}");
   WiFi.config(IPAddress({{ slave_id|replace(".", ", ") }}), IPAddress(), IPAddress(), IPAddress(), IPAddress());
 
@@ -155,7 +152,7 @@ void modbus_setup()
 }
 
 
-void loop()
+void modbus_loop()
 {
   mb.task();              // not implemented yet: mb.Hreg(TOTAL_ERRORS, mb.task());
   process_actions();
