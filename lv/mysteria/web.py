@@ -13,7 +13,7 @@ flask_sijax.Sijax(app)
 def index():
     def fire_event_fsm(obj_response, fsm, event):
         if app.game_state.fire_event(fsm, event):
-            obj_response.alert('{} {} fired'.format(fsm, event))
+            obj_response.html('#flash', '{} {} fired'.format(fsm, event))
 
     def fire_event_modbus_fsm(obj_response, slave_id, event):
         try:
@@ -22,7 +22,7 @@ def index():
             pass
 
         if app.game_state.modbus.fire_event(slave_id, event):
-            obj_response.alert('{} {} fired'.format(slave_id, event))
+            obj_response.html('#flash', '{} {} fired'.format(slave_id, event))
 
     if g.sijax.is_sijax_request:
         g.sijax.register_callback('fire_event_fsm', fire_event_fsm)

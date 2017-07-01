@@ -18,8 +18,8 @@ class ModBus(object):
         self.port = port
 
         from pymodbus.constants import Defaults
-        Defaults.Timeout = 0.1
-        Defaults.Retries = 1
+        Defaults.Timeout = 0.3
+        Defaults.Retries = 2
 
         self.serialModbus = ModbusSerialClient('rtu', timeout=0.5, port=port, baudrate=57600)
 

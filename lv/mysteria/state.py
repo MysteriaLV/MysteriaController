@@ -58,7 +58,7 @@ class Sampler(object):
     vlc = vlc.Instance('--no-video')
 
     def __init__(self):
-        self.tag_players = {}
+        self.tag_players = []
 
     mappings = {
         'startup': 'Kalinin3'
@@ -77,3 +77,9 @@ class Sampler(object):
 
         if player.is_playing() == 0:
             player.play()
+
+        self.tag_players.append(player)
+
+    def reset(self):
+        for player in self.tag_players:
+            player.stop()

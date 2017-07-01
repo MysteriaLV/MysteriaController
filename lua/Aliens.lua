@@ -21,12 +21,13 @@ quest = machine.create({
             relay_box:enable_top_lights2()
             power_console:reset()
             boxes:reset()
+            sampler:reset()
         end,
         on_intro = function(self)
             print('People are entering the room')
 
             lights:go_dim()
-            sampler:bg_stage1()
+            sampler:play('bg_slow_L')
             relay_box:disable_top_lights1()
             relay_box:disable_top_lights2()
         end,
@@ -35,7 +36,7 @@ quest = machine.create({
             relay_box:lock_exit_door();
 
             -- TODO start timer
-            sampler:play('stage1')
+            sampler:play('Kalinin1')
         end,
         on_powered_on = function(self)
             print('Lights and machinery are on now, go away. Sprint1')
@@ -52,16 +53,20 @@ REGISTER_STATES("main_quest", quest)
 
 power_console = rs485_node.create({
     name = 'power_console',
-    slave_id = '192.168.14.11',
+    slave_id = '192.168.118.11',
     events = {
         { name = 'reset', action_id = 1, from = '*', to = 'disconnected' },
         { name = 'connect', triggered_by_register = 1, action_id = 2, from = 'disconnected', to = 'powered_off' },
         { name = 'power_on', triggered_by_register = 2, from = 'powered_off', to = 'completed' },
     },
     callbacks = {
-        on_connect = function() sampler:power_console_activated() end,
-        on_completed = function()
-            sampler:power_on()
+        on_connect = function()
+            print('Power console has wire connected')
+            sampler:play('power_console_activated')
+        end,
+        on_power_on = function()
+            print('Power console blocks are complete, station is powering on')
+            sampler:play('power_on')
             quest:power_on()
         end,
     }
