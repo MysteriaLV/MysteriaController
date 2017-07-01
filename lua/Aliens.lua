@@ -53,18 +53,18 @@ REGISTER_STATES("main_quest", quest)
 
 power_console = rs485_node.create({
     name = 'power_console',
-    slave_id = '192.168.118.11',
+    slave_id = '192.168.14.11',
     events = {
         { name = 'reset', action_id = 1, from = '*', to = 'disconnected' },
         { name = 'connect', triggered_by_register = 1, action_id = 2, from = 'disconnected', to = 'powered_off' },
         { name = 'power_on', triggered_by_register = 2, from = 'powered_off', to = 'completed' },
     },
     callbacks = {
-        on_connect = function()
+        on_powered_off = function()
             print('Power console has wire connected')
             sampler:play('power_console_activated')
         end,
-        on_power_on = function()
+        on_completed = function()
             print('Power console blocks are complete, station is powering on')
             sampler:play('power_on')
             quest:power_on()
