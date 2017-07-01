@@ -7,7 +7,8 @@ from lupa import LuaRuntime
 from state import LUA_SCENARIO
 
 TEMPLATE_SERIAL = 'arduino/_template_serial.ino.j2'
-TEMPLATE_TCP = 'arduino/_template_tcp.ino.j2'
+TEMPLATE_TCP = 'arduino/_template_serial.ino.j2'
+# TEMPLATE_TCP = 'arduino/_template_tcp.ino.j2'
 
 
 def render(tpl_path, context):
@@ -34,10 +35,10 @@ def register_slave_lua(slave):
                for i in slave['events'].values() if i.config.action_id}
 
     # TODO basic validation for identical event/action ids
-    if not os.path.exists('arduino/{}'.format(slave.name.lower())):
-        os.mkdir('arduino/{}'.format(slave.name.lower()))
+    if not os.path.exists('arduino/{}_modbus'.format(slave.name.lower())):
+        os.mkdir('arduino/{}_modbus'.format(slave.name.lower()))
 
-    with open('arduino/{0}/{0}_modbus.ino'.format(slave.name.lower()), 'w') as f:
+    with open('arduino/{0}_modbus/{0}_modbus.ino'.format(slave.name.lower()), 'w') as f:
         def get_template(slave_id):
             if type(slave_id) is int:
                 return TEMPLATE_SERIAL
