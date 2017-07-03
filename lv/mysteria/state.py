@@ -19,7 +19,7 @@ class GameState(object):
         lua.globals()['REGISTER_MODBUS_SLAVE'] = self.register_slave_lua
         lua.globals()['REGISTER_CODE_PANEL'] = self.touchpanel.register_code_panel_lua
         lua.globals()['REGISTER_SAMPLER'] = self.sampler.register_sampler
-        lua.globals()['MODBUS_ACTION'] = self.modbus.send_action
+        lua.globals()['MODBUS_ACTION'] = self.modbus.queue_action
         lua.globals()['print'] = logging.getLogger('lua').info
         lua.execute(open(LUA_SCENARIO, 'r').read())
 

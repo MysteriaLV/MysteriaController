@@ -2,7 +2,6 @@
 import logging
 from collections import namedtuple
 
-import ipaddress
 from pymodbus.client.sync import ModbusSerialClient, ModbusTcpClient
 from pymodbus.exceptions import ConnectionException
 
@@ -15,6 +14,7 @@ pymodbus_logger.setLevel(logging.INFO)
 class ModBus(object):
     def __init__(self, port='COM5'):
         self.port = port
+        self.action_queue = []
 
         from pymodbus.constants import Defaults
         Defaults.Timeout = 0.5
@@ -50,8 +50,6 @@ class ModBus(object):
     def processor(self):
         while self.running:
             for slave in self.slaves.values():
-                slave.last_data = slave.current_data
-
                 try:
                     slave.current_data = self.read_registers(slave)
                 except ConnectionException:
@@ -67,12 +65,25 @@ class ModBus(object):
                                     logging.info("External event {} - result {}".format(
                                         i.config.name,
                                         slave.fsm[i.config.name](slave.fsm)))
+                    slave.last_data = slave.current_data
                 else:
                     logging.warn("Timeout for {}".format(slave.name))
                     slave.errors += 1
 
-                    # TODO maybe remove for faster reactions
-                    # time.sleep(5)
+            # Process actions if any
+            attempted = set()
+            for action in self.action_queue[:]:
+                slave_id, action_id = action
+
+                if slave_id in attempted:
+                    continue    # One attempt per cycle
+
+                attempted.add(slave_id)
+                if self._send_action(slave_id, action_id):
+                    self.action_queue.remove(action)
+
+            # TODO maybe remove for faster reactions
+            # time.sleep(5)
 
     def register_slave(self, lua_slave):
         slave_id = lua_slave['slave_id']
@@ -87,22 +98,28 @@ class ModBus(object):
         slave.last_data = slave.current_data = None
         self.slaves[slave_id] = slave
 
-    def send_action(self, slave_id, action_id):
+    def queue_action(self, slave_id, action_id):
+        self.action_queue.append((slave_id, action_id))
+
+    def _send_action(self, slave_id, action_id):
         slave = self.slaves[slave_id]
         try:
             if not slave.current_data.getRegister(ACTION_REGISTER) == 0:
                 logging.warn(
                     "Sending action {} to {} while it apparently didn't finish processing previous action {}".format(
                         action_id, slave_id, slave.current_data.getRegister(ACTION_REGISTER)))
+                return False
         except AttributeError:
-            pass
+            return False
 
         try:
             self.write_action_register(action_id, slave)
+            return True
         except ConnectionException:
-            # TODO add to retry queue?
-            logging.error("Cannot send {} to {}".format(action_id, slave.name))
+            logging.warn("Cannot send {} to {}".format(action_id, slave.name))
             slave.errors += 1
+
+        return False
 
     @staticmethod
     def get_remote_errors(slave):
