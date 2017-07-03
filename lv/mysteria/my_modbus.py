@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import logging
-import time
 from collections import namedtuple
 
 import ipaddress
@@ -18,10 +17,10 @@ class ModBus(object):
         self.port = port
 
         from pymodbus.constants import Defaults
-        Defaults.Timeout = 0.3
-        Defaults.Retries = 2
+        Defaults.Timeout = 0.5
+        Defaults.Retries = 1
 
-        self.serialModbus = ModbusSerialClient('rtu', timeout=0.5, port=port, baudrate=57600)
+        self.serialModbus = ModbusSerialClient('rtu', timeout=Defaults.Timeout, port=port, baudrate=57600)
 
         self.slaves = {}
         self.running = True
@@ -30,19 +29,23 @@ class ModBus(object):
         if type(slave.slave_id) is int:
             return self.serialModbus.read_holding_registers(0, slave.reg_count, unit=slave.slave_id)
 
-        assert ipaddress.ip_address(slave.slave_id)
-        tcpModbus = ModbusTcpClient(slave.slave_id)
-        tcpModbus.connect()
-        return tcpModbus.read_holding_registers(0, slave.reg_count)
+        try:
+            tcpModbus = ModbusTcpClient(slave.slave_id)
+            tcpModbus.connect()
+            return tcpModbus.read_holding_registers(0, slave.reg_count)
+        except ConnectionException:
+            return None
 
     def write_action_register(self, value, slave):
         if type(slave.slave_id) is int:
             self.serialModbus.write_register(ACTION_REGISTER, value, unit=slave.slave_id)
         else:
-            assert ipaddress.ip_address(slave.slave_id)
-            tcpModbus = ModbusTcpClient(slave.slave_id)
-            tcpModbus.connect()
-            tcpModbus.write_register(ACTION_REGISTER, value)
+            try:
+                tcpModbus = ModbusTcpClient(slave.slave_id)
+                tcpModbus.connect()
+                tcpModbus.write_register(ACTION_REGISTER, value)
+            except ConnectionException:
+                pass
 
     def processor(self):
         while self.running:
@@ -61,14 +64,15 @@ class ModBus(object):
                                 if slave.current_data.getRegister(i.config.triggered_by_register) and \
                                         not slave.last_data.getRegister(i.config.triggered_by_register):
                                     # We got a value change to TRUE on a register we monitor
-                                    slave.fsm['on_' + i.config.name](
-                                        slave.current_data.getRegister(i.config.triggered_by_register))
+                                    logging.info("External event {} - result {}".format(
+                                        i.config.name,
+                                        slave.fsm[i.config.name](slave.fsm)))
                 else:
                     logging.warn("Timeout for {}".format(slave.name))
                     slave.errors += 1
 
-            # TODO maybe remove for faster reactions
-            time.sleep(5)
+                    # TODO maybe remove for faster reactions
+                    # time.sleep(5)
 
     def register_slave(self, lua_slave):
         slave_id = lua_slave['slave_id']
