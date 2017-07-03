@@ -21,7 +21,10 @@ class TouchPanel(object):
 
         self.touches = deque()
         self.running = True
-        self.device = usb.core.find(idVendor=0x0eef, idProduct=0x0001)
+        try:
+            self.device = usb.core.find(idVendor=0x0eef, idProduct=0x0001)
+        except usb.core.NoBackendError:
+            self.device = None
 
         if not self.device:
             logging.error("No USB touch panel was found")
