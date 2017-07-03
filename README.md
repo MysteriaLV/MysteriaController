@@ -8,7 +8,7 @@ git clone https://github.com/W4RH4WK/Debloat-Windows-10.git
 
 Install Lupa
 ---
-c:\tools\python2-x86_32\Scripts\easy_install.exe dist\lupa-1.3-py2.7-win32.egg
+c:\Python27\Scripts\easy_install.exe dist\lupa-1.3-py2.7-win32.egg
 
 
 OR build Lupa
