@@ -1,13 +1,16 @@
+import os
+
 import ipaddress
 import jinja2
 import lupa
-import os
 from lupa import LuaRuntime
 
 from state import LUA_SCENARIO
 
 TEMPLATE_SERIAL = 'arduino/_template_serial.ino.j2'
 TEMPLATE_TCP = 'arduino/_template_serial.ino.j2'
+
+
 # TEMPLATE_TCP = 'arduino/_template_tcp.ino.j2'
 
 
@@ -23,6 +26,11 @@ lua = LuaRuntime(unpack_returned_tuples=True)
 
 def _dummy(*args):
     pass
+
+
+class _dummy_sampler(object):
+    def __getitem__(self, item):
+        return _dummy
 
 
 @lupa.unpacks_lua_table_method
@@ -65,4 +73,5 @@ lua.globals()['REGISTER_CODE_PANEL'] = _dummy
 lua.globals()['REGISTER_SAMPLER'] = _dummy
 lua.globals()['REGISTER_MODBUS_SLAVE'] = register_slave_lua
 lua.globals()['MODBUS_ACTION'] = _dummy
+lua.globals()['REGISTER_SAMPLER'] = _dummy_sampler
 lua.execute(open(LUA_SCENARIO, 'r').read())

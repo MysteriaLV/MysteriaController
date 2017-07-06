@@ -38,8 +38,12 @@ quest = machine.create({
             -- TODO start timer
             sampler:play('Kalinin1')
         end,
+        on_power_console_connected = function(self)
+            sampler:play('Kalinin2')
+        end,
         on_powered_on = function(self)
             print('Lights and machinery are on now, go away. Sprint1')
+            sampler:play('Kalinin3')
 
             lights:go_normal()
             relay_box:enable_top_lights1()
@@ -62,11 +66,10 @@ power_console = rs485_node.create({
     callbacks = {
         on_powered_off = function()
             print('Power console has wire connected')
-            sampler:play('power_console_activated')
+            quest:on_power_console_connected()
         end,
         on_completed = function()
             print('Power console blocks are complete, station is powering on')
-            sampler:play('power_on')
             quest:power_on()
         end,
     }
@@ -81,6 +84,7 @@ lights = rs485_node.create({
         { name = 'go_alarms', action_id = 3, from = '*', to = 'alarms' },
         { name = 'go_off', action_id = 4, from = '*', to = 'off' },
         { name = 'go_max', action_id = 5, from = '*', to = 'normal' },
+        { name = 'power_console_connected', action_id = 6, from = 'dimmed', to = 'dimmed' },
     },
 })
 
