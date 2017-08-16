@@ -42,11 +42,17 @@ quest = machine.create({
             sampler:play('Kalinin2')
         end,
         on_powered_on = function(self)
-            print('Lights and machinery are on now, go away. Sprint1')
+            print('Lights and machinery are on now')
             sampler:play('Kalinin3')
 
-            lights:go_normal()
             relay_box:enable_top_lights1()
+        end,
+        on_second_room_opened = function(self)
+            print('We are in Room2 now. Sprint2')
+
+            relay_box:activate_smoke()
+            relay_box:enable_top_lights2()
+            lights:go_normal()
             relay_box:unlock_exit_door()
         end,
     }
@@ -110,9 +116,26 @@ relay_box = rs485_node.create({
         { name = 'disable_top_lights2', action_id = 5, from = '*', to = 'idle' },
         { name = 'unlock_exit_door', action_id = 6, from = '*', to = 'idle' },
         { name = 'lock_exit_door', action_id = 7, from = '*', to = 'idle' },
+        { name = 'activate_smoke', action_id = 8, from = '*', to = 'idle' },
     },
 })
 
+magnetic_door = rs485_node.create({
+    name = 'magnetic_door',
+    slave_id = 5,
+    events = {
+        { name = 'reset', action_id = 1, from = '*', to = 'idle' },
+        { name = 'activated', action_id = 2, from = 'idle', to = 'active' },
+        { name = 'opened', triggered_by_register = 1, from = 'active', to = 'completed' },
+        { name = 'force_complete', action_id = 3, from = '*', to = 'completed' },
+    },
+    callbacks = {
+        on_opened = function()
+            print('People entered second room')
+            quest:on_second_room_opened()
+        end,
+    }
+})
 
 --Fire off main initialization machine
 quest:restart()

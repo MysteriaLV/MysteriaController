@@ -1,4 +1,4 @@
-lupa
+# lupa - manual
 Flask
 flask-sijax
 
