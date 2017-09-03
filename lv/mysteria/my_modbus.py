@@ -3,7 +3,7 @@ import logging
 from collections import namedtuple
 
 from pymodbus.client.sync import ModbusSerialClient, ModbusTcpClient
-from pymodbus.exceptions import ConnectionException
+from pymodbus.exceptions import ConnectionException, ModbusIOException
 
 ACTION_REGISTER = 0
 
@@ -17,7 +17,10 @@ class ModBus(object):
         self.action_queue = []
 
         from pymodbus.constants import Defaults
-        Defaults.Timeout = 0.5
+        from pymodbus import __version__
+        pymodbus_logger.info("Running version: {}".format(__version__))
+
+        Defaults.Timeout = 0.1
         Defaults.Retries = 1
 
         self.serialModbus = ModbusSerialClient('rtu', timeout=Defaults.Timeout, port=port, baudrate=57600)
@@ -33,7 +36,7 @@ class ModBus(object):
             tcpModbus = ModbusTcpClient(slave.slave_id)
             tcpModbus.connect()
             return tcpModbus.read_holding_registers(0, slave.reg_count)
-        except ConnectionException:
+        except (ConnectionException, IndexError):
             return None
 
     def write_action_register(self, value, slave):
@@ -52,6 +55,8 @@ class ModBus(object):
             for slave in self.slaves.values():
                 try:
                     slave.current_data = self.read_registers(slave)
+                    if type(slave.current_data) is ModbusIOException:
+                        raise ConnectionException
                 except ConnectionException:
                     slave.current_data = None
 
@@ -67,7 +72,7 @@ class ModBus(object):
                                         slave.fsm[i.config.name](slave.fsm)))
                     slave.last_data = slave.current_data
                 else:
-                    logging.warn("Timeout for {}".format(slave.name))
+                    # logging.warn("Timeout for {}".format(slave.name))
                     slave.errors += 1
 
             # Process actions if any

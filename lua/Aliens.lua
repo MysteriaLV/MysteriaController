@@ -20,8 +20,10 @@ quest = machine.create({
             relay_box:enable_top_lights1()
             relay_box:enable_top_lights2()
             power_console:reset()
+            gestures:reset()
             boxes:reset()
             sampler:reset()
+            magnetic_door:reset()
         end,
         on_intro = function(self)
             print('People are entering the room')
@@ -46,14 +48,13 @@ quest = machine.create({
             sampler:play('Kalinin3')
 
             relay_box:enable_top_lights1()
+            magnetic_door:activated();
         end,
         on_second_room_opened = function(self)
-            print('We are in Room2 now. Sprint2')
+            print('We are in Room2 now. Sprint2+gestures')
 
             relay_box:activate_smoke()
             relay_box:enable_top_lights2()
-            lights:go_normal()
-            relay_box:unlock_exit_door()
         end,
     }
 })
@@ -123,6 +124,8 @@ gestures = rs485_node.create({
         on_down = function() lights:go_off() end,
         on_completed = function()
             print('Gestures are resolved')
+            lights:go_normal()
+            relay_box:unlock_exit_door()
         end,
     }
 })
