@@ -27,7 +27,7 @@ def main():
     t_modbus.start()
     t_touchpanel.start()
     t_flask.start()
-    t_hud.start()
+    # t_hud.start()
 
     # noinspection PyRedeclaration
     # modbus.running = False
