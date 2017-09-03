@@ -105,6 +105,28 @@ boxes = rs485_node.create({
     },
 })
 
+gestures = rs485_node.create({
+    name = 'gestures',
+    slave_id = 3,
+    events = {
+        { name = 'reset', action_id = 1, from = '*', to = 'idle' },
+        { name = 'complete', triggered_by_register = 1, action_id = 2, from = 'idle', to = 'completed' },
+        { name = 'left', triggered_by_register = 2, from = 'idle', to = 'idle' },
+        { name = 'right', triggered_by_register = 3, from = 'idle', to = 'idle' },
+        { name = 'up', triggered_by_register = 4, from = 'idle', to = 'idle' },
+        { name = 'down', triggered_by_register = 5, from = 'idle', to = 'idle' },
+    },
+    callbacks = {
+        on_left = function() lights:go_dim() end,
+        on_right = function() lights:go_alarm() end,
+        on_up = function() lights:go_normal() end,
+        on_down = function() lights:go_off() end,
+        on_completed = function()
+            print('Gestures are resolved')
+        end,
+    }
+})
+
 relay_box = rs485_node.create({
     name = 'relay_box',
     slave_id = 4,

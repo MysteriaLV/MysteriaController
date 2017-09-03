@@ -73,7 +73,7 @@ void process_actions() {
       Serial.println("[{{ action }}] action fired");
       {%- if MODBUS_DEBUG %}
       digitalWrite(LED_BUILTIN, {{ 'HIGH' if action_id==1 else 'LOW' }});
-      {% endif -%}
+      {% endif %}
       break;
     {%- endfor %}
     default:
