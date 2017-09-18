@@ -23,7 +23,7 @@ class ModBus(object):
         Defaults.Timeout = 0.1
         Defaults.Retries = 1
 
-        self.serialModbus = ModbusSerialClient('rtu', timeout=Defaults.Timeout, port=port, baudrate=57600)
+        self.serialModbus = ModbusSerialClient('rtu', timeout=Defaults.Timeout, port=port, baudrate=31250)
 
         self.slaves = {}
         self.running = True
