@@ -38,14 +38,14 @@ quest = machine.create({
             relay_box:lock_exit_door();
 
             -- TODO start timer
-            sampler:play('Kalinin1')
+            sampler:play('MA_SFX_StartRamp_1')
         end,
         on_power_console_connected = function(self)
-            sampler:play('Kalinin2')
+            sampler:play('Church_Organ_Powerup')
         end,
         on_powered_on = function(self)
             print('Lights and machinery are on now')
-            sampler:play('Kalinin3')
+            sampler:play('ascending_organ')
 
             relay_box:enable_top_lights1()
             magnetic_door:activated();
@@ -64,7 +64,7 @@ REGISTER_STATES("main_quest", quest)
 
 power_console = rs485_node.create({
     name = 'power_console',
-    slave_id = '192.168.14.11',
+    slave_id = 6,
     events = {
         { name = 'reset', action_id = 1, from = '*', to = 'disconnected' },
         { name = 'connect', triggered_by_register = 1, action_id = 2, from = 'disconnected', to = 'powered_off' },
