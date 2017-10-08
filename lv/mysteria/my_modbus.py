@@ -2,6 +2,7 @@
 import logging
 from collections import namedtuple
 
+import struct
 from pymodbus.client.sync import ModbusSerialClient, ModbusTcpClient
 from pymodbus.exceptions import ConnectionException, ModbusIOException
 
@@ -12,7 +13,7 @@ pymodbus_logger.setLevel(logging.INFO)
 
 
 class ModBus(object):
-    def __init__(self, port='COM5'):
+    def __init__(self, port='COM6'):
         self.port = port
         self.action_queue = []
 
@@ -30,25 +31,35 @@ class ModBus(object):
 
     def read_registers(self, slave):
         if type(slave.slave_id) is int:
-            return self.serialModbus.read_holding_registers(0, slave.reg_count, unit=slave.slave_id)
+            try:
+                return self.serialModbus.read_holding_registers(0, slave.reg_count, unit=slave.slave_id)
+            except struct.error as e:
+                logging.error(e)
+                slave.errors += 1
+                return None
 
         try:
             tcpModbus = ModbusTcpClient(slave.slave_id)
             tcpModbus.connect()
             return tcpModbus.read_holding_registers(0, slave.reg_count)
         except (ConnectionException, IndexError):
+            slave.errors += 1
             return None
 
     def write_action_register(self, value, slave):
         if type(slave.slave_id) is int:
-            self.serialModbus.write_register(ACTION_REGISTER, value, unit=slave.slave_id)
+            try:
+                self.serialModbus.write_register(ACTION_REGISTER, value, unit=slave.slave_id)
+            except struct.error as e:
+                logging.error(e)
+                slave.errors += 1
         else:
             try:
                 tcpModbus = ModbusTcpClient(slave.slave_id)
                 tcpModbus.connect()
                 tcpModbus.write_register(ACTION_REGISTER, value)
             except ConnectionException:
-                pass
+                slave.errors += 1
 
     def processor(self):
         while self.running:
@@ -59,6 +70,7 @@ class ModBus(object):
                         raise ConnectionException
                 except ConnectionException:
                     slave.current_data = None
+                    slave.errors += 1
 
                 if slave.current_data:
                     if slave.last_data:
