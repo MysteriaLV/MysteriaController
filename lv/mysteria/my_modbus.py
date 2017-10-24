@@ -33,7 +33,7 @@ class ModBus(object):
         if type(slave.slave_id) is int:
             try:
                 return self.serialModbus.read_holding_registers(0, slave.reg_count, unit=slave.slave_id)
-            except struct.error as e:
+            except (IndexError, struct.error) as e:
                 logging.error(e)
                 slave.errors += 1
                 return None
