@@ -3,6 +3,8 @@ import logging
 from collections import namedtuple
 
 import struct
+
+import time
 from pymodbus.client.sync import ModbusSerialClient, ModbusTcpClient
 from pymodbus.exceptions import ConnectionException, ModbusIOException
 
@@ -30,10 +32,12 @@ class ModBus(object):
         self.running = True
 
     def read_registers(self, slave):
+        # Carefully measued artificial pause to make sure everything is processed
+        time.sleep(0.02)
         if type(slave.slave_id) is int:
             try:
                 return self.serialModbus.read_holding_registers(0, slave.reg_count, unit=slave.slave_id)
-            except struct.error as e:
+            except (IndexError, struct.error) as e:
                 logging.error(e)
                 slave.errors += 1
                 return None
@@ -50,7 +54,7 @@ class ModBus(object):
         if type(slave.slave_id) is int:
             try:
                 self.serialModbus.write_register(ACTION_REGISTER, value, unit=slave.slave_id)
-            except struct.error as e:
+            except (IndexError, struct.error) as e:
                 logging.error(e)
                 slave.errors += 1
         else:

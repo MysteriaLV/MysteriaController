@@ -111,7 +111,7 @@ if __name__ == '__main__':
         format='(%(threadName)-10s) [%(name)s] %(message)s',
     )
 
-    touchpanel = TouchPanel()
+    touchpanel = TouchPanel(3, 3)
     t_touchpanel = threading.Thread(name='touchpanel', target=touchpanel.processor)
     t_touchpanel.start()
 
