@@ -97,7 +97,7 @@ class ModBus(object):
                 slave_id, action_id = action
 
                 if slave_id in attempted:
-                    continue    # One attempt per cycle
+                    continue  # One attempt per cycle
 
                 attempted.add(slave_id)
                 if self._send_action(slave_id, action_id):
