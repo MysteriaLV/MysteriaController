@@ -8,21 +8,7 @@ git clone https://github.com/W4RH4WK/Debloat-Windows-10.git
 
 Install Lupa
 ---
-c:\Python27\Scripts\easy_install.exe dist\lupa-1.3-py2.7-win32.egg
-
-
-OR build Lupa
----
-get lupa-1.3.tar.gz to c:\tools\lupa-1.3
-unpack LuaJIT-2.0.4 to c:\tools\lupa-1.3\LuaJIT-2.0.4
-
-via "Visual C+ 2008 32bit command prompt"
-c:\tools\lupa-1.3\LuaJIT-2.0.4\src>msvcbuild.bat
-
-https://github.com/chemeris/msinttypes/archive/master.zip
-extract msinttypes to C:\tools\lupa-1.3\lupa
-
-c:\tools\lupa-1.3>..\python2-x86_32\python.exe setup.py install
+c:\Python27\Scripts\easy_install.exe https://github.com/MysteriaLV/lupa/releases/download/lupa-1.6_luajit-2.0.5_build-49/lupa-1.6-cp27-cp27m-win32.whl
 
 Install AVBin
 ---
