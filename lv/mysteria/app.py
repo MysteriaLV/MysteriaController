@@ -1,11 +1,11 @@
 import logging
 import threading
 
-from my_hud import HUD
-from my_modbus import ModBus
-from my_usb import TouchPanel
-from state import GameState
-from web import app as flask, eternal_flask_app
+from mysteria.my_hud import HUD
+from mysteria.my_modbus import ModBus
+from mysteria.my_usb import TouchPanel
+from mysteria.state import GameState
+from mysteria.web import app as flask, eternal_flask_app
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -14,7 +14,7 @@ logging.basicConfig(
 
 
 def main():
-    modbus = ModBus()
+    modbus = ModBus(port='COM19')
     touchpanel = TouchPanel()
     hud = HUD()
     flask.game_state = GameState(modbus, touchpanel)
@@ -35,4 +35,6 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+
 
