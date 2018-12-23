@@ -6,11 +6,12 @@ class HUD(object):
     default_bg_video_options = ['--no-audio', '--video-y=1']
 
     video_mappings = {
-        1: DotMap({'source': 'idle/camera1.mp4', 'offset': 0}),
-        2: DotMap({'source': 'idle/camera2.mp4', 'offset': 2000}),
-        3: DotMap({'source': 'idle/camera3.mp4', 'offset': 3000}),
-        4: DotMap({'source': 'idle/camera4.mp4', 'offset': 4000}),
-        5: DotMap({'source': 'idle/camera5.mp4', 'offset': 5000}),
+        # 1: DotMap({'source': 'idle/camera1.mp4', 'offset': 0}),
+        2: DotMap({'source': 'idle/1360x768.mov',    'offset': 1280}),
+        3: DotMap({'source': 'idle/1280x1024.mov',   'offset': 1280+768}),
+        4: DotMap({'source': 'idle/1280x1024-2.mov', 'offset': 1280+768+1280}),
+        5: DotMap({'source': 'idle/1280x1024.mov',   'offset': 1280+768+1280+1280}),
+        6: DotMap({'source': 'idle/1360x768.mov',    'offset': 1280+768+1280+1280+768}),
     }
 
     @staticmethod
