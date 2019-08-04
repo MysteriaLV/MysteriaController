@@ -79,7 +79,7 @@ class TouchPanel(object):
             self.touch_panel_pressed = True
 
         except usb.core.USBError as e:
-            if not (e.args == ('Operation timed out',) or 'timeout' in e.args[1]):
+            if not (e.args == ('Operation timed out',) or 'timeout' in str(e.args[1])):
                 logging.error(e)
 
     def process_codes(self):
