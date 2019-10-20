@@ -1,4 +1,4 @@
-lupa
+lupa>=1.7
 Flask
 flask-sijax
 

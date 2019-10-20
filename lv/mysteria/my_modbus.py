@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 import logging
+import struct
+import time
 from collections import namedtuple
 
-import struct
-
-import time
 from pymodbus.client.sync import ModbusSerialClient, ModbusTcpClient
+from pymodbus.constants import Defaults
 from pymodbus.exceptions import ConnectionException, ModbusIOException
 
 ACTION_REGISTER = 0
@@ -19,7 +19,6 @@ class ModBus(object):
         self.port = port
         self.action_queue = []
 
-        from pymodbus.constants import Defaults
         from pymodbus import __version__
         pymodbus_logger.info("Running version: {}".format(__version__))
 
@@ -32,7 +31,7 @@ class ModBus(object):
         self.running = True
 
     def read_registers(self, slave):
-        # Carefully measued artificial pause to make sure everything is processed
+        # Carefully measured artificial pause to make sure everything is processed
         time.sleep(0.02)
         if type(slave.slave_id) is int:
             try:
