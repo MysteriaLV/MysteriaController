@@ -10,32 +10,38 @@ quest = machine.create({
         { name = 'make_intro', from = 'preparation', to = 'intro' },
         { name = 'start', from = 'intro', to = 'powered_off' },
         { name = 'power_on', from = 'powered_off', to = 'powered_on' },
+        { name = 'open_laboratory', from = 'powered_on', to = 'laboratory_access' },
+        { name = 'start_self_destruct', from = 'laboratory_access', to = 'self_destruction' },
+        { name = 'win', from = 'self_destruction', to = 'victory' },
+        { name = 'lose', from = 'self_destruction', to = 'failure' },
     },
     callbacks = {
         on_preparation = function(self)
             print('Resetting everything to inital states, walking around cleaning etc')
 
-            lights:go_max()
-            relay_box:unlock_exit_door()
-            relay_box:enable_top_lights1()
-            relay_box:enable_top_lights2()
+            lights:full_lights()
+            lights:unlock_door()
+            lights:enable_xray()
+
             power_console:reset()
             gestures:reset()
             boxes:reset()
-            sampler:reset()
             magnetic_door:reset()
+            small_colbs:reset()
+            destruction_console:reset()
+            sample_transmitter:reset()
+            sampler:reset()
         end,
         on_intro = function(self)
             print('People are entering the room')
 
-            lights:go_dim()
+            lights:no_power()
+            lights:disable_xray()
             sampler:play('bg_slow_L')
-            relay_box:disable_top_lights1()
-            relay_box:disable_top_lights2()
         end,
         on_start = function(self)
             print('Game is ON!')
-            relay_box:lock_exit_door();
+            lights:lock_door();
 
             -- TODO start timer
             sampler:play('MA_SFX_StartRamp_1')
@@ -47,12 +53,18 @@ quest = machine.create({
             print('Lights and machinery are on now')
             sampler:play('ascending_organ')
 
-            relay_box:enable_top_lights1()
+            light:power_active()
+            light:enable_xray()
             magnetic_door:activated();
         end,
-        on_second_room_opened = function(self)
-            print('We are in Room2 now. Sprint2+gestures')
-            relay_box:enable_top_lights2()
+        on_laboratory_access = function(self)
+            print('We are in Room2 now.')
+        end,
+        on_self_destruction = function(self)
+            print('It\'s the final countdown.')
+
+            destruction_console:activated()
+            light:alarms()
         end,
     }
 })
@@ -84,12 +96,15 @@ lights = rs485_node.create({
     name = 'lights',
     slave_id = 1,
     events = {
-        { name = 'go_dim', action_id = 1, from = '*', to = 'dimmed' },
-        { name = 'go_normal', action_id = 2, from = '*', to = 'normal' },
-        { name = 'go_alarms', action_id = 3, from = '*', to = 'alarms' },
-        { name = 'go_off', action_id = 4, from = '*', to = 'off' },
-        { name = 'go_max', action_id = 5, from = '*', to = 'normal' },
-        { name = 'power_console_connected', action_id = 6, from = 'dimmed', to = 'dimmed' },
+        { name = 'full_lights', action_id = 1, from = '*', to = 'idle' },
+        { name = 'no_power', action_id = 2, from = '*', to = 'idle' },
+        { name = 'power_active', action_id = 3, from = '*', to = 'idle' },
+        { name = 'alarms', action_id = 4, from = '*', to = 'idle' },
+        { name = 'lock_door', action_id = 5, from = '*', to = 'idle' },
+        { name = 'unlock_door', action_id = 6, from = '*', to = 'idle' },
+        { name = 'enable_xray', action_id = 7, from = '*', to = 'idle' },
+        { name = 'disable_xray', action_id = 8, from = '*', to = 'idle' },
+        { name = 'force_lapa', action_id = 9, from = '*', to = 'idle' },
     },
 })
 
@@ -116,30 +131,24 @@ gestures = rs485_node.create({
         { name = 'down', triggered_by_register = 5, from = 'idle', to = 'idle' },
     },
     callbacks = {
-        on_left = function() lights:go_dim() end,
-        on_right = function() lights:go_alarm() end,
-        on_up = function() lights:go_normal() end,
-        on_down = function() lights:go_off() end,
         on_completed = function()
             print('Gestures are resolved')
-            lights:go_normal()
-            relay_box:unlock_exit_door()
         end,
     }
 })
 
-relay_box = rs485_node.create({
-    name = 'relay_box',
+small_colbs = rs485_node.create({
+    name = 'small_colbs',
     slave_id = 4,
     events = {
         { name = 'reset', action_id = 1, from = '*', to = 'idle' },
-        { name = 'enable_top_lights1', action_id = 2, from = '*', to = 'idle' },
-        { name = 'enable_top_lights2', action_id = 3, from = '*', to = 'idle' },
-        { name = 'disable_top_lights1', action_id = 4, from = '*', to = 'idle' },
-        { name = 'disable_top_lights2', action_id = 5, from = '*', to = 'idle' },
-        { name = 'unlock_exit_door', action_id = 6, from = '*', to = 'idle' },
-        { name = 'lock_exit_door', action_id = 7, from = '*', to = 'idle' },
+        { name = 'complete', triggered_by_register = 1, from = 'idle', to = 'completed' },
     },
+    callbacks = {
+        on_completed = function()
+            print('Gestures are resolved')
+        end,
+    }
 })
 
 magnetic_door = rs485_node.create({
@@ -152,9 +161,9 @@ magnetic_door = rs485_node.create({
         { name = 'force_complete', action_id = 3, from = '*', to = 'completed' },
     },
     callbacks = {
-        on_opened = function()
+        on_completed = function()
             print('People entered second room')
-            quest:on_second_room_opened()
+            quest:laboratory_access()
         end,
     }
 })
@@ -170,6 +179,23 @@ destruction_console = rs485_node.create({
     }
 })
 
+sample_transmitter = rs485_node.create({
+    name = 'sample_transmitter',
+    slave_id = '192.168.118.8',
+    events = {
+        { name = 'reset', action_id = 1, from = '*', to = 'idle' },
+        { name = 'force_complete', action_id = 2, from = 'idle', to = 'completed' },
+        { name = 'INCOMPLETE_UPLOAD', triggered_by_register = 1, from = '*', to = 'idle' },
+        { name = 'EMPTY_UPLOAD', triggered_by_register = 2, from = '*', to = 'idle' },
+        { name = 'COMPLETE', triggered_by_register = 3, from = 'idle', to = 'completed' },
+    },
+    callbacks = {
+        on_completed = function()
+            print('Samples are transmitted. Sound the alarm!')
+            quest:start_self_destruct()
+        end,
+    }
+})
 
 --Fire off main initialization machine
 quest:restart()
