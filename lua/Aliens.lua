@@ -186,10 +186,10 @@ sample_transmitter = rs485_node.create({
     slave_id = '192.168.118.8',
     events = {
         { name = 'reset', action_id = 1, from = '*', to = 'idle' },
-        { name = 'force_complete', action_id = 2, from = 'idle', to = 'completed' },
-        { name = 'COMPLETE', triggered_by_register = 1, from = '*', to = 'idle' },
-        { name = 'EMPTY_UPLOAD', triggered_by_register = 2, from = '*', to = 'idle' },
-        { name = 'INCOMPLETE_UPLOAD', triggered_by_register = 3, from = 'idle', to = 'completed' },
+        { name = 'force_step', action_id = 2, from = '*', to = 'idle' },
+        { name = 'complete', triggered_by_register = 1, from = '*', to = 'completed' },
+        { name = 'empty_upload', triggered_by_register = 2, from = '*', to = 'idle' },
+        { name = 'incomplete_upload', triggered_by_register = 3, from = '*', to = 'idle' },
     },
     callbacks = {
         on_completed = function()
