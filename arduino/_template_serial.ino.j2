@@ -16,7 +16,7 @@ enum
   ACTIONS,      // Always present, used for incoming actions
 
   // Any registered events, denoted by 'triggered_by_register' in rs485_node of Lua script, 1 and up
-  {% for event_id, event in events.items() -%}
+  {% for event_id, event in events -%}
   {{ event }},
   {% endfor %}
   TOTAL_ERRORS     // leave this one, error counter
@@ -68,7 +68,7 @@ void process_actions() {
     return;
 
   switch (mb.Hreg(ACTIONS)) {
-    {%- for action_id, action in actions.items() %}
+    {%- for action_id, action in actions %}
     case {{ action_id }} : // Put here code for {{ action }}
       Serial.println("[{{ action }}] action fired");
       {%- if MODBUS_DEBUG %}
@@ -139,7 +139,7 @@ void modbus_setup()
 #endif
 
   mb.addHreg(ACTIONS, 0);
-  {% for event_id, event in events.items() -%}
+  {% for event_id, event in events -%}
   mb.addHreg({{ event }}, 0);
   {% endfor %}
 
@@ -168,7 +168,7 @@ void modbus_loop()
   process_actions();
 
   // Notify main console of local events
-  {% for event_id, event in events.items() -%}
+  {% for event_id, event in events -%}
   // mb.Hreg({{ event }}, 1);
   {% endfor %}
 

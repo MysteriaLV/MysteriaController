@@ -1,3 +1,4 @@
+import collections
 import os
 
 import ipaddress
@@ -36,11 +37,11 @@ class _dummy_sampler(object):
 @lupa.unpacks_lua_table_method
 def register_slave_lua(slave):
     # TODO make sure the are no gaps
-    events = {i.config.triggered_by_register: i.config.name.upper()
-              for i in slave['events'].values() if i.config.triggered_by_register}
+    events = sorted({i.config.triggered_by_register: i.config.name.upper()
+              for i in slave['events'].values() if i.config.triggered_by_register}.items())
 
-    actions = {i.config.action_id: i.config.name.capitalize()
-               for i in slave['events'].values() if i.config.action_id}
+    actions = sorted({i.config.action_id: i.config.name.capitalize()
+               for i in slave['events'].values() if i.config.action_id}.items())
 
     # TODO basic validation for identical event/action ids
     if not os.path.exists('arduino/{}_modbus'.format(slave.name.lower())):
