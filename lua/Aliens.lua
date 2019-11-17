@@ -105,6 +105,7 @@ lights = rs485_node.create({
         { name = 'enable_xray', action_id = 7, from = '*', to = 'idle' },
         { name = 'disable_xray', action_id = 8, from = '*', to = 'idle' },
         { name = 'force_lapa', action_id = 9, from = '*', to = 'idle' },
+        { name = 'power_console_connected', action_id = 10, from = '*', to = 'idle' },
     },
 })
 
