@@ -165,7 +165,7 @@ magnetic_door = rs485_node.create({
     callbacks = {
         on_completed = function()
             print('People entered second room')
-            quest:laboratory_access()
+            quest:open_laboratory()
         end,
     }
 })
