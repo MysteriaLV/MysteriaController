@@ -19,9 +19,9 @@ quest = machine.create({
         on_preparation = function(self)
             print('Resetting everything to inital states, walking around cleaning etc')
 
-            lights:full_lights()
-            lights:unlock_door()
-            lights:enable_xray()
+            light:full_lights()
+            light:unlock_door()
+            light:enable_xray()
 
             power_console:reset()
             gestures:reset()
@@ -35,20 +35,20 @@ quest = machine.create({
         on_intro = function(self)
             print('People are entering the room')
 
-            lights:no_power()
-            lights:disable_xray()
+            light:no_power()
+            light:disable_xray()
             sampler:play('bg_slow_L')
         end,
         on_start = function(self)
             print('Game is ON!')
-            lights:lock_door();
+            light:lock_door();
 
             -- TODO start timer
             sampler:play('MA_SFX_StartRamp_1')
         end,
         on_power_console_connected = function(self)
             sampler:play('Church_Organ_Powerup')
-            lights:power_console_connected()
+            light:power_console_connected()
         end,
         on_powered_on = function(self)
             print('Lights and machinery are on now')
@@ -79,7 +79,7 @@ power_console = rs485_node.create({
     events = {
         { name = 'reset', action_id = 1, from = '*', to = 'disconnected' },
         { name = 'connect', triggered_by_register = 1, action_id = 2, from = 'disconnected', to = 'powered_off' },
-        { name = 'power_on', triggered_by_register = 2, from = 'powered_off', to = 'completed' },
+        { name = 'power_on', triggered_by_register = 2, action_id = 3, from = 'powered_off', to = 'completed' },
     },
     callbacks = {
         on_powered_off = function()
@@ -93,8 +93,8 @@ power_console = rs485_node.create({
     }
 })
 
-lights = rs485_node.create({
-    name = 'lights',
+light = rs485_node.create({
+    name = 'light',
     slave_id = 1,
     events = {
         { name = 'full_lights', action_id = 1, from = '*', to = 'idle' },
