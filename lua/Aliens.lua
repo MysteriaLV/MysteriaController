@@ -48,6 +48,7 @@ quest = machine.create({
         end,
         on_power_console_connected = function(self)
             sampler:play('Church_Organ_Powerup')
+            lights:power_console_connected()
         end,
         on_powered_on = function(self)
             print('Lights and machinery are on now')
@@ -55,7 +56,7 @@ quest = machine.create({
 
             light:power_active()
             light:enable_xray()
-            magnetic_door:activated();
+            magnetic_door:activated()
         end,
         on_laboratory_access = function(self)
             print('We are in Room2 now.')
