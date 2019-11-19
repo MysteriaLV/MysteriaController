@@ -4,6 +4,7 @@ import struct
 import time
 from collections import namedtuple
 
+import schedule
 from pymodbus.client.sync import ModbusSerialClient, ModbusTcpClient
 from pymodbus.constants import Defaults
 from pymodbus.exceptions import ConnectionException, ModbusIOException
@@ -13,6 +14,7 @@ ACTION_REGISTER = 0
 
 pymodbus_logger = logging.getLogger('pymodbus')
 pymodbus_logger.setLevel(logging.INFO)
+logging.getLogger('schedule').setLevel(logging.WARNING)
 
 
 class ModBus(object):
@@ -68,8 +70,11 @@ class ModBus(object):
 
     def processor(self):
         while self.running:
+            schedule.run_pending()
+
             for slave in self.slaves.values():
-                self.read_and_react(slave)
+                if slave.can_run:
+                    self.read_and_react(slave)
 
             # Process actions if any
             attempted = set()
@@ -90,7 +95,8 @@ class ModBus(object):
         try:
             slave.current_data = self.read_registers(slave)
             if type(slave.current_data) is ModbusIOException \
-                    or type(slave.current_data) is ExceptionResponse:
+                    or type(slave.current_data) is ExceptionResponse \
+                    or not slave.current_data:
                 raise ConnectionException
 
             if slave.last_data:
@@ -103,15 +109,20 @@ class ModBus(object):
                             logging.info("External event {} - result {}".format(i.config.name, event_result))
 
             slave.last_data = slave.current_data
+
         except ConnectionException:
             # logging.debug("Timeout for {}".format(slave.name))
             slave.current_data = None
             slave.errors += 1
 
+        # Disable until timer enables it
+        if slave.poll_frequency:
+            slave.can_run = False
+
     def register_slave(self, lua_slave):
         slave_id = lua_slave['slave_id']
         slave = namedtuple(lua_slave['name'] or 'Slave {}'.format(slave_id),
-                           ['name', 'slave_id', 'reg_count', 'last_data', 'current_data', 'errors', 'fsm', 'poll_frequency'])
+                           ['name', 'slave_id', 'reg_count', 'last_data', 'current_data', 'errors', 'fsm', 'poll_frequency', 'can_run'])
         slave.name = lua_slave['name'] or 'Slave {}'.format(slave_id)
         slave.slave_id = slave_id
         slave.poll_frequency = lua_slave['poll_frequency'] or 0
@@ -120,6 +131,15 @@ class ModBus(object):
         slave.errors = 0
         slave.fsm = lua_slave
         slave.last_data = slave.current_data = None
+
+        def _enable_run(x):
+            logging.info(x)
+            x.can_run = True
+
+        if slave.poll_frequency:
+            schedule.every(int(slave.poll_frequency)).seconds.do(_enable_run, slave)
+        else:
+            slave.can_run = True
         self.slaves[slave_id] = slave
 
     def queue_action(self, slave_id, action_id):

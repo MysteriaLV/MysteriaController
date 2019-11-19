@@ -8,6 +8,7 @@ function rs485.create(options)
 
     my_node.slave_id = options.slave_id
     my_node.name = options.name
+    my_node.poll_frequency = options.poll_frequency
 
     REGISTER_MODBUS_SLAVE(my_node)
 
