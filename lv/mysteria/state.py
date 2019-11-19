@@ -23,9 +23,6 @@ class GameState(object):
         lua.globals()['print'] = logging.getLogger('lua').info
         lua.execute(open(LUA_SCENARIO, 'r').read())
 
-        # lua.execute('alien_arm.complete()')
-        # print lua.eval('quest')
-
     # @lupa.unpacks_lua_table_method
     def register_slave_lua(self, slave):
         self.modbus.register_slave(slave)

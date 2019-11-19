@@ -184,6 +184,7 @@ destruction_console = rs485_node.create({
 sample_transmitter = rs485_node.create({
     name = 'sample_transmitter',
     slave_id = '192.168.118.8',
+    poll_frequency = '2',
     events = {
         { name = 'reset', action_id = 1, from = '*', to = 'idle' },
         { name = 'force_step', action_id = 2, from = '*', to = 'idle' },

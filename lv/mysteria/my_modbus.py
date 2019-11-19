@@ -7,6 +7,7 @@ from collections import namedtuple
 from pymodbus.client.sync import ModbusSerialClient, ModbusTcpClient
 from pymodbus.constants import Defaults
 from pymodbus.exceptions import ConnectionException, ModbusIOException
+from pymodbus.pdu import ExceptionResponse
 
 ACTION_REGISTER = 0
 
@@ -42,9 +43,9 @@ class ModBus(object):
                 return None
 
         try:
-            tcpModbus = ModbusTcpClient(slave.slave_id)
-            tcpModbus.connect()
-            return tcpModbus.read_holding_registers(0, slave.reg_count)
+            tcp_modbus = ModbusTcpClient(slave.slave_id)
+            tcp_modbus.connect()
+            return tcp_modbus.read_holding_registers(0, slave.reg_count)
         except (ConnectionException, IndexError):
             slave.errors += 1
             return None
@@ -58,37 +59,17 @@ class ModBus(object):
                 slave.errors += 1
         else:
             try:
-                tcpModbus = ModbusTcpClient(slave.slave_id)
-                tcpModbus.connect()
-                tcpModbus.write_register(ACTION_REGISTER, value)
-            except ConnectionException:
+                tcp_modbus = ModbusTcpClient(slave.slave_id)
+                tcp_modbus.connect()
+                tcp_modbus.write_register(ACTION_REGISTER, value)
+            except ConnectionException as e:
+                logging.exception(e)
                 slave.errors += 1
 
     def processor(self):
         while self.running:
             for slave in self.slaves.values():
-                try:
-                    slave.current_data = self.read_registers(slave)
-                    if type(slave.current_data) is ModbusIOException:
-                        raise ConnectionException
-                except ConnectionException:
-                    slave.current_data = None
-                    slave.errors += 1
-
-                if slave.current_data:
-                    if slave.last_data:
-                        for i in slave.fsm['events'].values():
-                            if i.config.triggered_by_register:
-                                if slave.current_data.getRegister(i.config.triggered_by_register) and \
-                                        not slave.last_data.getRegister(i.config.triggered_by_register):
-                                    # We got a value change to TRUE on a register we monitor
-                                    logging.info("External event {} - result {}".format(
-                                        i.config.name,
-                                        slave.fsm[i.config.name](slave.fsm)))
-                    slave.last_data = slave.current_data
-                else:
-                    # logging.warn("Timeout for {}".format(slave.name))
-                    slave.errors += 1
+                self.read_and_react(slave)
 
             # Process actions if any
             attempted = set()
@@ -105,12 +86,35 @@ class ModBus(object):
             # TODO maybe remove for faster reactions
             # time.sleep(5)
 
+    def read_and_react(self, slave):
+        try:
+            slave.current_data = self.read_registers(slave)
+            if type(slave.current_data) is ModbusIOException \
+                    or type(slave.current_data) is ExceptionResponse:
+                raise ConnectionException
+
+            if slave.last_data:
+                for i in slave.fsm['events'].values():
+                    if i.config.triggered_by_register:
+                        if slave.current_data.getRegister(i.config.triggered_by_register) and \
+                                not slave.last_data.getRegister(i.config.triggered_by_register):
+                            # We got a value change to TRUE on a register we monitor
+                            event_result = slave.fsm[i.config.name](slave.fsm)
+                            logging.info("External event {} - result {}".format(i.config.name, event_result))
+
+            slave.last_data = slave.current_data
+        except ConnectionException:
+            # logging.debug("Timeout for {}".format(slave.name))
+            slave.current_data = None
+            slave.errors += 1
+
     def register_slave(self, lua_slave):
         slave_id = lua_slave['slave_id']
         slave = namedtuple(lua_slave['name'] or 'Slave {}'.format(slave_id),
-                           ['name', 'slave_id', 'reg_count', 'last_data', 'current_data', 'errors', 'fsm'])
+                           ['name', 'slave_id', 'reg_count', 'last_data', 'current_data', 'errors', 'fsm', 'poll_frequency'])
         slave.name = lua_slave['name'] or 'Slave {}'.format(slave_id)
         slave.slave_id = slave_id
+        slave.poll_frequency = lua_slave['poll_frequency'] or 0
         slave.reg_count = sum(
             1 for i in lua_slave['events'].values() if i.config.triggered_by_register) + 2  # ACTIONS and TOTAL_ERRORS
         slave.errors = 0
@@ -125,7 +129,7 @@ class ModBus(object):
         slave = self.slaves[slave_id]
         try:
             if not slave.current_data.getRegister(ACTION_REGISTER) == 0:
-                logging.warn(
+                logging.warning(
                     "Sending action {} to {} while it apparently didn't finish processing previous action {}".format(
                         action_id, slave_id, slave.current_data.getRegister(ACTION_REGISTER)))
                 return False
@@ -136,7 +140,7 @@ class ModBus(object):
             self.write_action_register(action_id, slave)
             return True
         except ConnectionException:
-            logging.warn("Cannot send {} to {}".format(action_id, slave.name))
+            logging.warning("Cannot send {} to {}".format(action_id, slave.name))
             slave.errors += 1
 
         return False
