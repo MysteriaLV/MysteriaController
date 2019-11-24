@@ -3,7 +3,16 @@ from dotmap import DotMap
 
 
 class HUD(object):
-    default_bg_video_options = ['--no-audio', '--video-y=1']
+    default_bg_video_options = ['--no-audio', '--video-y=1', '--vout=direct3d11', '--avcodec-hw=any']
+
+    # video_mappings = {
+    #     # 1: DotMap({'source': 'idle/camera1.mp4', 'offset': 0}),
+    #     2: DotMap({'source': 'idle/1360x768.mov',    'offset': 1280}),
+    #     3: DotMap({'source': 'idle/1280x1024.mov',   'offset': 1280+768}),
+    #     4: DotMap({'source': 'idle/1280x1024-2.mov', 'offset': 1280+768+1280}),
+    #     5: DotMap({'source': 'idle/1280x1024.mov',   'offset': 1280+768+1280+1280}),
+    #     6: DotMap({'source': 'idle/1360x768.mov',    'offset': 1280+768+1280+1280+768}),
+    # }
 
     video_mappings = {
         # 1: DotMap({'source': 'idle/camera1.mp4', 'offset': 0}),
