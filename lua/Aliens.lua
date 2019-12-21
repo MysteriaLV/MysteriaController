@@ -67,7 +67,13 @@ quest = machine.create({
             destruction_console:activated()
             light:alarms()
         end,
-    }
+        on_victory = function(self)
+            print('You won!')
+            sampler:play('music1_left')
+            light:full_lights()
+            light:unlock_door()
+        end,
+        }
 })
 REGISTER_STATES("main_quest", quest)
 
@@ -176,8 +182,14 @@ destruction_console = rs485_node.create({
     events = {
         { name = 'reset', action_id = 1, from = '*', to = 'idle' },
         { name = 'activated', action_id = 2, from = 'idle', to = 'active' },
-        { name = 'entered_code', triggered_by_register = 1, from = 'active', to = 'completed' },
-        { name = 'force_complete', action_id = 3, from = '*', to = 'completed' },
+        { name = 'force_step', action_id = 2, from = '*', to = 'active' },
+        { name = 'complete', triggered_by_register = 1, from = 'active', to = 'completed' },
+    },
+    callbacks = {
+        on_completed = function()
+            print('They entered correct code in a console!')
+            quest:start_self_destruct()
+        end,
     }
 })
 
@@ -195,7 +207,7 @@ sample_transmitter = rs485_node.create({
     callbacks = {
         on_completed = function()
             print('Samples are transmitted. Sound the alarm!')
-            quest:start_self_destruct()
+            quest:win()
         end,
     }
 })
