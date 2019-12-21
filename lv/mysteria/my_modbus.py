@@ -13,6 +13,7 @@ ACTION_REGISTER = 0
 
 pymodbus_logger = logging.getLogger('pymodbus')
 pymodbus_logger.setLevel(logging.INFO)
+
 logging.getLogger('schedule').setLevel(logging.WARNING)
 
 
@@ -37,10 +38,9 @@ class ModBus(object):
         time.sleep(0.02)
         try:
             if type(slave.slave_id) is int:
-                return None
                 response = self.serialModbus.read_holding_registers(0, slave.reg_count, unit=slave.slave_id)
             else:
-                logging.debug(f'++ Requesting data from {slave.slave_id}')
+                # logging.debug(f'++ Requesting data from {slave.slave_id}')
                 tcp_modbus = ModbusTcpClient(slave.slave_id)
                 tcp_modbus.connect()
                 response = tcp_modbus.read_holding_registers(0, slave.reg_count)
@@ -48,7 +48,7 @@ class ModBus(object):
             if issubclass(type(response), ModbusException):
                 raise response
 
-            logging.debug(f'++ Got data from {slave.slave_id}')
+            # logging.debug(f'++ Got data from {slave.slave_id}')
             return response
 
         except (IndexError, struct.error, ModbusException, ConnectionException) as e:
@@ -92,8 +92,8 @@ class ModBus(object):
                 attempted.add(slave_id)
                 if self._send_action(slave_id, action_id):
                     self.action_queue.remove(action)
-                # else:
-                # logging.debug(f"Failure to send action. Will requeue, actions in queue {len(self.action_queue)}")
+                else:
+                    logging.debug(f"Failure to send action. Will requeue, actions in queue {len(self.action_queue)}")
 
             # Read values
             for slave in self.slaves.values():
@@ -131,7 +131,8 @@ class ModBus(object):
     def register_slave(self, lua_slave):
         slave_id = lua_slave['slave_id']
         slave = namedtuple(lua_slave['name'] or 'Slave {}'.format(slave_id),
-                           ['name', 'slave_id', 'reg_count', 'last_data', 'current_data', 'errors', 'fsm', 'poll_frequency', 'can_run'])
+                           ['name', 'slave_id', 'reg_count', 'last_data', 'current_data', 'errors', 'fsm',
+                            'poll_frequency', 'can_run'])
         slave.name = lua_slave['name'] or 'Slave {}'.format(slave_id)
         slave.slave_id = slave_id
         slave.poll_frequency = lua_slave['poll_frequency'] or 0
