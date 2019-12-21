@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/AliensLua.iml" filepath="$PROJECT_DIR$/AliensLua.iml" />
+      <module fileurl="file://$PROJECT_DIR$/MysteriaController.iml" filepath="$PROJECT_DIR$/MysteriaController.iml" />
     </modules>
   </component>
 </project>

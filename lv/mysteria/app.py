@@ -9,7 +9,8 @@ from mysteria.web import app as flask, eternal_flask_app
 
 logging.basicConfig(
     level=logging.DEBUG,
-    format='(%(threadName)-10s) [%(name)s] %(message)s',
+    format='(%(threadName)-7s) %(asctime)s [%(name)s] %(message)s',
+    datefmt='%M:%S'
 )
 
 

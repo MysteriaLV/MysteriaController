@@ -7,8 +7,7 @@ from collections import namedtuple
 import schedule
 from pymodbus.client.sync import ModbusSerialClient, ModbusTcpClient
 from pymodbus.constants import Defaults
-from pymodbus.exceptions import ConnectionException, ModbusIOException
-from pymodbus.pdu import ExceptionResponse
+from pymodbus.exceptions import ConnectionException, ModbusException
 
 ACTION_REGISTER = 0
 
@@ -36,45 +35,51 @@ class ModBus(object):
     def read_registers(self, slave):
         # Carefully measured artificial pause to make sure everything is processed
         time.sleep(0.02)
-        if type(slave.slave_id) is int:
-            try:
-                return self.serialModbus.read_holding_registers(0, slave.reg_count, unit=slave.slave_id)
-            except (IndexError, struct.error) as e:
-                logging.error(e)
-                slave.errors += 1
-                return None
-
         try:
-            tcp_modbus = ModbusTcpClient(slave.slave_id)
-            tcp_modbus.connect()
-            return tcp_modbus.read_holding_registers(0, slave.reg_count)
-        except (ConnectionException, IndexError):
+            if type(slave.slave_id) is int:
+                return None
+                response = self.serialModbus.read_holding_registers(0, slave.reg_count, unit=slave.slave_id)
+            else:
+                logging.debug(f'++ Requesting data from {slave.slave_id}')
+                tcp_modbus = ModbusTcpClient(slave.slave_id)
+                tcp_modbus.connect()
+                response = tcp_modbus.read_holding_registers(0, slave.reg_count)
+
+            if issubclass(type(response), ModbusException):
+                raise response
+
+            logging.debug(f'++ Got data from {slave.slave_id}')
+            return response
+
+        except (IndexError, struct.error, ModbusException, ConnectionException) as e:
+            logging.exception(e, exc_info=False)
             slave.errors += 1
             return None
 
     def write_action_register(self, value, slave):
-        if type(slave.slave_id) is int:
-            try:
-                self.serialModbus.write_register(ACTION_REGISTER, value, unit=slave.slave_id)
-            except (IndexError, struct.error) as e:
-                logging.error(e)
-                slave.errors += 1
-        else:
-            try:
+        logging.debug(f'-- Sending action {value} to {slave.slave_id}')
+        try:
+            if type(slave.slave_id) is int:
+                response = self.serialModbus.write_register(ACTION_REGISTER, value, unit=slave.slave_id)
+            else:
                 tcp_modbus = ModbusTcpClient(slave.slave_id)
                 tcp_modbus.connect()
-                tcp_modbus.write_register(ACTION_REGISTER, value)
-            except ConnectionException as e:
-                logging.exception(e)
-                slave.errors += 1
+                response = tcp_modbus.write_register(ACTION_REGISTER, value)
+
+            if issubclass(type(response), ModbusException):
+                raise response
+
+            logging.debug(f'-- Action ok from {slave.slave_id}')
+
+            return True
+        except (IndexError, struct.error, ModbusException, ConnectionException) as e:
+            logging.exception(e, exc_info=False)
+            slave.errors += 1
+            return False
 
     def processor(self):
         while self.running:
             schedule.run_pending()
-
-            for slave in self.slaves.values():
-                if slave.can_run:
-                    self.read_and_react(slave)
 
             # Process actions if any
             attempted = set()
@@ -87,6 +92,13 @@ class ModBus(object):
                 attempted.add(slave_id)
                 if self._send_action(slave_id, action_id):
                     self.action_queue.remove(action)
+                # else:
+                # logging.debug(f"Failure to send action. Will requeue, actions in queue {len(self.action_queue)}")
+
+            # Read values
+            for slave in self.slaves.values():
+                if slave.can_run:
+                    self.read_and_react(slave)
 
             # TODO maybe remove for faster reactions
             # time.sleep(5)
@@ -94,9 +106,7 @@ class ModBus(object):
     def read_and_react(self, slave):
         try:
             slave.current_data = self.read_registers(slave)
-            if type(slave.current_data) is ModbusIOException \
-                    or type(slave.current_data) is ExceptionResponse \
-                    or not slave.current_data:
+            if not slave.current_data:
                 raise ConnectionException
 
             if slave.last_data:
@@ -113,7 +123,6 @@ class ModBus(object):
         except ConnectionException:
             # logging.debug("Timeout for {}".format(slave.name))
             slave.current_data = None
-            slave.errors += 1
 
         # Disable until timer enables it
         if slave.poll_frequency:
@@ -133,11 +142,12 @@ class ModBus(object):
         slave.last_data = slave.current_data = None
 
         def _enable_run(x):
-            logging.info(x)
+            # logging.debug(f'Resetting run timer for {x}')
             x.can_run = True
 
         if slave.poll_frequency:
             schedule.every(int(slave.poll_frequency)).seconds.do(_enable_run, slave)
+            slave.can_run = False
         else:
             slave.can_run = True
         self.slaves[slave_id] = slave
@@ -156,14 +166,9 @@ class ModBus(object):
         except AttributeError:
             return False
 
-        try:
-            self.write_action_register(action_id, slave)
-            return True
-        except ConnectionException:
-            logging.warning("Cannot send {} to {}".format(action_id, slave.name))
-            slave.errors += 1
-
-        return False
+        # Mark this attempt as spent
+        slave.can_run = False
+        return self.write_action_register(action_id, slave)
 
     @staticmethod
     def get_remote_errors(slave):
