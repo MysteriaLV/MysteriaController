@@ -1,7 +1,6 @@
 import logging
 import threading
 
-from mysteria.my_hud import HUD
 from mysteria.my_modbus import ModBus
 from mysteria.my_usb import TouchPanel
 from mysteria.state import GameState

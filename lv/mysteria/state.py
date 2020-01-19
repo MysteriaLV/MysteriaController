@@ -1,7 +1,7 @@
 import logging
 from lupa import LuaRuntime
 
-from mysteria.media_players import Sampler, ZombieBox
+from mysteria.media_players import Sampler, ZombieBox, PotPlayer
 
 LUA_SCENARIO = 'lua/Aliens.lua'
 lua = LuaRuntime(unpack_returned_tuples=True)
@@ -13,6 +13,7 @@ class GameState(object):
         self.modbus = modbus
         self.sampler = Sampler()
         self.zombie_box = ZombieBox()
+        self.pot_player = PotPlayer()
         self.fsms = {}
 
         lua.globals()['REGISTER_STATES'] = self.register_fsm
@@ -20,6 +21,7 @@ class GameState(object):
         lua.globals()['REGISTER_CODE_PANEL'] = self.touchpanel.register_code_panel_lua
         lua.globals()['REGISTER_SAMPLER'] = self.sampler.register_in_lua
         lua.globals()['REGISTER_VLC'] = self.zombie_box.register_in_lua
+        lua.globals()['REGISTER_POTPLAYER'] = self.pot_player.register_in_lua
         lua.globals()['MODBUS_ACTION'] = self.modbus.queue_action
         lua.globals()['print'] = logging.getLogger('lua').info
         lua.execute(open(LUA_SCENARIO, 'r').read())

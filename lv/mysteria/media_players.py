@@ -1,3 +1,5 @@
+import shlex
+import subprocess
 import threading
 import time
 import random
@@ -30,6 +32,7 @@ class ZombieBox(object):
         self.vlc: vlc.Instance = vlc.Instance(
             ['--no-spu', '--no-osd', '--video-on-top', '--video-y=1', '--video-x=3000', '--fullscreen'])
         self.main_player: vlc.MediaPlayer = self.vlc.media_player_new()
+        self.main_player.set_fullscreen(True)
 
         event_manager = self.main_player.event_manager()
         event_manager.event_attach(vlc.EventType.MediaPlayerEndReached, self.ask_for_more)
@@ -97,11 +100,43 @@ class Sampler(object):
             player.stop()
 
 
+class PotPlayer(object):
+
+    def __init__(self):
+        self.pot_players = dict()
+        self.PLAYER_EXE = "PotPlayer_DISPLAY{display_number}.exe"
+        self.PLAYER_RUN_CMD = '"C:\\Program Files\\DAUM\PotPlayer\\PotPlayer_DISPLAY{display_number}.exe" "{media_file}" /new config=DISPLAY{display_number}'
+        self.NUM_DISPLAYS = 2
+
+    def register_in_lua(self):
+        return self
+
+    def stop(self, display_number):
+        subprocess.run(f"taskkill /im {self.PLAYER_EXE.format(display_number=display_number)} /f")
+
+    def play(self, display_number, media_file):
+        self.stop(display_number)
+        cmd = self.PLAYER_RUN_CMD.format(display_number=display_number, media_file=media_file)
+        print(cmd)
+
+        subprocess.Popen(shlex.split(cmd))
+
+    def reset(self):
+        for i in range(self.NUM_DISPLAYS):
+            self.stop(i)
+
+
 if __name__ == '__main__':
-    z = ZombieBox()
-    z.start()
+    # z = ZombieBox()
+    # z.start()
+    # time.sleep(4)
+    # print("GO")
+    # z.idle_media_files = ['idle/11.mp4', 'idle/12.mp4']
+    # # z.play('idle/11.mp4')
+    # time.sleep(200)
+
+    p = PotPlayer()
+    p.play(2, 'idle/11.mp4')
     time.sleep(4)
-    print("GO")
-    z.idle_media_files = ['idle/11.mp4', 'idle/12.mp4']
-    # z.play('idle/11.mp4')
-    time.sleep(200)
+    p.play(2, 'idle/12.mp4')
+    time.sleep(10)
