@@ -1,3 +1,4 @@
+// clang-format off
 #define USE_HOLDING_REGISTERS_ONLY
 #include <ESP8266WiFi.h>
 #include <Modbus.h>
@@ -16,6 +17,7 @@ enum
   TOTAL_ERRORS,     // leave this one, error counter
   TOTAL_REGS_SIZE   // INTERNAL: total number of registers for function 3 and 16 share the same register array
 };
+// clang-format on
 
 //ModbusIP object
 ModbusIP mb;

@@ -6,7 +6,7 @@ import jinja2
 import lupa
 from lupa import LuaRuntime
 
-from state import LUA_SCENARIO
+from .state import LUA_SCENARIO
 
 TEMPLATE_SERIAL = 'arduino/_template_serial.ino.j2'
 TEMPLATE_TCP = 'arduino/_template_serial.ino.j2'
@@ -42,6 +42,8 @@ def register_slave_lua(slave):
 
     actions = sorted({i.config.action_id: i.config.name.capitalize()
                for i in slave['events'].values() if i.config.action_id}.items())
+
+    # actions = {k: actions[k] for k in sorted(actions)}
 
     # TODO basic validation for identical event/action ids
     if not os.path.exists('arduino/{}_modbus'.format(slave.name.lower())):

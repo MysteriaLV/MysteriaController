@@ -1,5 +1,6 @@
 #ifndef {{ slave_name|upper }}_MODBUS_H
 #define {{ slave_name|upper }}_MODBUS_H
+// clang-format off
 
 #define USE_HOLDING_REGISTERS_ONLY
 #include <Arduino.h>
@@ -21,6 +22,7 @@ enum
   {% endfor %}
   TOTAL_ERRORS     // leave this one, error counter
 };
+// clang-format on
 #endif //{{ slave_name|upper }}_MODBUS_H
 
 #ifdef USE_SOFTWARE_SERIAL

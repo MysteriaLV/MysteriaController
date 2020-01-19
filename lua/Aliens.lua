@@ -2,6 +2,8 @@ local machine = require('lua/statemachine')
 local rs485_node = require('lua/rs485_node')
 
 sampler = REGISTER_SAMPLER()
+zombie_box = REGISTER_VLC()
+--video = REGISTER_POTPLAYER()
 
 --noinspection UnusedDef
 quest = machine.create({
@@ -31,6 +33,9 @@ quest = machine.create({
             destruction_console:reset()
             sample_transmitter:reset()
             sampler:reset()
+
+            zombie_box:set_idle_files({'idle/1.mp4', 'idle/2.mp4', 'idle/3.mp4', 'idle/4.mp4'})
+            zombie_box:start()
         end,
         on_intro = function(self)
             print('People are entering the room')
