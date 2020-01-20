@@ -2,7 +2,7 @@ import logging
 import threading
 
 from mysteria.my_modbus import ModBus
-from mysteria.my_usb import TouchPanel
+from mysteria.touchpanel import TouchPanel
 from mysteria.state import GameState
 from mysteria.web import app as flask, eternal_flask_app
 

@@ -28,6 +28,7 @@ class ZombieBox(object):
     def __init__(self):
         self.idle_media_files = ['idle/1.mp4', 'idle/2.mp4', 'idle/3.mp4', 'idle/4.mp4']
         self.needs_next_video = False
+        self.hints_fsm = None
 
         self.vlc: vlc.Instance = vlc.Instance(
             ['--no-spu', '--no-osd', '--video-on-top', '--video-y=1', '--video-x=3000', '--fullscreen'])
@@ -47,7 +48,8 @@ class ZombieBox(object):
     def play_next_idle(self):
         self.play(random.choice(self.idle_media_files))
 
-    def register_in_lua(self):
+    def register_in_lua(self, hints_fsm):
+        self.hints_fsm = hints_fsm
         return self
 
     def set_idle_files(self, media_files):
@@ -70,6 +72,10 @@ class ZombieBox(object):
         while True:
             time.sleep(0.01)
             if self.needs_next_video:
+                # Inform code panel that we done playing current video
+                if self.hints_fsm:
+                    self.hints_fsm['ready_for_input'](self.hints_fsm)
+
                 self.play_next_idle()
 
 

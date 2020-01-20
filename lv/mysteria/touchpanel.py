@@ -10,8 +10,11 @@ class TouchPanel(object):
     MIN = (75, 125)
     MAX = (1980, 1935)
 
-    def __init__(self, rows=2, columns=3):
-        self.code_panel = self.code_length = self.code_timeout = None
+    LETTERS = ['A', 'B', 'C', 'X'
+               '1', '2', '3', 'X']
+
+    def __init__(self, rows=2, columns=4):
+        self.code_panel = self.code_timeout = None
         self.code_panel_input_start_time = None
         self.touch_panel_pressed = False
 
@@ -19,7 +22,7 @@ class TouchPanel(object):
         self.y_interval = (TouchPanel.MAX[1] - TouchPanel.MIN[1]) / rows
         self.columns = columns
 
-        self.touches = deque()
+        self.touches = list()
         self.running = True
         try:
             self.device = usb.core.find(idVendor=0x0eef, idProduct=0x0001)
@@ -37,9 +40,8 @@ class TouchPanel(object):
         # first endpoint
         self.endpoint = self.device[0][(0, 0)][0]
 
-    def register_code_panel_lua(self, name, code_panel, code_length, timeout):
+    def register_code_panel_lua(self, code_panel, timeout):
         self.code_panel = code_panel
-        self.code_length = code_length
         self.code_timeout = timeout
 
     def processor(self):
@@ -50,6 +52,7 @@ class TouchPanel(object):
         while self.running:
             self.poll_usb_device()
             if self.code_panel:
+                time.sleep(0.1)
                 self.process_codes()
 
     def poll_usb_device(self):
@@ -69,13 +72,15 @@ class TouchPanel(object):
 
             mapped_x, mapped_y = int((x - TouchPanel.MIN[0]) / self.x_interval), \
                                  int((y - TouchPanel.MIN[1]) / self.y_interval)
-            absolute = mapped_y * self.columns + mapped_x + 1
+
+            absolute = mapped_y * self.columns + mapped_x
+            letter = self.LETTERS[absolute]
 
             logging.debug(
                 "x={0}, y={1}, keypress={2}, mapped to ({3}, {4})={5}".format(x, y, data[0],
-                                                                              mapped_x, mapped_y, absolute))
+                                                                              mapped_x, mapped_y, letter))
 
-            self.touches.append((mapped_x, mapped_y, absolute))
+            self.touches.append(letter)
             self.touch_panel_pressed = True
 
         except usb.core.USBError as e:
@@ -94,8 +99,8 @@ class TouchPanel(object):
             self.touches.clear()
             return
 
-        if len(self.touches) == self.code_length:
-            code = ''.join([str(x[2]) for x in self.touches])
+        if self.touches[-1:] == 'X':
+            code = ''.join(self.touches[:-1])
             self.code_panel_input_start_time = None
             self.touches.clear()
 

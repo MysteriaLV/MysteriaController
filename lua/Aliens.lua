@@ -1,10 +1,6 @@
 local machine = require('lua/statemachine')
 local rs485_node = require('lua/rs485_node')
 
-sampler = REGISTER_SAMPLER()
-zombie_box = REGISTER_VLC()
-video = REGISTER_POTPLAYER()
-
 --noinspection UnusedDef
 quest = machine.create({
     events = {
@@ -35,9 +31,9 @@ quest = machine.create({
             sampler:reset()
             video:reset()
 
-            zombie_box:set_idle_files({'idle/1.mp4', 'idle/2.mp4', 'idle/3.mp4', 'idle/4.mp4'})
+            zombie_box:set_idle_files({ 'idle/1.mp4', 'idle/2.mp4', 'idle/3.mp4', 'idle/4.mp4' })
             zombie_box:start()
-            --video:play(2, 'idle/4.mp4')
+            --video:play(2, 'idle/nothing.jpg')
         end,
         on_intro = function(self)
             print('People are entering the room')
@@ -50,7 +46,7 @@ quest = machine.create({
             print('Game is ON!')
             light:lock_door();
 
-            -- TODO start timer
+            self.start_time = os.clock();
             sampler:play('MA_SFX_StartRamp_1')
         end,
         on_power_console_connected = function(self)
@@ -80,7 +76,7 @@ quest = machine.create({
             light:full_lights()
             light:unlock_door()
         end,
-        }
+    }
 })
 REGISTER_STATES("main_quest", quest)
 
@@ -218,6 +214,33 @@ sample_transmitter = rs485_node.create({
         end,
     }
 })
+
+hints = machine.create({
+    events = {
+        { name = 'reset', from = '*', to = 'idle' },
+        { name = 'ready_for_input', from = '*', to = 'idle' },
+        { name = 'code_CAC1', from = 'idle', to = 'alien_arm_1' },
+        { name = 'code_CAC3', from = 'idle', to = 'alien_arm_2' },
+        { name = 'code_CAC3', from = 'idle', to = 'alien_arm_3' },
+    },
+    callbacks = {
+        on_alien_arm_1 = function()
+            zombie_box:play('idle/1.mp4')
+        end,
+        on_alien_arm_2 = function()
+            zombie_box:play('idle/1.mp4')
+        end,
+        on_alien_arm_3 = function()
+            zombie_box:play('idle/1.mp4')
+        end,
+    }
+})
+
+REGISTER_CODE_PANEL(hints, 20) -- VAR, timeout
+REGISTER_STATES("hints", hints)
+sampler = REGISTER_SAMPLER()
+zombie_box = REGISTER_VLC(hints)
+video = REGISTER_POTPLAYER()
 
 --Fire off main initialization machine
 quest:restart()
