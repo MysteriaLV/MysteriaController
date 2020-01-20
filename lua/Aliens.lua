@@ -17,10 +17,6 @@ quest = machine.create({
         on_preparation = function(self)
             print('Resetting everything to inital states, walking around cleaning etc')
 
-            light:full_lights()
-            light:unlock_door()
-            light:enable_xray()
-
             power_console:reset()
             gestures:reset()
             boxes:reset()
@@ -31,20 +27,27 @@ quest = machine.create({
             sampler:reset()
             video:reset()
             hints:reset()
+            zombie_controller:reset()
+
+            light:full_lights()
+            light:unlock_door()
+            light:enable_xray()
+            zombie_controller:mirror(True)
 
             zombie_box:set_idle_files({ 'idle/1.mp4', 'idle/2.mp4', 'idle/3.mp4', 'idle/4.mp4' })
---            zombie_box:start()
---            video:play(2, 'idle/camera1.mp4')
---            video:play(3, 'idle/camera2.mp4')
---            video:play(4, 'idle/camera3.mp4')
---            video:play(5, 'idle/camera4.mp4')
---            video:play(6, 'idle/camera5.mp4')
+            --            zombie_box:start()
+            video:play(2, 'idle/camera1.mp4')
+            --            video:play(3, 'idle/camera2.mp4')
+            --            video:play(4, 'idle/camera3.mp4')
+            --            video:play(5, 'idle/camera4.mp4')
+            --            video:play(6, 'idle/camera5.mp4')
         end,
         on_intro = function(self)
             print('People are entering the room')
 
             light:no_power()
             light:disable_xray()
+            zombie_controller:mirror(False)
             sampler:play('bg_slow_L')
         end,
         on_start = function(self)
@@ -64,6 +67,7 @@ quest = machine.create({
 
             light:power_active()
             light:enable_xray()
+            zombie_controller:mirror(True)
             magnetic_door:activated()
         end,
         on_laboratory_access = function(self)
@@ -244,7 +248,8 @@ hints = machine.create({
 REGISTER_CODE_PANEL(hints, 20) -- VAR, timeout
 REGISTER_STATES("hints", hints)
 sampler = REGISTER_SAMPLER()
-zombie_box = REGISTER_VLC(hints)
+zombie_controller = REGISTER_ZOMBIE_CONTROLLER(quest)
+zombie_box = REGISTER_VLC(hints, zombie_controller)
 video = REGISTER_POTPLAYER()
 
 --Fire off main initialization machine

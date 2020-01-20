@@ -1,10 +1,12 @@
+import random
 import shlex
 import subprocess
 import threading
 import time
-import random
 
 import vlc
+
+from mysteria.firmata import ZombieController
 
 
 def memoize(f):
@@ -29,6 +31,7 @@ class ZombieBox(object):
         self.idle_media_files = ['idle/1.mp4', 'idle/2.mp4', 'idle/3.mp4', 'idle/4.mp4']
         self.needs_next_video = False
         self.hints_fsm = None
+        self.sparkler = None
 
         self.vlc: vlc.Instance = vlc.Instance(
             ['--no-spu', '--no-osd', '--video-on-top', '--video-y=1', '--video-x=1280', '--fullscreen'])
@@ -48,7 +51,8 @@ class ZombieBox(object):
     def play_next_idle(self):
         self.play(random.choice(self.idle_media_files))
 
-    def register_in_lua(self, hints_fsm):
+    def register_in_lua(self, hints_fsm, sparkler):
+        self.sparkler: ZombieController = sparkler
         self.hints_fsm = hints_fsm
         return self
 
@@ -67,6 +71,8 @@ class ZombieBox(object):
 
         self.main_player.set_media(self.vlc.media_new(media_file))
         self.main_player.play()
+        if self.sparkler:
+            self.sparkler.sparkle()
 
     def processor(self):
         while True:
@@ -113,7 +119,7 @@ class PotPlayer(object):
         self.PLAYER_EXE = "PotPlayer_DISPLAY{display_number}.exe"
         self.PLAYER_RUN_CMD = '"C:\\Program Files\\DAUM\PotPlayer\\PotPlayer_DISPLAY{display_number}.exe" "{media_file}" /new'
         # self.PLAYER_RUN_CMD = '"C:\\Program Files\\DAUM\PotPlayer\\PotPlayer_DISPLAY{display_number}.exe" "{media_file}" /new config=DISPLAY{display_number}'
-        self.DISPLAYS = [2,3,4,5,6]
+        self.DISPLAYS = [2, 3, 4, 5, 6]
 
     def register_in_lua(self):
         return self

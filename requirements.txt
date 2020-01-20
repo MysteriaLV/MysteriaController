@@ -12,6 +12,7 @@ transitions
 pyserial
 pymodbus>=1.3.2
 pyusb
+pymata-aio
 
 python-vlc
 
