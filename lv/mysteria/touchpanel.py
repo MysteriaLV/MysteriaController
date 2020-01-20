@@ -10,8 +10,8 @@ class TouchPanel(object):
     MIN = (75, 125)
     MAX = (1980, 1935)
 
-    LETTERS = ['A', 'B', 'C', 'X'
-               '1', '2', '3', 'X']
+    LETTERS = ['X', 'C', 'B', 'A',
+               'X', '3', '2', '1']
 
     def __init__(self, rows=2, columns=4):
         self.code_panel = self.code_timeout = None
@@ -23,6 +23,7 @@ class TouchPanel(object):
         self.columns = columns
 
         self.touches = list()
+        self.incoming_data = deque()
         self.running = True
         try:
             self.device = usb.core.find(idVendor=0x0eef, idProduct=0x0001)
@@ -52,13 +53,25 @@ class TouchPanel(object):
         while self.running:
             self.poll_usb_device()
             if self.code_panel:
-                time.sleep(0.1)
                 self.process_codes()
 
     def poll_usb_device(self):
         try:
-            data = self.device.read(self.endpoint.bEndpointAddress, self.endpoint.wMaxPacketSize)
-            if len(data) < 5 or data[0] not in [128, 129]:
+            read = self.device.read(self.endpoint.bEndpointAddress, self.endpoint.wMaxPacketSize)
+            self.incoming_data.extendleft(read)
+
+            if len(self.incoming_data) < 5:
+                return  # Not enough data yet
+
+            data = [
+                self.incoming_data.pop(),
+                self.incoming_data.pop(),
+                self.incoming_data.pop(),
+                self.incoming_data.pop(),
+                self.incoming_data.pop()
+            ]
+
+            if data[0] not in [128, 129]:
                 return  # Invalid or useless
 
             if self.touch_panel_pressed and data[0] == 129:
@@ -99,12 +112,13 @@ class TouchPanel(object):
             self.touches.clear()
             return
 
-        if self.touches[-1:] == 'X':
+        if self.touches[-1:][0] == 'X':
             code = ''.join(self.touches[:-1])
             self.code_panel_input_start_time = None
             self.touches.clear()
 
             if self.code_panel['code_' + code]:
+                logging.error(f"Executing hint {code}")
                 self.code_panel['code_' + code](self.code_panel)
 
 
@@ -120,4 +134,4 @@ if __name__ == '__main__':
     t_touchpanel = threading.Thread(name='touchpanel', target=touchpanel.processor)
     t_touchpanel.start()
 
-    touchpanel.register_code_panel_lua("test", "sdf", 2, 10)
+    touchpanel.register_code_panel_lua("test", 10)

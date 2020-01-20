@@ -30,14 +30,15 @@ quest = machine.create({
             sample_transmitter:reset()
             sampler:reset()
             video:reset()
+            hints:reset()
 
             zombie_box:set_idle_files({ 'idle/1.mp4', 'idle/2.mp4', 'idle/3.mp4', 'idle/4.mp4' })
-            zombie_box:start()
-            video:play(2, 'idle/camera1.mp4')
+--            zombie_box:start()
+--            video:play(2, 'idle/camera1.mp4')
 --            video:play(3, 'idle/camera2.mp4')
-            video:play(4, 'idle/camera3.mp4')
-            video:play(5, 'idle/camera4.mp4')
-            video:play(6, 'idle/camera5.mp4')
+--            video:play(4, 'idle/camera3.mp4')
+--            video:play(5, 'idle/camera4.mp4')
+--            video:play(6, 'idle/camera5.mp4')
         end,
         on_intro = function(self)
             print('People are entering the room')
@@ -224,18 +225,18 @@ hints = machine.create({
         { name = 'reset', from = '*', to = 'idle' },
         { name = 'ready_for_input', from = '*', to = 'idle' },
         { name = 'code_CAC1', from = 'idle', to = 'alien_arm_1' },
-        { name = 'code_CAC3', from = 'idle', to = 'alien_arm_2' },
+        { name = 'code_CAC2', from = 'idle', to = 'alien_arm_2' },
         { name = 'code_CAC3', from = 'idle', to = 'alien_arm_3' },
     },
     callbacks = {
         on_alien_arm_1 = function()
-            zombie_box:play('idle/1.mp4')
+            zombie_box:play('idle/camera1.mp4')
         end,
         on_alien_arm_2 = function()
-            zombie_box:play('idle/1.mp4')
+            zombie_box:play('idle/camera2.mp4')
         end,
         on_alien_arm_3 = function()
-            zombie_box:play('idle/1.mp4')
+            zombie_box:play('idle/camera3.mp4')
         end,
     }
 })
