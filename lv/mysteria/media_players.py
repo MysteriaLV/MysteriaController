@@ -31,7 +31,7 @@ class ZombieBox(object):
         self.hints_fsm = None
 
         self.vlc: vlc.Instance = vlc.Instance(
-            ['--no-spu', '--no-osd', '--video-on-top', '--video-y=1', '--video-x=3000', '--fullscreen'])
+            ['--no-spu', '--no-osd', '--video-on-top', '--video-y=1', '--video-x=1280', '--fullscreen'])
         self.main_player: vlc.MediaPlayer = self.vlc.media_player_new()
         self.main_player.set_fullscreen(True)
 
@@ -111,8 +111,9 @@ class PotPlayer(object):
     def __init__(self):
         self.pot_players = dict()
         self.PLAYER_EXE = "PotPlayer_DISPLAY{display_number}.exe"
-        self.PLAYER_RUN_CMD = '"C:\\Program Files\\DAUM\PotPlayer\\PotPlayer_DISPLAY{display_number}.exe" "{media_file}" /new config=DISPLAY{display_number}'
-        self.NUM_DISPLAYS = 2
+        self.PLAYER_RUN_CMD = '"C:\\Program Files\\DAUM\PotPlayer\\PotPlayer_DISPLAY{display_number}.exe" "{media_file}" /new'
+        # self.PLAYER_RUN_CMD = '"C:\\Program Files\\DAUM\PotPlayer\\PotPlayer_DISPLAY{display_number}.exe" "{media_file}" /new config=DISPLAY{display_number}'
+        self.DISPLAYS = [2,3,4,5,6]
 
     def register_in_lua(self):
         return self
@@ -128,7 +129,7 @@ class PotPlayer(object):
         subprocess.Popen(shlex.split(cmd))
 
     def reset(self):
-        for i in range(self.NUM_DISPLAYS):
+        for i in self.DISPLAYS:
             self.stop(i)
 
 

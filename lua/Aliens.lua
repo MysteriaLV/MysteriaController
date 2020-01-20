@@ -33,7 +33,11 @@ quest = machine.create({
 
             zombie_box:set_idle_files({ 'idle/1.mp4', 'idle/2.mp4', 'idle/3.mp4', 'idle/4.mp4' })
             zombie_box:start()
-            --video:play(2, 'idle/nothing.jpg')
+            video:play(2, 'idle/camera1.mp4')
+--            video:play(3, 'idle/camera2.mp4')
+            video:play(4, 'idle/camera3.mp4')
+            video:play(5, 'idle/camera4.mp4')
+            video:play(6, 'idle/camera5.mp4')
         end,
         on_intro = function(self)
             print('People are entering the room')
@@ -191,7 +195,7 @@ destruction_console = rs485_node.create({
     callbacks = {
         on_completed = function()
             print('They entered correct code in a console!')
-            quest:start_self_destruct()
+            quest:win()
         end,
     }
 })
@@ -210,7 +214,7 @@ sample_transmitter = rs485_node.create({
     callbacks = {
         on_completed = function()
             print('Samples are transmitted. Sound the alarm!')
-            quest:win()
+            quest:start_self_destruct()
         end,
     }
 })
