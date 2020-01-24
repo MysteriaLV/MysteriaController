@@ -42,4 +42,4 @@ class ZombieController(object):
     def big_red_button_pressed(self, data):
         if data == 1:
             self.button_pin.disable_reporting()
-            print(data)
+            self.main_quest['on_zombie_activated'](self.main_quest)

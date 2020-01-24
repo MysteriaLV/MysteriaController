@@ -34,7 +34,7 @@ quest = machine.create({
             light:enable_xray()
             zombie_controller:mirror(True)
 
-            zombie_box:set_idle_files({ 'idle/1.mp4', 'idle/2.mp4', 'idle/3.mp4', 'idle/4.mp4' })
+            zombie_box:set_idle_files({ 'idle/1.mp4', 'idle/2.mp4' })
             --            zombie_box:start()
             video:play(2, 'idle/camera1.mp4')
             --            video:play(3, 'idle/camera2.mp4')
@@ -72,6 +72,11 @@ quest = machine.create({
         end,
         on_laboratory_access = function(self)
             print('We are in Room2 now.')
+        end,
+        on_zombie_activated = function(self)
+            print('They woke the zombie!')
+            zombie_box:set_idle_files({ 'idle/3.mp4', 'idle/4.mp4' })
+            zombie_box:play('idle/camera2.mp4')
         end,
         on_self_destruction = function(self)
             print('It\'s the final countdown.')
