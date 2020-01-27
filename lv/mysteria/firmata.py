@@ -1,4 +1,5 @@
 import random
+import time
 
 from pyfirmata2 import Arduino, Pin, INPUT
 
@@ -14,7 +15,7 @@ class ZombieController(object):
     def __init__(self):
         self.main_quest = None
         self.board = Arduino(Arduino.AUTODETECT)
-        self.board.samplingOn(100)
+        self.board.samplingOn(50)
 
         self.mirror_pin: Pin = self.board.digital[ZombieController.PIN_MIRROR]
         self.sparks_pin: Pin = self.board.digital[ZombieController.PIN_SPARKS]
@@ -31,15 +32,17 @@ class ZombieController(object):
         self.mirror_pin.write(0 if turn_on else 1)
 
     def sparkle(self):
-        for i in range(200):
+        for i in range(20):
             self.sparks_pin.write(random.randint(0, 1))
             self.board.pass_time(0.02)
+        self.sparks_pin.write(0)
 
     def register_in_lua(self, main_quest):
         self.main_quest = main_quest
         return self
 
     def big_red_button_pressed(self, data):
-        if data == 1:
+        if data > 0.02:
+            print(f"Activated on {data}")
             self.button_pin.disable_reporting()
             self.main_quest['on_zombie_activated'](self.main_quest)

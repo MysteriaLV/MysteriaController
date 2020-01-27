@@ -28,7 +28,7 @@ def memoize(f):
 
 class ZombieBox(object):
     def __init__(self):
-        self.idle_media_files = ['idle/1.mp4', 'idle/2.mp4', 'idle/3.mp4', 'idle/4.mp4']
+        self.idle_media_files = ['idle/nothing.jpg']
         self.needs_next_video = False
         self.hints_fsm = None
         self.sparkler = None
