@@ -132,7 +132,10 @@ class PotPlayer(object):
         cmd = self.PLAYER_RUN_CMD.format(display_number=display_number, media_file=media_file)
         print(cmd)
 
-        subprocess.Popen(shlex.split(cmd))
+        try:
+            subprocess.Popen(shlex.split(cmd))
+        except FileNotFoundError:
+            pass
 
     def reset(self):
         for i in self.DISPLAYS:

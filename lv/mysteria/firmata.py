@@ -1,5 +1,4 @@
 import random
-import time
 
 from pyfirmata2 import Arduino, Pin, INPUT
 
@@ -14,24 +13,38 @@ class ZombieController(object):
 
     def __init__(self):
         self.main_quest = None
-        self.board = Arduino(Arduino.AUTODETECT)
-        self.board.samplingOn(50)
+        # noinspection PyBroadException
+        try:
+            self.board = Arduino(Arduino.AUTODETECT)
+            self.board_missing = False
+            self.board.samplingOn(50)
 
-        self.mirror_pin: Pin = self.board.digital[ZombieController.PIN_MIRROR]
-        self.sparks_pin: Pin = self.board.digital[ZombieController.PIN_SPARKS]
+            self.mirror_pin: Pin = self.board.digital[ZombieController.PIN_MIRROR]
+            self.sparks_pin: Pin = self.board.digital[ZombieController.PIN_SPARKS]
 
-        self.button_pin: Pin = self.board.analog[ZombieController.PIN_BUTTON]
-        self.button_pin.mode = INPUT
-        self.button_pin.register_callback(self.big_red_button_pressed)
-        self.button_pin.enable_reporting()
+            self.button_pin: Pin = self.board.analog[ZombieController.PIN_BUTTON]
+            self.button_pin.mode = INPUT
+            self.button_pin.register_callback(self.big_red_button_pressed)
+            self.button_pin.enable_reporting()
+        except Exception:
+            self.board_missing = True
 
     def reset(self):
+        if self.board_missing:
+            return
+
         self.button_pin.enable_reporting()
 
     def mirror(self, turn_on=True):
+        if self.board_missing:
+            return
+
         self.mirror_pin.write(0 if turn_on else 1)
 
     def sparkle(self):
+        if self.board_missing:
+            return
+
         for i in range(20):
             self.sparks_pin.write(random.randint(0, 1))
             self.board.pass_time(0.02)
