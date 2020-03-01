@@ -34,14 +34,14 @@ quest = machine.create({
             light:enable_xray()
             zombie_controller:mirror(True)
 
-            zombie_box:set_idle_files({ 'idle/1.mp4', 'idle/2.mp4' })
+            zombie_box:set_idle_files({ 'idle/finish/tv/intro.mp4' })
             zombie_box:start()
-            video:play(5, 'idle/1360x768.mov') -- nad rukavicami (5)
+            video:play(5, 'idle/finish/intro/1024x1280.mp4') -- nad rukavicami (5)
             video:play(1, 'idle/table.jpg') -- stol (2)
-            video:play(3, 'idle/1360x768.mov') -- podskazki (4)
-            --            video:play(4, 'idle/camera3.mp4') -- telek (3)
-            --            video:play(2, 'idle/1280x1024.mov') -- osnovnoj (3)
-            video:play(6, 'idle/1280x1024.mov') -- pult (6)
+            video:play(3, 'idle/finish/intro/text_standby.mp4') -- podskazki (4)
+--                video:play(4, 'idle/camera3.mp4') -- telek (3)
+            video:play(2, 'idle/finish/intro/1600x1200.mp4') -- osnovnoj (3)
+            video:play(6, 'idle/finish/intro/1280x1024.mp4') -- pult (6)
         end,
         on_intro = function(self)
             print('People are entering the room')
@@ -49,14 +49,15 @@ quest = machine.create({
             light:no_power()
             light:disable_xray()
             zombie_controller:mirror(False)
-            sampler:play('bg_slow_L')
+--            sampler:play('bg_slow_L')
         end,
         on_start = function(self)
             print('Game is ON!')
             light:lock_door();
 
+            video:play(3, 'idle/finish/game/text.mp4') -- podskazki (4)
             self.start_time = os.clock();
-            sampler:play('MA_SFX_StartRamp_1')
+            sampler:play('audio/power2')
         end,
         on_power_console_connected = function(self)
             sampler:play('Church_Organ_Powerup')
@@ -64,7 +65,11 @@ quest = machine.create({
         end,
         on_powered_on = function(self)
             print('Lights and machinery are on now')
-            sampler:play('ascending_organ')
+            sampler:play('audio/power')
+
+            video:play(5, 'idle/finish/game/5_1024x1280.mp4') -- nad rukavicami (5)
+            video:play(2, 'idle/finish/game/3_1600x1200.mp4') -- osnovnoj (3)
+            video:play(6, 'idle/finish/game/5_1024x1280.mp4') -- pult (6)
 
             light:power_active()
             light:enable_xray()
@@ -76,11 +81,16 @@ quest = machine.create({
         end,
         on_zombie_activated = function(self)
             print('They woke the zombie!')
-            zombie_box:set_idle_files({ 'idle/3.mp4', 'idle/4.mp4' })
-            zombie_box:play('idle/zombie_intro.mp4')
+            zombie_box:set_idle_files({ 'idle/finish/tv/standby.mp4' })
+            zombie_box:play('idle/finish/tv/start.mp4')
         end,
         on_self_destruction = function(self)
             print('It\'s the final countdown.')
+            sampler:play('audio/alarm')
+
+            video:play(5, 'idle/finish/alarm/6_1024x1280.mp4') -- nad rukavicami (5)
+            video:play(2, 'idle/finish/alarm/6_1024x1280.mp4') -- osnovnoj (3)
+            video:play(6, 'idle/finish/alarm/exit_pass.mp4') -- pult (6)
 
             destruction_console:activated()
             light:alarms()
@@ -234,19 +244,87 @@ hints = machine.create({
     events = {
         { name = 'reset', from = '*', to = 'idle' },
         { name = 'ready_for_input', from = '*', to = 'idle' },
-        { name = 'code_CAC1', from = 'idle', to = 'alien_arm_1' },
-        { name = 'code_CAC2', from = 'idle', to = 'alien_arm_2' },
-        { name = 'code_CAC3', from = 'idle', to = 'alien_arm_3' },
+        { name = 'code_BAC1', from = 'idle', to = 'hint_1' },
+        { name = 'code_BAC2', from = 'idle', to = 'hint_2' },
+        { name = 'code_BCA1', from = 'idle', to = 'hint_3' },
+        { name = 'code_CAC1', from = 'idle', to = 'hint_4' },
+        { name = 'code_BCA2', from = 'idle', to = 'hint_5' },
+        { name = 'code_CBC1', from = 'idle', to = 'hint_6' },
+        { name = 'code_CBC2', from = 'idle', to = 'hint_7' },
+        { name = 'code_CBC3', from = 'idle', to = 'hint_8' },
+        { name = 'code_ACB1', from = 'idle', to = 'hint_9' },
+        { name = 'code_ACB2', from = 'idle', to = 'hint_10' },
+        { name = 'code_ACB3', from = 'idle', to = 'hint_11' },
+        { name = 'code_CBA1', from = 'idle', to = 'hint_12' },
+        { name = 'code_CBA2', from = 'idle', to = 'hint_13' },
+        { name = 'code_CBA3', from = 'idle', to = 'hint_14' },
+        { name = 'code_ABA1', from = 'idle', to = 'hint_15' },
+        { name = 'code_ABA2', from = 'idle', to = 'hint_16' },
+        { name = 'code_ABA3', from = 'idle', to = 'hint_17' },
+        { name = 'code_BCB1', from = 'idle', to = 'hint_18' },
+        { name = 'code_BCB2', from = 'idle', to = 'hint_19' },
+        { name = 'code_BCB3', from = 'idle', to = 'hint_20' },
     },
     callbacks = {
-        on_alien_arm_1 = function()
-            zombie_box:play('idle/camera1.mp4')
+        on_hint_1 = function()
+            zombie_box:play('idle/finish/tv/hints/1.mp4')
         end,
-        on_alien_arm_2 = function()
-            zombie_box:play('idle/camera2.mp4')
+        on_hint_2 = function()
+            zombie_box:play('idle/finish/tv/hints/2.mp4')
         end,
-        on_alien_arm_3 = function()
-            zombie_box:play('idle/camera3.mp4')
+        on_hint_3 = function()
+            zombie_box:play('idle/finish/tv/hints/3.mp4')
+        end,
+        on_hint_4 = function()
+            zombie_box:play('idle/finish/tv/hints/5.mp4')
+        end,
+        on_hint_5 = function()
+            zombie_box:play('idle/finish/tv/hints/6.mp4')
+        end,
+        on_hint_6 = function()
+            zombie_box:play('idle/finish/tv/hints/7.mp4')
+        end,
+        on_hint_7 = function()
+            zombie_box:play('idle/finish/tv/hints/8.mp4')
+        end,
+        on_hint_8 = function()
+            zombie_box:play('idle/finish/tv/hints/9.mp4')
+        end,
+        on_hint_9 = function()
+            zombie_box:play('idle/finish/tv/hints/14.mp4')
+        end,
+        on_hint_10 = function()
+            zombie_box:play('idle/finish/tv/hints/15.mp4')
+        end,
+        on_hint_11 = function()
+            zombie_box:play('idle/finish/tv/hints/16.mp4')
+        end,
+        on_hint_12 = function()
+            zombie_box:play('idle/finish/tv/hints/11.mp4')
+        end,
+        on_hint_13 = function()
+            zombie_box:play('idle/finish/tv/hints/12.mp4')
+        end,
+        on_hint_14 = function()
+            zombie_box:play('idle/finish/tv/hints/13.mp4')
+        end,
+        on_hint_15 = function()
+            zombie_box:play('idle/finish/tv/hints/17.mp4')
+        end,
+        on_hint_16 = function()
+            zombie_box:play('idle/finish/tv/hints/18.mp4')
+        end,
+        on_hint_17 = function()
+            zombie_box:play('idle/finish/tv/hints/19.mp4')
+        end,
+        on_hint_18 = function()
+            zombie_box:play('idle/finish/tv/hints/20.mp4')
+        end,
+        on_hint_19 = function()
+            zombie_box:play('idle/finish/tv/hints/21.mp4')
+        end,
+        on_hint_20 = function()
+            zombie_box:play('idle/finish/tv/hints/22.mp4')
         end,
     }
 })

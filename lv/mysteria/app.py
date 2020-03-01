@@ -22,7 +22,7 @@ def main():
     t_flask = threading.Thread(name='flask', target=eternal_flask_app,
                                kwargs={'port': 5555, 'host': '0.0.0.0', 'debug': True, 'use_reloader': False})
 
-    # t_modbus.start()
+    t_modbus.start()
     t_touchpanel.start()
     t_flask.start()
 

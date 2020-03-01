@@ -38,6 +38,7 @@ class ModBus(object):
         time.sleep(0.02)
         try:
             if type(slave.slave_id) is int:
+                # logging.debug(f'++ Requesting data from {slave.slave_id}')
                 response = self.serialModbus.read_holding_registers(0, slave.reg_count, unit=slave.slave_id)
             else:
                 # logging.debug(f'++ Requesting data from {slave.slave_id}')
@@ -121,7 +122,7 @@ class ModBus(object):
             slave.last_data = slave.current_data
 
         except ConnectionException:
-            # logging.debug("Timeout for {}".format(slave.name))
+            logging.debug("Timeout for {}".format(slave.name))
             slave.current_data = None
 
         # Disable until timer enables it
@@ -168,7 +169,9 @@ class ModBus(object):
             return False
 
         # Mark this attempt as spent
-        slave.can_run = False
+        if slave.poll_frequency:
+            slave.can_run = False
+
         return self.write_action_register(action_id, slave)
 
     @staticmethod
