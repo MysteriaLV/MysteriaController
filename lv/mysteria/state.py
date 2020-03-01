@@ -10,9 +10,10 @@ lua = LuaRuntime(unpack_returned_tuples=True)
 
 
 class GameState(object):
-    def __init__(self, modbus, touchpanel):
+    def __init__(self, modbus, touchpanel, usb_detector):
         self.touchpanel = touchpanel
         self.modbus = modbus
+        self.usb_detector = usb_detector
         self.sampler = Sampler()
         self.zombie_box = ZombieBox()
         self.zombie_controller = ZombieController()
@@ -25,6 +26,7 @@ class GameState(object):
         lua.globals()['REGISTER_SAMPLER'] = self.sampler.register_in_lua
         lua.globals()['REGISTER_VLC'] = self.zombie_box.register_in_lua
         lua.globals()['REGISTER_ZOMBIE_CONTROLLER'] = self.zombie_controller.register_in_lua
+        lua.globals()['REGISTER_ZOMBIE_TRANSLATOR'] = self.usb_detector.register_in_lua
         lua.globals()['REGISTER_POTPLAYER'] = self.pot_player.register_in_lua
         lua.globals()['MODBUS_ACTION'] = self.modbus.queue_action
         lua.globals()['print'] = logging.getLogger('lua').info

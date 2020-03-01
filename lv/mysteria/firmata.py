@@ -58,4 +58,5 @@ class ZombieController(object):
         if data > 0.02:
             print(f"Activated on {data}")
             self.button_pin.disable_reporting()
-            self.main_quest['on_zombie_activated'](self.main_quest)
+            if self.main_quest:
+                self.main_quest['on_zombie_activated'](self.main_quest)

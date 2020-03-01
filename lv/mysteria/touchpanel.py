@@ -117,9 +117,8 @@ class TouchPanel(object):
             self.code_panel_input_start_time = None
             self.touches.clear()
 
-            if self.code_panel['code_' + code]:
-                logging.error(f"Executing hint {code}")
-                self.code_panel['code_' + code](self.code_panel)
+            logging.info(f"Executing hint {code}")
+            self.code_panel['code'](self.code_panel, code)
 
 
 if __name__ == '__main__':

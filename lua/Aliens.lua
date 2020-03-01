@@ -26,20 +26,20 @@ quest = machine.create({
             sample_transmitter:reset()
             sampler:reset()
             video:reset()
-            hints:reset()
-            zombie_controller:reset()
+            zombie:reset()
+            zombie_arduino:reset()
 
             light:full_lights()
             light:unlock_door()
             light:enable_xray()
-            zombie_controller:mirror(True)
+            zombie_arduino:mirror(True)
 
-            zombie_box:set_idle_files({ 'idle/finish/tv/intro.mp4' })
-            zombie_box:start()
-            video:play(5, 'idle/finish/intro/1024x1280.mp4') -- nad rukavicami (5)
+            zombie_video:set_idle_files({ 'idle/finish/tv/intro.mp4' })
+            zombie_video:start()
+            --video:play(5, 'idle/finish/intro/1024x1280.mp4') -- nad rukavicami (5)
             video:play(1, 'idle/table.jpg') -- stol (2)
             video:play(3, 'idle/finish/intro/text_standby.mp4') -- podskazki (4)
---                video:play(4, 'idle/camera3.mp4') -- telek (3)
+            --                video:play(4, 'idle/camera3.mp4') -- telek (3)
             video:play(2, 'idle/finish/intro/1600x1200.mp4') -- osnovnoj (3)
             video:play(6, 'idle/finish/intro/1280x1024.mp4') -- pult (6)
         end,
@@ -48,8 +48,8 @@ quest = machine.create({
 
             light:no_power()
             light:disable_xray()
-            zombie_controller:mirror(False)
---            sampler:play('bg_slow_L')
+            zombie_arduino:mirror(False)
+            -- sampler:play('bg_slow_L')
         end,
         on_start = function(self)
             print('Game is ON!')
@@ -73,7 +73,7 @@ quest = machine.create({
 
             light:power_active()
             light:enable_xray()
-            zombie_controller:mirror(True)
+            zombie_arduino:mirror(True)
             magnetic_door:activated()
         end,
         on_laboratory_access = function(self)
@@ -81,8 +81,10 @@ quest = machine.create({
         end,
         on_zombie_activated = function(self)
             print('They woke the zombie!')
-            zombie_box:set_idle_files({ 'idle/finish/tv/standby.mp4' })
-            zombie_box:play('idle/finish/tv/start.mp4')
+            zombie:defrost()
+        end,
+        on_zombie_translator = function(self)
+            zombie:translate()
         end,
         on_self_destruction = function(self)
             print('It\'s the final countdown.')
@@ -223,7 +225,7 @@ destruction_console = rs485_node.create({
 
 sample_transmitter = rs485_node.create({
     name = 'sample_transmitter',
-    slave_id = '192.168.1.50',
+    slave_id = '192.168.118.3',
     poll_frequency = '2',
     events = {
         { name = 'reset', action_id = 1, from = '*', to = 'idle' },
@@ -240,100 +242,115 @@ sample_transmitter = rs485_node.create({
     }
 })
 
-hints = machine.create({
+zombie = machine.create({
     events = {
-        { name = 'reset', from = '*', to = 'idle' },
-        { name = 'ready_for_input', from = '*', to = 'idle' },
-        { name = 'code_BAC1', from = 'idle', to = 'hint_1' },
-        { name = 'code_BAC2', from = 'idle', to = 'hint_2' },
-        { name = 'code_BCA1', from = 'idle', to = 'hint_3' },
-        { name = 'code_CAC1', from = 'idle', to = 'hint_4' },
-        { name = 'code_BCA2', from = 'idle', to = 'hint_5' },
-        { name = 'code_CBC1', from = 'idle', to = 'hint_6' },
-        { name = 'code_CBC2', from = 'idle', to = 'hint_7' },
-        { name = 'code_CBC3', from = 'idle', to = 'hint_8' },
-        { name = 'code_ACB1', from = 'idle', to = 'hint_9' },
-        { name = 'code_ACB2', from = 'idle', to = 'hint_10' },
-        { name = 'code_ACB3', from = 'idle', to = 'hint_11' },
-        { name = 'code_CBA1', from = 'idle', to = 'hint_12' },
-        { name = 'code_CBA2', from = 'idle', to = 'hint_13' },
-        { name = 'code_CBA3', from = 'idle', to = 'hint_14' },
-        { name = 'code_ABA1', from = 'idle', to = 'hint_15' },
-        { name = 'code_ABA2', from = 'idle', to = 'hint_16' },
-        { name = 'code_ABA3', from = 'idle', to = 'hint_17' },
-        { name = 'code_BCB1', from = 'idle', to = 'hint_18' },
-        { name = 'code_BCB2', from = 'idle', to = 'hint_19' },
-        { name = 'code_BCB3', from = 'idle', to = 'hint_20' },
+        { name = 'reset', from = '*', to = 'frozen' },
+        { name = 'defrost', from = 'frozen', to = 'alien_language' },
+        { name = 'translate', from = 'alien_language', to = 'active' },
+
+        { name = 'code', from = 'alien_language', to = 'gibberish' },
+        { name = 'code', from = 'active', to = 'hint' },
+
+        { name = 'ready_for_input', from = 'frozen', to = 'frozen' },
+        { name = 'ready_for_input', from = 'gibberish', to = 'alien_language' },
+        { name = 'ready_for_input', from = 'hint', to = 'active' },
     },
     callbacks = {
-        on_hint_1 = function()
-            zombie_box:play('idle/finish/tv/hints/1.mp4')
+        on_defrost = function()
+            zombie_video:set_idle_files({ 'idle/finish/tv/standby.mp4' })
+            zombie_video:play('idle/finish/tv/start.mp4')
         end,
-        on_hint_2 = function()
-            zombie_box:play('idle/finish/tv/hints/2.mp4')
+        on_gibberish = function()
+            -- TODO zombie speaks bullshit
+            zombie_video:play('idle/finish/tv/start.mp4')
         end,
-        on_hint_3 = function()
-            zombie_box:play('idle/finish/tv/hints/3.mp4')
+        on_translate = function()
+            print('Zombie talks!')
+
+            -- TODO zombie speaks my language now! intro
+            zombie_video:play('idle/finish/tv/start.mp4')
         end,
-        on_hint_4 = function()
-            zombie_box:play('idle/finish/tv/hints/5.mp4')
-        end,
-        on_hint_5 = function()
-            zombie_box:play('idle/finish/tv/hints/6.mp4')
-        end,
-        on_hint_6 = function()
-            zombie_box:play('idle/finish/tv/hints/7.mp4')
-        end,
-        on_hint_7 = function()
-            zombie_box:play('idle/finish/tv/hints/8.mp4')
-        end,
-        on_hint_8 = function()
-            zombie_box:play('idle/finish/tv/hints/9.mp4')
-        end,
-        on_hint_9 = function()
-            zombie_box:play('idle/finish/tv/hints/14.mp4')
-        end,
-        on_hint_10 = function()
-            zombie_box:play('idle/finish/tv/hints/15.mp4')
-        end,
-        on_hint_11 = function()
-            zombie_box:play('idle/finish/tv/hints/16.mp4')
-        end,
-        on_hint_12 = function()
-            zombie_box:play('idle/finish/tv/hints/11.mp4')
-        end,
-        on_hint_13 = function()
-            zombie_box:play('idle/finish/tv/hints/12.mp4')
-        end,
-        on_hint_14 = function()
-            zombie_box:play('idle/finish/tv/hints/13.mp4')
-        end,
-        on_hint_15 = function()
-            zombie_box:play('idle/finish/tv/hints/17.mp4')
-        end,
-        on_hint_16 = function()
-            zombie_box:play('idle/finish/tv/hints/18.mp4')
-        end,
-        on_hint_17 = function()
-            zombie_box:play('idle/finish/tv/hints/19.mp4')
-        end,
-        on_hint_18 = function()
-            zombie_box:play('idle/finish/tv/hints/20.mp4')
-        end,
-        on_hint_19 = function()
-            zombie_box:play('idle/finish/tv/hints/21.mp4')
-        end,
-        on_hint_20 = function()
-            zombie_box:play('idle/finish/tv/hints/22.mp4')
-        end,
+        on_code = function(self, event, from, to, code)
+            local codes = {
+                ['BAC1'] = function()
+                    zombie_video:play('idle/finish/tv/hints/1.mp4')
+                end,
+                ['BAC2'] = function()
+                    zombie_video:play('idle/finish/tv/hints/2.mp4')
+                end,
+                ['BCA1'] = function()
+                    zombie_video:play('idle/finish/tv/hints/3.mp4')
+                end,
+                ['CAC1'] = function()
+                    zombie_video:play('idle/finish/tv/hints/5.mp4')
+                end,
+                ['BCA2'] = function()
+                    zombie_video:play('idle/finish/tv/hints/6.mp4')
+                end,
+                ['CBC1'] = function()
+                    zombie_video:play('idle/finish/tv/hints/7.mp4')
+                end,
+                ['CBC2'] = function()
+                    zombie_video:play('idle/finish/tv/hints/8.mp4')
+                end,
+                ['CBC3'] = function()
+                    zombie_video:play('idle/finish/tv/hints/9.mp4')
+                end,
+                ['ACB1'] = function()
+                    zombie_video:play('idle/finish/tv/hints/14.mp4')
+                end,
+                ['ACB2'] = function()
+                    zombie_video:play('idle/finish/tv/hints/15.mp4')
+                end,
+                ['ACB3'] = function()
+                    zombie_video:play('idle/finish/tv/hints/16.mp4')
+                end,
+                ['CBA1'] = function()
+                    zombie_video:play('idle/finish/tv/hints/11.mp4')
+                end,
+                ['CBA2'] = function()
+                    zombie_video:play('idle/finish/tv/hints/12.mp4')
+                end,
+                ['CBA3'] = function()
+                    zombie_video:play('idle/finish/tv/hints/13.mp4')
+                end,
+                ['ABA1'] = function()
+                    zombie_video:play('idle/finish/tv/hints/17.mp4')
+                end,
+                ['ABA2'] = function()
+                    zombie_video:play('idle/finish/tv/hints/18.mp4')
+                end,
+                ['ABA3'] = function()
+                    zombie_video:play('idle/finish/tv/hints/19.mp4')
+                end,
+                ['BCB1'] = function()
+                    zombie_video:play('idle/finish/tv/hints/20.mp4')
+                end,
+                ['BCB2'] = function()
+                    zombie_video:play('idle/finish/tv/hints/21.mp4')
+                end,
+                ['BCB3'] = function()
+                    zombie_video:play('idle/finish/tv/hints/22.mp4')
+                end,
+            }
+
+            local code_action = codes[code]
+            if (code_action) then
+                code_action()
+            else
+                print "Unknown code???"
+                -- TODO zombie_box:play('idle/finish/tv/hints/UNKNOWN.mp4')
+            end
+        end
     }
 })
 
-REGISTER_CODE_PANEL(hints, 20) -- VAR, timeout
-REGISTER_STATES("hints", hints)
+REGISTER_CODE_PANEL(zombie, 20) -- VAR, timeout
+REGISTER_STATES("hints", zombie)
 sampler = REGISTER_SAMPLER()
-zombie_controller = REGISTER_ZOMBIE_CONTROLLER(quest)
-zombie_box = REGISTER_VLC(hints, zombie_controller)
+zombie_arduino = REGISTER_ZOMBIE_CONTROLLER(quest)
+zombie_translator = REGISTER_ZOMBIE_TRANSLATOR(quest)
+zombie_video = REGISTER_VLC(zombie, zombie_arduino)
 video = REGISTER_POTPLAYER()
 
 --Fire off main initialization machine

@@ -9,6 +9,11 @@ from mysteria.state import GameState
 class USBDetector(object):
     def __init__(self, game_state):
         self.game_state: GameState = game_state
+        self.main_quest = None
+
+    def register_in_lua(self, main_quest):
+        self.main_quest = main_quest
+        return self
 
     def processor(self):
         while True:
@@ -16,6 +21,10 @@ class USBDetector(object):
                 usb_drive = win32api.GetVolumeInformation("D:\\")
                 if usb_drive[0] == "MULTIBOOT":
                     print("Device present")
+
+                    if self.main_quest:
+                        self.main_quest['on_zombie_translator'](self.main_quest)
+
                 time.sleep(3)
             except pywintypes.error:
                 pass

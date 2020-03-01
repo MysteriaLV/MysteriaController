@@ -30,7 +30,7 @@ class ZombieBox(object):
     def __init__(self):
         self.idle_media_files = ['idle/nothing.jpg']
         self.needs_next_video = False
-        self.hints_fsm = None
+        self.zombie_fsm = None
         self.sparkler = None
 
         self.vlc: vlc.Instance = vlc.Instance(
@@ -53,7 +53,7 @@ class ZombieBox(object):
 
     def register_in_lua(self, hints_fsm, sparkler):
         self.sparkler: ZombieController = sparkler
-        self.hints_fsm = hints_fsm
+        self.zombie_fsm = hints_fsm
         return self
 
     def set_idle_files(self, media_files):
@@ -79,8 +79,8 @@ class ZombieBox(object):
             time.sleep(0.01)
             if self.needs_next_video:
                 # Inform code panel that we done playing current video
-                if self.hints_fsm:
-                    self.hints_fsm['ready_for_input'](self.hints_fsm)
+                if self.zombie_fsm:
+                    self.zombie_fsm['ready_for_input'](self.zombie_fsm)
 
                 self.play_next_idle()
 
