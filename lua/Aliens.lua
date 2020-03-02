@@ -36,11 +36,11 @@ quest = machine.create({
 
             zombie_video:set_idle_files({ 'idle/finish/tv/intro.mp4' })
             zombie_video:start()
-            --video:play(5, 'idle/finish/intro/1024x1280.mp4') -- nad rukavicami (5)
-            video:play(1, 'idle/table.jpg') -- stol (2)
+            video:play(5, 'idle/finish/intro/1024x1280.mp4') -- nad rukavicami (5)
+            video:play(2, 'idle/table.jpg') -- stol (2)
             video:play(3, 'idle/finish/intro/text_standby.mp4') -- podskazki (4)
-            --                video:play(4, 'idle/camera3.mp4') -- telek (3)
-            video:play(2, 'idle/finish/intro/1600x1200.mp4') -- osnovnoj (3)
+            --                            video:play(4, 'idle/camera3.mp4') -- telek (3)
+--            video:play(1, 'idle/finish/intro/1600x1200.mp4') -- osnovnoj (3)
             video:play(6, 'idle/finish/intro/1280x1024.mp4') -- pult (6)
         end,
         on_intro = function(self)
@@ -225,7 +225,7 @@ destruction_console = rs485_node.create({
 
 sample_transmitter = rs485_node.create({
     name = 'sample_transmitter',
-    slave_id = '192.168.118.3',
+    slave_id = '192.168.1.50',
     poll_frequency = '2',
     events = {
         { name = 'reset', action_id = 1, from = '*', to = 'idle' },
@@ -245,13 +245,14 @@ sample_transmitter = rs485_node.create({
 zombie = machine.create({
     events = {
         { name = 'reset', from = '*', to = 'frozen' },
-        { name = 'defrost', from = 'frozen', to = 'alien_language' },
+        { name = 'defrost', from = 'frozen', to = 'defrosting' },
         { name = 'translate', from = 'alien_language', to = 'active' },
 
         { name = 'code', from = 'alien_language', to = 'gibberish' },
         { name = 'code', from = 'active', to = 'hint' },
 
         { name = 'ready_for_input', from = 'frozen', to = 'frozen' },
+        { name = 'ready_for_input', from = 'defrosting', to = 'alien_language' },
         { name = 'ready_for_input', from = 'gibberish', to = 'alien_language' },
         { name = 'ready_for_input', from = 'hint', to = 'active' },
     },
@@ -262,13 +263,11 @@ zombie = machine.create({
         end,
         on_gibberish = function()
             -- TODO zombie speaks bullshit
-            zombie_video:play('idle/finish/tv/start.mp4')
+            zombie_video:play('idle/finish/tv/hints/1.mp4')
         end,
         on_translate = function()
             print('Zombie talks!')
-
-            -- TODO zombie speaks my language now! intro
-            zombie_video:play('idle/finish/tv/start.mp4')
+            zombie_video:play('idle/finish/tv/hints/TRANSLATOR.mp4')
         end,
         on_code = function(self, event, from, to, code)
             local codes = {

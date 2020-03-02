@@ -7,8 +7,7 @@ from mysteria.state import GameState
 
 
 class USBDetector(object):
-    def __init__(self, game_state):
-        self.game_state: GameState = game_state
+    def __init__(self):
         self.main_quest = None
 
     def register_in_lua(self, main_quest):
