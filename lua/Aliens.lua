@@ -49,7 +49,7 @@ quest = machine.create({
             light:no_power()
             light:disable_xray()
             zombie_arduino:mirror(False)
-            -- sampler:play('bg_slow_L')
+            sampler:play('bg_slow_L', true, 'background')
         end,
         on_start = function(self)
             print('Game is ON!')
@@ -57,7 +57,7 @@ quest = machine.create({
 
             video:play(3, 'idle/finish/game/text.mp4') -- podskazki (4)
             self.start_time = os.clock();
-            sampler:play('audio/power2')
+            sampler:play('audio/power2', true, 'background')
         end,
         on_power_console_connected = function(self)
             sampler:play('Church_Organ_Powerup')
@@ -65,7 +65,7 @@ quest = machine.create({
         end,
         on_powered_on = function(self)
             print('Lights and machinery are on now')
-            sampler:play('audio/power')
+            sampler:play('audio/power', true, 'background')
 
             video:play(5, 'idle/finish/game/5_1024x1280.mp4') -- nad rukavicami (5)
             video:play(2, 'idle/finish/game/3_1600x1200.mp4') -- osnovnoj (3)
@@ -88,7 +88,7 @@ quest = machine.create({
         end,
         on_self_destruction = function(self)
             print('It\'s the final countdown.')
-            sampler:play('audio/alarm')
+            sampler:play('audio/alarm', true, 'background')
 
             video:play(5, 'idle/finish/alarm/6_1024x1280.mp4') -- nad rukavicami (5)
             video:play(2, 'idle/finish/alarm/6_1024x1280.mp4') -- osnovnoj (3)
@@ -99,7 +99,7 @@ quest = machine.create({
         end,
         on_victory = function(self)
             print('You won!')
-            sampler:play('music1_left')
+            sampler:play('music1_left', true, 'background')
             light:full_lights()
             light:unlock_door()
         end,

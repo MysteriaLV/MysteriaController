@@ -3,6 +3,7 @@ import shlex
 import subprocess
 import threading
 import time
+from typing import Dict
 
 import vlc
 
@@ -90,22 +91,28 @@ class Sampler(object):
 
     def __init__(self):
         self.tag_players = []
+        self.player_groups: Dict[str, vlc.MediaPlayer] = {}
 
     def register_in_lua(self):
         return self
 
     @staticmethod
     @memoize
-    def _get_sound_tag_player(sound_file):
+    def _get_sound_tag_player(sound_file) -> vlc.MediaPlayer:
         return Sampler.vlc.media_player_new('idle/{}.mp3'.format(sound_file))
 
-    def play(self, audio_file, loop=False):
+    def play(self, audio_file, loop=False, group=None):
+        # Stop previous audio if any
+        if group in self.player_groups:
+            self.player_groups[group].stop()
+
         player = self._get_sound_tag_player(audio_file)
 
         if player.is_playing() == 0:
             player.play()
 
         self.tag_players.append(player)
+        self.player_groups[group] = player
 
     def reset(self):
         for player in self.tag_players:
