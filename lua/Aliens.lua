@@ -91,8 +91,8 @@ quest = machine.create({
             print('It\'s the final countdown.')
             sampler:play('audio/alert', 'background')
 
-            video:play(5, 'idle/finish/alarm/timer_1024x1280.mp4') -- nad rukavicami (5)
-            video:play(2, 'idle/finish/alarm/timer_1600x1200.mp4') -- osnovnoj (3)
+            video:play(5, 'idle/finish/alarm/timer_1024x1280.mp4', os.clock() - self.start_time) -- nad rukavicami (5)
+            video:play(2, 'idle/finish/alarm/timer_1600x1200.mp4', os.clock() - self.start_time) -- osnovnoj (3)
             video:play(6, 'idle/finish/alarm/exit_pass.mp4') -- pult (6)
             video:play(3, 'idle/finish/alarm/timer_1024x1280.mp4') -- podskazki (4)
 

@@ -126,8 +126,8 @@ class PotPlayer(object):
     def __init__(self):
         self.pot_players = dict()
         self.PLAYER_EXE = "PotPlayer_DISPLAY{display_number}.exe"
-        self.PLAYER_RUN_CMD = '"C:\\Program Files\\DAUM\PotPlayer\\PotPlayer_DISPLAY{display_number}.exe" "{media_file}" /new'
-        # self.PLAYER_RUN_CMD = '"C:\\Program Files\\DAUM\PotPlayer\\PotPlayer_DISPLAY{display_number}.exe" "{media_file}" /new config=DISPLAY{display_number}'
+        self.PLAYER_RUN_CMD = '"C:\\Program Files\\DAUM\PotPlayer\\PotPlayer_DISPLAY{display_number}.exe" "{media_file}" /seek={offset} /new'
+        # self.PLAYER_RUN_CMD = '"C:\\Program Files\\DAUM\PotPlayer\\PotPlayerMini64.exe" "{media_file}" /new /seek={offset}'
         self.DISPLAYS = [2, 3, 4, 5, 6]
 
     def register_in_lua(self):
@@ -136,9 +136,9 @@ class PotPlayer(object):
     def stop(self, display_number):
         subprocess.run(f"taskkill /im {self.PLAYER_EXE.format(display_number=display_number)} /f")
 
-    def play(self, display_number, media_file):
+    def play(self, display_number, media_file, offset=0):
         self.stop(display_number)
-        cmd = self.PLAYER_RUN_CMD.format(display_number=display_number, media_file=media_file)
+        cmd = self.PLAYER_RUN_CMD.format(display_number=display_number, media_file=media_file, offset=offset)
         print(cmd)
 
         try:
@@ -161,7 +161,7 @@ if __name__ == '__main__':
     # time.sleep(200)
 
     p = PotPlayer()
-    p.play(2, 'idle/11.mp4')
-    time.sleep(4)
-    p.play(2, 'idle/12.mp4')
+    p.play(2, 'idle/timer_1024x1280.mp4')
+    # time.sleep(4)
+    # p.play(2, 'idle/12.mp4')
     time.sleep(10)
