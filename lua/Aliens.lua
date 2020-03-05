@@ -32,7 +32,7 @@ quest = machine.create({
             light:full_lights()
             light:unlock_door()
             light:enable_xray()
-            zombie_arduino:mirror(True)
+            zombie_arduino:mirror(true)
 
             zombie_video:set_idle_files({ 'idle/finish/prepare/1.jpg' })
             zombie_video:start()
@@ -48,7 +48,7 @@ quest = machine.create({
 
             light:no_power()
             light:disable_xray()
-            zombie_arduino:mirror(False)
+            zombie_arduino:mirror(false)
             sampler:play('audio/intro', 'background')
 
             zombie_video:set_idle_files({ 'idle/finish/tv/intro.mp4' })
@@ -79,7 +79,7 @@ quest = machine.create({
 
             light:power_active()
             light:enable_xray()
-            zombie_arduino:mirror(True)
+            zombie_arduino:mirror(true)
             magnetic_door:activated()
         end,
         on_laboratory_access = function(self)

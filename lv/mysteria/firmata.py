@@ -16,7 +16,6 @@ class ZombieController(object):
         # noinspection PyBroadException
         try:
             self.board = Arduino(Arduino.AUTODETECT)
-            self.board_missing = False
             self.board.samplingOn(50)
 
             self.mirror_pin: Pin = self.board.digital[ZombieController.PIN_MIRROR]
@@ -26,6 +25,7 @@ class ZombieController(object):
             self.button_pin.mode = INPUT
             self.button_pin.register_callback(self.big_red_button_pressed)
             self.button_pin.enable_reporting()
+            self.board_missing = False
         except Exception:
             self.board_missing = True
 
