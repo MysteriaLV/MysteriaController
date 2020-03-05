@@ -17,8 +17,8 @@ class USBDetector(object):
     def processor(self):
         while True:
             try:
-                usb_drive = win32api.GetVolumeInformation("D:\\")
-                if usb_drive[0] == "MULTIBOOT":
+                usb_drive = win32api.GetVolumeInformation("E:\\")
+                if usb_drive[0] == "OFFLINE":
                     print("Device present")
 
                     if self.main_quest:
