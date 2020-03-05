@@ -6,9 +6,9 @@ import time
 from typing import Dict
 
 import vlc
+from vlc import MediaPlayer, Instance
 
 from mysteria.firmata import ZombieController
-from vlc import MediaPlayer
 
 
 def memoize(f):
@@ -35,7 +35,7 @@ class ZombieBox(object):
         self.zombie_fsm = None
         self.sparkler = None
 
-        self.vlc: vlc.Instance = vlc.Instance(
+        self.vlc: Instance = vlc.Instance(
             ['--no-spu', '--no-osd', '--video-on-top', '--video-y=1', '--video-x=-1200', '--fullscreen'])
         self.main_player: vlc.MediaPlayer = self.vlc.media_player_new()
         self.main_player.set_fullscreen(True)
@@ -88,7 +88,7 @@ class ZombieBox(object):
 
 
 class Sampler(object):
-    vlc = vlc.Instance('--no-video')
+    vlc: Instance = vlc.Instance('--no-video')
 
     def __init__(self):
         self.tag_players = []
@@ -102,9 +102,9 @@ class Sampler(object):
     def _get_sound_tag_player(sound_file) -> MediaPlayer:
         return Sampler.vlc.media_player_new('idle/{}.mp3'.format(sound_file))
 
-    def play(self, audio_file, loop=False, group=None):
+    def play(self, audio_file, group=None):
         # Stop previous audio if any
-        if group in self.player_groups:
+        if group and group in self.player_groups:
             self.player_groups[group].stop()
 
         player = self._get_sound_tag_player(audio_file)
@@ -113,7 +113,8 @@ class Sampler(object):
             player.play()
 
         self.tag_players.append(player)
-        self.player_groups[group] = player
+        if group:
+            self.player_groups[group] = player
 
     def reset(self):
         for player in self.tag_players:
