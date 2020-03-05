@@ -8,6 +8,7 @@ from typing import Dict
 import vlc
 
 from mysteria.firmata import ZombieController
+from vlc import MediaPlayer
 
 
 def memoize(f):
@@ -91,14 +92,14 @@ class Sampler(object):
 
     def __init__(self):
         self.tag_players = []
-        self.player_groups: Dict[str, vlc.MediaPlayer] = {}
+        self.player_groups: Dict[str, MediaPlayer] = {}
 
     def register_in_lua(self):
         return self
 
     @staticmethod
     @memoize
-    def _get_sound_tag_player(sound_file) -> vlc.MediaPlayer:
+    def _get_sound_tag_player(sound_file) -> MediaPlayer:
         return Sampler.vlc.media_player_new('idle/{}.mp3'.format(sound_file))
 
     def play(self, audio_file, loop=False, group=None):

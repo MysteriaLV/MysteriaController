@@ -36,12 +36,7 @@ quest = machine.create({
 
             zombie_video:set_idle_files({ 'idle/finish/tv/intro.mp4' })
             zombie_video:start()
-            video:play(5, 'idle/finish/intro/1024x1280.mp4') -- nad rukavicami (5)
-            video:play(2, 'idle/table.jpg') -- stol (2)
-            video:play(3, 'idle/finish/intro/text_standby.mp4') -- podskazki (4)
-            --                            video:play(4, 'idle/camera3.mp4') -- telek (3)
---            video:play(1, 'idle/finish/intro/1600x1200.mp4') -- osnovnoj (3)
-            video:play(6, 'idle/finish/intro/1280x1024.mp4') -- pult (6)
+            -- TODO fotki monitorov dlja devochek
         end,
         on_intro = function(self)
             print('People are entering the room')
@@ -49,7 +44,14 @@ quest = machine.create({
             light:no_power()
             light:disable_xray()
             zombie_arduino:mirror(False)
-            sampler:play('bg_slow_L', true, 'background')
+            sampler:play('audio/intro', true, 'background')
+
+            video:play(5, 'idle/finish/intro/1024x1280.mp4') -- nad rukavicami (5)
+            video:play(2, 'idle/table.jpg') -- stol (2)
+            video:play(3, 'idle/finish/intro/text_standby.mp4') -- podskazki (4)
+            --            video:play(4, 'idle/camera3.mp4') -- telek (3)
+            video:play(1, 'idle/finish/intro/1600x1200.mp4') -- osnovnoj (3)
+            video:play(6, 'idle/finish/intro/1280x1024.mp4') -- pult (6)
         end,
         on_start = function(self)
             print('Game is ON!')
@@ -57,10 +59,9 @@ quest = machine.create({
 
             video:play(3, 'idle/finish/game/text.mp4') -- podskazki (4)
             self.start_time = os.clock();
-            sampler:play('audio/power2', true, 'background')
         end,
         on_power_console_connected = function(self)
-            sampler:play('Church_Organ_Powerup')
+            -- TODO           sampler:play('Church_Organ_Powerup')
             light:power_console_connected()
         end,
         on_powered_on = function(self)
@@ -68,8 +69,7 @@ quest = machine.create({
             sampler:play('audio/power', true, 'background')
 
             video:play(5, 'idle/finish/game/5_1024x1280.mp4') -- nad rukavicami (5)
-            video:play(2, 'idle/finish/game/3_1600x1200.mp4') -- osnovnoj (3)
-            video:play(6, 'idle/finish/game/5_1024x1280.mp4') -- pult (6)
+            video:play(1, 'idle/finish/game/3_1600x1200.mp4') -- osnovnoj (3)
 
             light:power_active()
             light:enable_xray()
@@ -81,6 +81,7 @@ quest = machine.create({
         end,
         on_zombie_activated = function(self)
             print('They woke the zombie!')
+            video:play(3, 'idle/finish/intro/text_standby.mp4') -- podskazki (4)
             zombie:defrost()
         end,
         on_zombie_translator = function(self)
