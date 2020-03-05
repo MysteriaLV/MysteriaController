@@ -4,6 +4,7 @@ from lupa import LuaRuntime
 
 from mysteria.firmata import ZombieController
 from mysteria.media_players import Sampler, ZombieBox, PotPlayer
+from mysteria.touchpanel import TouchPanel
 
 LUA_SCENARIO = 'lua/Aliens.lua'
 lua = LuaRuntime(unpack_returned_tuples=True)
@@ -11,7 +12,7 @@ lua = LuaRuntime(unpack_returned_tuples=True)
 
 class GameState(object):
     def __init__(self, modbus, touchpanel, usb_detector):
-        self.touchpanel = touchpanel
+        self.touchpanel: TouchPanel = touchpanel
         self.modbus = modbus
         self.usb_detector = usb_detector
         self.sampler = Sampler()
@@ -19,6 +20,8 @@ class GameState(object):
         self.zombie_controller = ZombieController()
         self.pot_player = PotPlayer()
         self.fsms = {}
+
+        self.touchpanel.register_blinker(self.zombie_controller)
 
         lua.globals()['REGISTER_STATES'] = self.register_fsm
         lua.globals()['REGISTER_MODBUS_SLAVE'] = self.register_slave_lua

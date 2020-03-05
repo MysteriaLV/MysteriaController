@@ -41,6 +41,14 @@ class ZombieController(object):
 
         self.mirror_pin.write(0 if turn_on else 1)
 
+    def blink(self):
+        if self.board_missing:
+            return
+
+        self.sparks_pin.write(1)
+        self.board.pass_time(0.05)
+        self.sparks_pin.write(0)
+
     def sparkle(self):
         if self.board_missing:
             return

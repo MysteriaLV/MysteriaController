@@ -4,6 +4,8 @@ from collections import deque
 
 import usb
 
+from mysteria.firmata import ZombieController
+
 
 class TouchPanel(object):
     # Calibration data
@@ -14,6 +16,7 @@ class TouchPanel(object):
                'X', '3', '2', '1']
 
     def __init__(self, rows=2, columns=4):
+        self.blinker: ZombieController = None
         self.code_panel = self.code_timeout = None
         self.code_panel_input_start_time = None
         self.touch_panel_pressed = False
@@ -96,6 +99,9 @@ class TouchPanel(object):
             self.touches.append(letter)
             self.touch_panel_pressed = True
 
+            if self.blinker:
+                self.blinker.blink()
+
         except usb.core.USBError as e:
             if not (e.args == ('Operation timed out',) or 'timeout' in str(e.args[1])):
                 logging.error(e)
@@ -119,6 +125,9 @@ class TouchPanel(object):
 
             logging.info(f"Executing hint {code}")
             self.code_panel['code'](self.code_panel, code)
+
+    def register_blinker(self, zombie_controller: ZombieController):
+        self.blinker = zombie_controller
 
 
 if __name__ == '__main__':
