@@ -34,8 +34,6 @@ quest = machine.create({
             light:enable_xray()
             zombie_arduino:mirror(True)
 
-            zombie_video:set_idle_files({ 'idle/finish/tv/intro.mp4' })
-            zombie_video:start()
             -- TODO fotki monitorov dlja devochek
         end,
         on_intro = function(self)
@@ -45,6 +43,9 @@ quest = machine.create({
             light:disable_xray()
             zombie_arduino:mirror(False)
             sampler:play('audio/intro', 'background')
+
+            zombie_video:set_idle_files({ 'idle/finish/tv/intro.mp4' })
+            zombie_video:start()
 
             video:play(5, 'idle/finish/intro/1024x1280.mp4') -- nad rukavicami (5)
             video:play(2, 'idle/table.jpg') -- stol (2)
@@ -91,10 +92,10 @@ quest = machine.create({
             print('It\'s the final countdown.')
             sampler:play('audio/alert', 'background')
 
-            video:play(5, 'idle/finish/alarm/timer_1024x1280.mp4', os.clock() - self.start_time) -- nad rukavicami (5)
-            video:play(2, 'idle/finish/alarm/timer_1600x1200.mp4', os.clock() - self.start_time) -- osnovnoj (3)
+            video:play(5, 'idle/finish/alarm/timer_1024x1280.mp4', math.floor(os.clock() - self.start_time)) -- nad rukavicami (5)
+            video:play(1, 'idle/finish/alarm/timer_1600x1200.mp4', math.floor(os.clock() - self.start_time)) -- osnovnoj (3)
+            video:play(3, 'idle/finish/alarm/timer_1024x1280.mp4', math.floor(os.clock() - self.start_time)) -- podskazki (4)
             video:play(6, 'idle/finish/alarm/exit_pass.mp4') -- pult (6)
-            video:play(3, 'idle/finish/alarm/timer_1024x1280.mp4') -- podskazki (4)
 
             destruction_console:activated()
             light:alarms()
