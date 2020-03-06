@@ -271,7 +271,7 @@ zombie = machine.create({
         { name = 'ready_for_input', from = 'hint', to = 'active' },
     },
     callbacks = {
-        on_defrost = function()
+        on_defrosting = function()
             zombie_video:set_idle_files({ 'idle/finish/tv/standby.mp4' })
             zombie_video:play('idle/finish/tv/start.mp4')
         end,
@@ -283,7 +283,7 @@ zombie = machine.create({
             zombie_video:set_idle_files({ 'idle/finish/tv/standby.mp4', 'idle/finish/tv/joke_1.mp4',  'idle/finish/tv/joke_2.mp4',  'idle/finish/tv/joke_3.mp4' })
             zombie_video:play('idle/finish/tv/hints/TRANSLATOR.mp4')
         end,
-        on_code = function(self, event, from, to, code)
+        on_hint = function(self, event, from, to, code)
             local codes = {
                 ['BAC1'] = function()
                     zombie_video:play('idle/finish/tv/hints/1.mp4')
