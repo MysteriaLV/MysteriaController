@@ -1,6 +1,12 @@
 local machine = require('lua/statemachine')
 local rs485_node = require('lua/rs485_node')
 
+main = 2
+table = 1
+hints = 3
+bio = 5
+console = 6
+
 --noinspection UnusedDef
 quest = machine.create({
     events = {
@@ -37,11 +43,11 @@ quest = machine.create({
             zombie_video:set_idle_files({ 'idle/finish/prepare/1.jpg' })
             zombie_video:start()
 
-            video:play(1, 'idle/finish/prepare/3.jpg') -- osnovnoj (3)
-            video:play(2, 'idle/finish/prepare/4.jpg') -- stol (2)
-            video:play(3, 'idle/finish/prepare/6.jpg') -- podskazki (4)
-            video:play(5, 'idle/finish/prepare/2.jpg') -- nad rukavicami (5)
-            video:play(6, 'idle/finish/prepare/5.jpg') -- pult (6)
+            video:play(main, 'idle/finish/prepare/3.jpg')
+            video:play(table, 'idle/finish/prepare/4.jpg')
+            video:play(hints, 'idle/finish/prepare/6.jpg')
+            video:play(bio, 'idle/finish/prepare/2.jpg')
+            video:play(console, 'idle/finish/prepare/5.jpg')
         end,
         on_intro = function(self)
             print('People are entering the room')
@@ -53,17 +59,17 @@ quest = machine.create({
 
             zombie_video:set_idle_files({ 'idle/finish/tv/intro.mp4' })
 
-            video:play(1, 'idle/finish/intro/1600x1200.mp4') -- osnovnoj (3)
-            video:play(2, 'idle/table.jpg') -- stol (2)
-            video:play(3, 'idle/finish/intro/text_standby.mp4') -- podskazki (4)
-            video:play(5, 'idle/finish/intro/1024x1280.mp4') -- nad rukavicami (5)
-            video:play(6, 'idle/finish/intro/1280x1024.mp4') -- pult (6)
+            video:play(main, 'idle/finish/intro/1600x1200.mp4')
+            video:play(table, 'idle/table.jpg')
+            video:play(hints, 'idle/finish/intro/text_standby.mp4')
+            video:play(bio, 'idle/finish/intro/1024x1280.mp4')
+            video:play(console, 'idle/finish/intro/1280x1024.mp4')
         end,
         on_start = function(self)
             print('Game is ON!')
             light:lock_door();
 
-            video:play(3, 'idle/finish/game/text.mp4') -- podskazki (4)
+            video:play(hints, 'idle/finish/game/text.mp4')
             self.start_time = os.clock();
         end,
         on_power_console_connected = function(self)
@@ -74,8 +80,8 @@ quest = machine.create({
             print('Lights and machinery are on now')
             sampler:play('audio/power', 'background')
 
-            video:play(5, 'idle/finish/game/5_1024x1280.mp4') -- nad rukavicami (5)
-            video:play(1, 'idle/finish/game/3_1600x1200.mp4') -- osnovnoj (3)
+            video:play(bio, 'idle/finish/game/5_1024x1280.mp4')
+            video:play(main, 'idle/finish/game/3_1600x1200.mp4')
 
             light:power_active()
             light:enable_xray()
@@ -87,7 +93,7 @@ quest = machine.create({
         end,
         on_zombie_activated = function(self)
             print('They woke the zombie!')
-            video:play(3, 'idle/finish/intro/text_standby.mp4') -- podskazki (4)
+            video:play(hints, 'idle/finish/intro/text_standby.mp4')
             zombie:defrost()
         end,
         on_zombie_translator = function(self)
@@ -97,10 +103,10 @@ quest = machine.create({
             print('It\'s the final countdown.')
             sampler:play('audio/alert', 'background')
 
-            video:play(5, 'idle/finish/alarm/timer_1024x1280.mp4', math.floor(os.clock() - self.start_time)) -- nad rukavicami (5)
-            video:play(1, 'idle/finish/alarm/timer_1600x1200.mp4', math.floor(os.clock() - self.start_time)) -- osnovnoj (3)
-            video:play(3, 'idle/finish/alarm/timer_1024x1280.mp4', math.floor(os.clock() - self.start_time)) -- podskazki (4)
-            video:play(6, 'idle/finish/alarm/exit_pass.mp4') -- pult (6)
+            video:play(bio, 'idle/finish/alarm/timer_1024x1280.mp4', math.floor(os.clock() - self.start_time))
+            video:play(main, 'idle/finish/alarm/timer_1600x1200.mp4', math.floor(os.clock() - self.start_time))
+            video:play(hints, 'idle/finish/alarm/timer_1024x1280.mp4', math.floor(os.clock() - self.start_time))
+            video:play(console, 'idle/finish/alarm/exit_pass.mp4')
 
             destruction_console:activated()
             light:alarms()
@@ -270,11 +276,11 @@ zombie = machine.create({
             zombie_video:play('idle/finish/tv/start.mp4')
         end,
         on_gibberish = function()
-            -- TODO zombie speaks bullshit
-            zombie_video:play('idle/finish/tv/hints/1.mp4')
+            zombie_video:play('idle/finish/tv/insert_translator_is.mp4')
         end,
         on_translate = function()
             print('Zombie talks!')
+            zombie_video:set_idle_files({ 'idle/finish/tv/standby.mp4', 'idle/finish/tv/joke_1.mp4',  'idle/finish/tv/joke_2.mp4',  'idle/finish/tv/joke_3.mp4' })
             zombie_video:play('idle/finish/tv/hints/TRANSLATOR.mp4')
         end,
         on_code = function(self, event, from, to, code)
@@ -346,7 +352,7 @@ zombie = machine.create({
                 code_action()
             else
                 print "Unknown code???"
-                -- TODO zombie_box:play('idle/finish/tv/hints/UNKNOWN.mp4')
+                zombie_video:play('idle/finish/tv/code_error.mp4')
             end
         end
     }
