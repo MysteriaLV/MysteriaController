@@ -345,6 +345,9 @@ zombie = machine.create({
                 ['BCB3'] = function()
                     zombie_video:play('idle/finish/tv/hints/22.mp4')
                 end,
+                ['2213'] = function()
+                    zombie_video:play('idle/finish/tv/hints/exit_code.mp4')
+                end,
             }
 
             local code_action = codes[code]
