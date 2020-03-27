@@ -15,7 +15,8 @@ quest = machine.create({
         { name = 'start', from = 'intro', to = 'powered_off' },
         { name = 'power_on', from = 'powered_off', to = 'powered_on' },
         { name = 'open_laboratory', from = 'powered_on', to = 'laboratory_access' },
-        { name = 'start_self_destruct', from = 'laboratory_access', to = 'self_destruction' },
+        { name = 'process_dna_samples', from = 'laboratory_access', to = 'destruction_console_access' },
+        { name = 'start_self_destruct', from = 'destruction_console_access', to = 'self_destruction' },
         { name = 'win', from = 'self_destruction', to = 'victory' },
         { name = 'lose', from = 'self_destruction', to = 'failure' },
     },
@@ -73,7 +74,7 @@ quest = machine.create({
             self.start_time = os.clock();
         end,
         on_power_console_connected = function(self)
-            -- TODO           sampler:play('Church_Organ_Powerup')
+--            sampler:play('audio/power_on')
             light:power_console_connected()
         end,
         on_powered_on = function(self)
@@ -99,6 +100,10 @@ quest = machine.create({
         on_zombie_translator = function(self)
             zombie:translate()
         end,
+        on_destruction_console_access = function(self)
+            print('Opening destruction console.')
+            destruction_console:activated()
+        end,
         on_self_destruction = function(self)
             print('It\'s the final countdown.')
             sampler:play('audio/alert', 'background')
@@ -108,7 +113,6 @@ quest = machine.create({
             video:play(hints, 'idle/finish/alarm/timer_1024x1280.mp4', math.floor(os.clock() - self.start_time))
             video:play(console, 'idle/finish/alarm/exit_pass.mp4')
 
-            destruction_console:activated()
             light:alarms()
         end,
         on_victory = function(self)
@@ -232,7 +236,7 @@ destruction_console = rs485_node.create({
     callbacks = {
         on_completed = function()
             print('They entered correct code in a console!')
-            quest:win()
+            quest:start_self_destruct()
         end,
     }
 })
@@ -250,8 +254,8 @@ sample_transmitter = rs485_node.create({
     },
     callbacks = {
         on_completed = function()
-            print('Samples are transmitted. Sound the alarm!')
-            quest:start_self_destruct()
+            print('Samples are transmitted.')
+            quest:process_dna_samples()
         end,
     }
 })
