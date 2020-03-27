@@ -94,7 +94,8 @@ class ModBus(object):
                 if self._send_action(slave_id, action_id):
                     self.action_queue.remove(action)
                 else:
-                    logging.debug(f"Failure to send action. Will requeue, actions in queue {len(self.action_queue)}")
+                    # logging.debug(f"Failure to send action. Will requeue, actions in queue {len(self.action_queue)}")
+                    pass
 
             # Read values
             for slave in self.slaves.values():
