@@ -9,8 +9,8 @@ from mysteria.firmata import ZombieController
 
 class TouchPanel(object):
     # Calibration data
-    MIN = (75, 125)
-    MAX = (1980, 1935)
+    MIN = (85, 145)
+    MAX = (1980, 1946)
 
     LETTERS = ['X', 'C', 'B', 'A',
                'X', '3', '2', '1']
@@ -19,7 +19,7 @@ class TouchPanel(object):
         self.blinker: ZombieController = None
         self.code_panel = self.code_timeout = None
         self.code_panel_input_start_time = None
-        self.touch_panel_pressed = False
+        self.last_input_time = time.time()
 
         self.x_interval = (TouchPanel.MAX[0] - TouchPanel.MIN[0]) / columns
         self.y_interval = (TouchPanel.MAX[1] - TouchPanel.MIN[1]) / rows
@@ -60,11 +60,12 @@ class TouchPanel(object):
 
     def poll_usb_device(self):
         try:
-            read = self.device.read(self.endpoint.bEndpointAddress, self.endpoint.wMaxPacketSize)
-            self.incoming_data.extendleft(read)
-
             if len(self.incoming_data) < 5:
-                return  # Not enough data yet
+                read = self.device.read(self.endpoint.bEndpointAddress, self.endpoint.wMaxPacketSize)
+                self.incoming_data.extendleft(read)
+
+                if len(self.incoming_data) < 5:
+                    return  # Not enough data even after read
 
             data = [
                 self.incoming_data.pop(),
@@ -77,30 +78,27 @@ class TouchPanel(object):
             if data[0] not in [128, 129]:
                 return  # Invalid or useless
 
-            if self.touch_panel_pressed and data[0] == 129:
-                return  # Holding
+            if time.time() - self.last_input_time < 0.2:
+                self.last_input_time = time.time()
+                return  # debounce
 
-            if data[0] == 128:
-                self.touch_panel_pressed = False
-                return
-
+            self.last_input_time = time.time()
             x, y = data[1] * 128 + data[2], data[3] * 128 + data[4]
 
             mapped_x, mapped_y = int((x - TouchPanel.MIN[0]) / self.x_interval), \
                                  int((y - TouchPanel.MIN[1]) / self.y_interval)
 
-            absolute = mapped_y * self.columns + mapped_x
-            letter = self.LETTERS[absolute]
+            try:
+                absolute = mapped_y * self.columns + mapped_x
+                letter = self.LETTERS[absolute]
 
-            logging.debug(
-                "x={0}, y={1}, keypress={2}, mapped to ({3}, {4})={5}".format(x, y, data[0],
-                                                                              mapped_x, mapped_y, letter))
+                logging.debug(f"x={x}, y={y}, keypress={data[0]}, mapped to ({mapped_x}, {mapped_y})={letter}")
+                self.touches.append(letter)
 
-            self.touches.append(letter)
-            self.touch_panel_pressed = True
-
-            if self.blinker:
-                self.blinker.blink()
+                if self.blinker:
+                    self.blinker.blink()
+            except IndexError:
+                logging.error(f'Position out of bounds x={x}, y={y}')
 
         except usb.core.USBError as e:
             if not (e.args == ('Operation timed out',) or 'timeout' in str(e.args[1])):
@@ -123,8 +121,10 @@ class TouchPanel(object):
             self.code_panel_input_start_time = None
             self.touches.clear()
 
-            logging.info(f"Executing hint {code}")
-            self.code_panel['code'](self.code_panel, code)
+            if code:
+                logging.info(f"Executing hint {code}")
+                time.sleep(1)
+                self.code_panel['code'](self.code_panel, code)
 
     def register_blinker(self, zombie_controller: ZombieController):
         self.blinker = zombie_controller
@@ -138,8 +138,8 @@ if __name__ == '__main__':
         format='(%(threadName)-10s) [%(name)s] %(message)s',
     )
 
-    touchpanel = TouchPanel(3, 3)
+    touchpanel = TouchPanel()
     t_touchpanel = threading.Thread(name='touchpanel', target=touchpanel.processor)
     t_touchpanel.start()
 
-    touchpanel.register_code_panel_lua("test", 10)
+    touchpanel.register_code_panel_lua("tst", 10)
