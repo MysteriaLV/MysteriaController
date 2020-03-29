@@ -5,7 +5,96 @@
     <script type="text/javascript" src="/static/js/sijax/sijax.js"></script>
     <script type="text/javascript">        {{ g.sijax.get_js()|safe }}    </script>
     <style>
-        div,h1{box-shadow:0 0 15px #282828}div,li{padding:5px}body{background:radial-gradient(#666 15%,transparent 16%),radial-gradient(#666 15%,transparent 16%) 8px 8px,radial-gradient(rgba(255,255,255,255) 15%,transparent 20%) 0 1px,radial-gradient(rgba(255,255,255,255) 15%,transparent 20%) 8px 9px;background-color:#999;background-size:16px 16px;font:12px arial,sans-serif;position:static;text-align:center;margin:10px;text-transform:uppercase}h1{padding:7px;font-size:20px;background:#fff;border:1px solid #666;border-radius:8px}div{display:inline-block;background:rgba(255,255,255,.6);border:1px solid #666;border-radius:8px;margin:8px}.button,.button span{-webkit-border-radius:10px}span{display:block;padding:3px;font-weight:800}.button,.button span,li{display:inline-block}ul{padding:inherit}li{margin:5px}.button{top:100px;left:200px;margin:0 auto;-webkit-box-shadow:0 3px rgba(128,128,128,1),0 4px rgba(118,118,118,1),0 5px rgba(108,108,108,1),0 6px rgba(98,98,98,1),0 7px rgba(88,88,88,1),0 8px rgba(78,78,78,1),0 14px 6px -1px rgba(128,128,128,1);-webkit-transition:-webkit-box-shadow .1s ease-in-out}.button span{background-color:#E8E8E8;background-image:-webkit-gradient(linear,left bottom,left top,color-stop(50%,rgba(255,255,255,0)),color-stop(50%,rgba(255,255,255,.3)),color-stop(100%,rgba(255,255,255,.2))),-webkit-gradient(linear,left top,right top,color-stop(0,rgba(210,210,210,.3)),color-stop(20%,rgba(210,210,210,0)),color-stop(80%,rgba(210,210,210,0)),color-stop(100%,rgba(210,210,210,.3))),-webkit-gradient(linear,left top,right top,color-stop(0,rgba(255,255,255,0)),color-stop(20%,rgba(255,255,255,.5)),color-stop(80%,rgba(255,255,255,.5)),color-stop(100%,rgba(255,255,255,0))),-webkit-gradient(linear,0 100%,100% 0,color-stop(0,rgba(255,255,255,0)),color-stop(40%,rgba(255,255,255,0)),color-stop(40%,#D2D2D1),color-stop(60%,#D2D2D1),color-stop(60%,rgba(255,255,255,0)),color-stop(100%,rgba(255,255,255,0)));-webkit-box-shadow:0 -1px #fff,0 1px 1px #fff;-webkit-background-size:100%,100%,100%,4px 4px;-webkit-transition:-webkit-transform .4s ease-in-out;padding:10px 40px;color:#3A474D;text-shadow:0 1px #fff,0 -1px #262F33;font-weight:400}.button span:hover{color:#8b0000;text-shadow:0 -1px red;cursor:pointer}.button:active{-webkit-box-shadow:0 3px rgba(128,128,128,1),0 4px rgba(118,118,118,1),0 5px rgba(108,108,108,1),0 6px rgba(98,98,98,1),0 7px rgba(88,88,88,1),0 8px rgba(78,78,78,1),0 10px 2px 0 rgba(128,128,128,.6)}.button:active span{-webkit-transform:translate(0,7px)}
+        div, h1 {
+            box-shadow: 0 0 15px #282828
+        }
+
+        div, li {
+            padding: 5px
+        }
+
+        body {
+            background: radial-gradient(#666 15%, transparent 16%), radial-gradient(#666 15%, transparent 16%) 8px 8px, radial-gradient(rgba(255, 255, 255, 255) 15%, transparent 20%) 0 1px, radial-gradient(rgba(255, 255, 255, 255) 15%, transparent 20%) 8px 9px;
+            background-color: #999;
+            background-size: 16px 16px;
+            font: 12px arial, sans-serif;
+            position: static;
+            text-align: center;
+            margin: 10px;
+            text-transform: uppercase
+        }
+
+        h1 {
+            padding: 7px;
+            font-size: 20px;
+            background: #fff;
+            border: 1px solid #666;
+            border-radius: 8px
+        }
+
+        div {
+            display: inline-block;
+            background: rgba(255, 255, 255, .6);
+            border: 1px solid #666;
+            border-radius: 8px;
+            margin: 8px
+        }
+
+        .button, .button span {
+            -webkit-border-radius: 10px
+        }
+
+        span {
+            display: block;
+            padding: 3px;
+            font-weight: 800
+        }
+
+        .button, .button span, li {
+            display: inline-block
+        }
+
+        ul {
+            padding: inherit
+        }
+
+        li {
+            margin: 5px
+        }
+
+        .button {
+            top: 100px;
+            left: 200px;
+            margin: 0 auto;
+            -webkit-box-shadow: 0 3px rgba(128, 128, 128, 1), 0 4px rgba(118, 118, 118, 1), 0 5px rgba(108, 108, 108, 1), 0 6px rgba(98, 98, 98, 1), 0 7px rgba(88, 88, 88, 1), 0 8px rgba(78, 78, 78, 1), 0 14px 6px -1px rgba(128, 128, 128, 1);
+            -webkit-transition: -webkit-box-shadow .1s ease-in-out
+        }
+
+        .button span {
+            background-color: #E8E8E8;
+            background-image: -webkit-gradient(linear, left bottom, left top, color-stop(50%, rgba(255, 255, 255, 0)), color-stop(50%, rgba(255, 255, 255, .3)), color-stop(100%, rgba(255, 255, 255, .2))), -webkit-gradient(linear, left top, right top, color-stop(0, rgba(210, 210, 210, .3)), color-stop(20%, rgba(210, 210, 210, 0)), color-stop(80%, rgba(210, 210, 210, 0)), color-stop(100%, rgba(210, 210, 210, .3))), -webkit-gradient(linear, left top, right top, color-stop(0, rgba(255, 255, 255, 0)), color-stop(20%, rgba(255, 255, 255, .5)), color-stop(80%, rgba(255, 255, 255, .5)), color-stop(100%, rgba(255, 255, 255, 0))), -webkit-gradient(linear, 0 100%, 100% 0, color-stop(0, rgba(255, 255, 255, 0)), color-stop(40%, rgba(255, 255, 255, 0)), color-stop(40%, #D2D2D1), color-stop(60%, #D2D2D1), color-stop(60%, rgba(255, 255, 255, 0)), color-stop(100%, rgba(255, 255, 255, 0)));
+            -webkit-box-shadow: 0 -1px #fff, 0 1px 1px #fff;
+            -webkit-background-size: 100%, 100%, 100%, 4px 4px;
+            -webkit-transition: -webkit-transform .4s ease-in-out;
+            padding: 10px 40px;
+            color: #3A474D;
+            text-shadow: 0 1px #fff, 0 -1px #262F33;
+            font-weight: 400
+        }
+
+        .button span:hover {
+            color: #8b0000;
+            text-shadow: 0 -1px red;
+            cursor: pointer
+        }
+
+        .button:active {
+            -webkit-box-shadow: 0 3px rgba(128, 128, 128, 1), 0 4px rgba(118, 118, 118, 1), 0 5px rgba(108, 108, 108, 1), 0 6px rgba(98, 98, 98, 1), 0 7px rgba(88, 88, 88, 1), 0 8px rgba(78, 78, 78, 1), 0 10px 2px 0 rgba(128, 128, 128, .6)
+        }
+
+        .button:active span {
+            -webkit-transform: translate(0, 7px)
+        }
     </style>
 </head>
 
@@ -43,5 +132,23 @@
     </ul>
 </div>
 {% endfor %}
+
+<h1>Computer controls</h1>
+<div id="pc">
+    <span class="fsm.name">PC</span>
+    <ul>
+        <li>
+            <a class="button" onclick="Sijax.request('pc', ['reboot'], {url: '/pc_controls'})">
+                <span>Reboot</span>
+            </a>
+        </li>
+        <li>
+            <a class="button" onclick="Sijax.request('pc', ['shutdown'], {url: '/pc_controls'})">
+                <span>Shutdown</span>
+            </a>
+        </li>
+    </ul>
+</div>
+
 </body>
 </html>
