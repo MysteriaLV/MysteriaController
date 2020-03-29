@@ -114,6 +114,7 @@ quest = machine.create({
             video:play(console, 'idle/finish/alarm/exit_pass.mp4')
 
             light:alarms()
+            light:disable_xray()
         end,
         on_victory = function(self)
             print('You won!')
