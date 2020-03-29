@@ -366,7 +366,7 @@ zombie = machine.create({
     }
 })
 
-REGISTER_CODE_PANEL(zombie, 20) -- VAR, timeout
+REGISTER_CODE_PANEL(zombie, 7) -- VAR, timeout
 REGISTER_STATES("hints", zombie)
 sampler = REGISTER_SAMPLER()
 zombie_arduino = REGISTER_ZOMBIE_CONTROLLER(quest)
