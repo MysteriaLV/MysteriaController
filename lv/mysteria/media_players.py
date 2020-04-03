@@ -100,7 +100,7 @@ class Sampler(object):
     @staticmethod
     @memoize
     def _get_sound_tag_player(sound_file) -> MediaPlayer:
-        return Sampler.vlc.media_player_new('idle/{}.mp3'.format(sound_file))
+        return Sampler.vlc.media_player_new('{}.mp3'.format(sound_file))
 
     def play(self, audio_file, group=None):
         # Stop previous audio if any

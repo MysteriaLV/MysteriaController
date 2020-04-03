@@ -56,7 +56,7 @@ quest = machine.create({
             light:no_power()
             light:disable_xray()
             zombie_arduino:mirror(false)
-            sampler:play('audio/intro', 'background')
+            sampler:play('idle/audio/intro', 'background')
 
             zombie_video:set_idle_files({ 'idle/finish/tv/intro.mp4' })
 
@@ -74,12 +74,13 @@ quest = machine.create({
             self.start_time = os.clock();
         end,
         on_power_console_connected = function(self)
---            sampler:play('audio/power_on')
+            sampler:play('audio/ru/power_cable_connected')
             light:power_console_connected()
         end,
         on_powered_on = function(self)
             print('Lights and machinery are on now')
-            sampler:play('audio/power', 'background')
+            sampler:play('idle/audio/power', 'background')
+            sampler:play('audio/ru/system_power_on')
 
             video:play(bio, 'idle/finish/game/5_1024x1280.mp4')
             video:play(main, 'idle/finish/game/3_1600x1200.mp4')
@@ -103,10 +104,11 @@ quest = machine.create({
         on_destruction_console_access = function(self)
             print('Opening destruction console.')
             destruction_console:activated()
+            sampler:play('audio/ru/data_transmitted')
         end,
         on_self_destruction = function(self)
             print('It\'s the final countdown.')
-            sampler:play('audio/alert', 'background')
+            sampler:play('idle/audio/alert', 'background')
 
             video:play(bio, 'idle/finish/alarm/timer_1024x1280.mp4', math.floor(os.clock() - self.start_time))
             video:play(main, 'idle/finish/alarm/timer_1600x1200.mp4', math.floor(os.clock() - self.start_time))
@@ -118,7 +120,7 @@ quest = machine.create({
         end,
         on_victory = function(self)
             print('You won!')
-            sampler:play('music1_left', 'background')
+            sampler:play('idle/music1_left', 'background')
             light:full_lights()
             light:unlock_door()
         end,
@@ -174,6 +176,11 @@ boxes = rs485_node.create({
         { name = 'major_failure', triggered_by_register = 2, from = 'idle', to = 'idle' },
         { name = 'complete', triggered_by_register = 3, action_id = 2, from = '*', to = 'completed' },
     },
+    callbacks = {
+        on_completed = function()
+            sampler:play('audio/ru/finish_boxes')
+        end,
+    }
 })
 
 gestures = rs485_node.create({
@@ -285,7 +292,7 @@ zombie = machine.create({
         end,
         on_translate = function()
             print('Zombie talks!')
-            zombie_video:set_idle_files({ 'idle/finish/tv/standby.mp4', 'idle/finish/tv/joke_1.mp4',  'idle/finish/tv/joke_2.mp4',  'idle/finish/tv/joke_3.mp4' })
+            zombie_video:set_idle_files({ 'idle/finish/tv/standby.mp4', 'idle/finish/tv/joke_1.mp4', 'idle/finish/tv/joke_2.mp4', 'idle/finish/tv/joke_3.mp4' })
             zombie_video:play('idle/finish/tv/hints/TRANSLATOR.mp4')
         end,
         on_hint = function(self, event, from, to, code)
