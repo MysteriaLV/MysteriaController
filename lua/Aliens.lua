@@ -70,7 +70,8 @@ quest = machine.create({
             print('Game is ON!')
             light:lock_door();
 
-            video:play(hints, 'idle/finish/game/text.mp4')
+            video:play(hints, 'video/hints.mp4')
+--            video:play(hints, 'idle/finish/game/text.mp4')
             self.start_time = os.clock();
         end,
         on_power_console_connected = function(self)
@@ -85,8 +86,6 @@ quest = machine.create({
             video:play(bio, 'idle/finish/game/5_1024x1280.mp4')
             video:play(main, 'idle/finish/game/3_1600x1200.mp4')
 
-            light:power_active()
-            light:enable_xray()
             zombie_arduino:mirror(true)
             magnetic_door:activated()
         end,
@@ -97,6 +96,9 @@ quest = machine.create({
             print('They woke the zombie!')
             video:play(hints, 'idle/finish/intro/text_standby.mp4')
             zombie:defrost()
+
+            light:power_active()
+            light:enable_xray()
         end,
         on_zombie_translator = function(self)
             zombie:translate()
@@ -357,7 +359,8 @@ zombie = machine.create({
                 ['BCB3'] = function()
                     zombie_video:play('idle/finish/tv/hints/22.mp4')
                 end,
-                ['2213'] = function()
+                ['31'] = function()
+                    -- 3175
                     zombie_video:play('idle/finish/tv/hints/exit_code.mp4')
                 end,
             }
