@@ -1,4 +1,6 @@
 import logging
+import threading
+import time
 
 from lupa import LuaRuntime
 
@@ -35,7 +37,15 @@ class GameState(object):
         lua.globals()['print'] = logging.getLogger('lua').info
         lua.execute(open(LUA_SCENARIO, 'r').read())
 
-    # @lupa.unpacks_lua_table_method
+        t_ticker = threading.Thread(name='lua_ticker', target=GameState.processor)
+        t_ticker.start()
+
+    @classmethod
+    def processor(cls):
+        while True:
+            time.sleep(1)
+            lua.globals()['quest']['on_tick'](lua.globals()['quest'])
+
     def register_slave_lua(self, slave):
         self.modbus.register_slave(slave)
 

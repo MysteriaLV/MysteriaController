@@ -1,11 +1,13 @@
 local machine = require('lua/statemachine')
 local rs485_node = require('lua/rs485_node')
 
-main = 2
-table = 1
-hints = 3
-bio = 5
-console = 6
+local GAME_TIME_MAX = 3600
+
+local DISPLAY_MAIN = 2
+local DISPLAY_CIRCUIT = 1
+local DISPLAY_HINTS = 3
+local DISPLAY_BIO = 5
+local DISPLAY_CONSOLE = 6
 
 --noinspection UnusedDef
 quest = machine.create({
@@ -18,11 +20,12 @@ quest = machine.create({
         { name = 'process_dna_samples', from = 'laboratory_access', to = 'destruction_console_access' },
         { name = 'start_self_destruct', from = 'destruction_console_access', to = 'self_destruction' },
         { name = 'win', from = 'self_destruction', to = 'victory' },
-        { name = 'lose', from = 'self_destruction', to = 'failure' },
+        { name = 'lose', from = { 'powered_on', 'laboratory_access', 'destruction_console_access', 'self_destruction', }, to = 'failure' },
     },
     callbacks = {
         on_preparation = function(self)
             print('Resetting everything to inital states, walking around cleaning etc')
+            self.start_time = os.clock();
 
             power_console:reset()
             gestures:reset()
@@ -44,11 +47,11 @@ quest = machine.create({
             zombie_video:set_idle_files({ 'idle/finish/prepare/1.jpg' })
             zombie_video:start()
 
-            video:play(main, 'idle/finish/prepare/3.jpg')
-            video:play(table, 'idle/finish/prepare/4.jpg')
-            video:play(hints, 'idle/finish/prepare/6.jpg')
-            video:play(bio, 'idle/finish/prepare/2.jpg')
-            video:play(console, 'idle/finish/prepare/5.jpg')
+            video:play(DISPLAY_MAIN, 'idle/finish/prepare/3.jpg')
+            video:play(DISPLAY_CIRCUIT, 'idle/finish/prepare/4.jpg')
+            video:play(DISPLAY_HINTS, 'idle/finish/prepare/6.jpg')
+            video:play(DISPLAY_BIO, 'idle/finish/prepare/2.jpg')
+            video:play(DISPLAY_CONSOLE, 'idle/finish/prepare/5.jpg')
         end,
         on_intro = function(self)
             print('People are entering the room')
@@ -60,31 +63,32 @@ quest = machine.create({
 
             zombie_video:set_idle_files({ 'idle/finish/tv/intro.mp4' })
 
-            video:play(main, 'idle/finish/intro/1600x1200.mp4')
-            video:play(table, 'idle/table.jpg')
-            video:play(hints, 'idle/finish/intro/text_standby.mp4')
-            video:play(bio, 'idle/finish/intro/1024x1280.mp4')
-            video:play(console, 'idle/finish/intro/1280x1024.mp4')
+            video:play(DISPLAY_MAIN, 'idle/finish/intro/1600x1200.mp4')
+            video:play(DISPLAY_CIRCUIT, 'idle/table.jpg')
+            video:play(DISPLAY_HINTS, 'idle/finish/intro/text_standby.mp4')
+            video:play(DISPLAY_BIO, 'idle/finish/intro/1024x1280.mp4')
+            video:play(DISPLAY_CONSOLE, 'idle/finish/intro/1280x1024.mp4')
         end,
         on_start = function(self)
             print('Game is ON!')
             light:lock_door();
 
-            video:play(hints, 'video/hints.mp4')
---            video:play(hints, 'idle/finish/game/text.mp4')
+            video:play(DISPLAY_HINTS, 'video/hints.mp4')
+            -- Version1 Hints: video:play(hints, 'idle/finish/game/text.mp4')
             self.start_time = os.clock();
         end,
         on_power_console_connected = function(self)
             sampler:play('audio/ru/power_cable_connected')
             light:power_console_connected()
+            -- 20 50 90 70
         end,
         on_powered_on = function(self)
             print('Lights and machinery are on now')
             sampler:play('idle/audio/power', 'background')
             sampler:play('audio/ru/system_power_on')
 
-            video:play(bio, 'idle/finish/game/5_1024x1280.mp4')
-            video:play(main, 'idle/finish/game/3_1600x1200.mp4')
+            video:play(DISPLAY_BIO, 'idle/finish/game/5_1024x1280.mp4')
+            video:play(DISPLAY_MAIN, 'idle/finish/game/3_1600x1200.mp4')
 
             zombie_arduino:mirror(true)
             magnetic_door:activated()
@@ -94,7 +98,7 @@ quest = machine.create({
         end,
         on_zombie_activated = function(self)
             print('They woke the zombie!')
-            video:play(hints, 'idle/finish/intro/text_standby.mp4')
+            video:play(DISPLAY_HINTS, 'idle/finish/intro/text_standby.mp4')
             zombie:defrost()
         end,
         on_zombie_translator = function(self)
@@ -109,10 +113,10 @@ quest = machine.create({
             print('It\'s the final countdown.')
             sampler:play('idle/audio/alert', 'background')
 
-            video:play(bio, 'idle/finish/alarm/timer_1024x1280.mp4', math.floor(os.clock() - self.start_time))
-            video:play(main, 'idle/finish/alarm/timer_1600x1200.mp4', math.floor(os.clock() - self.start_time))
-            video:play(hints, 'idle/finish/alarm/timer_1024x1280.mp4', math.floor(os.clock() - self.start_time))
-            video:play(console, 'idle/finish/alarm/exit_pass.mp4')
+            video:play(DISPLAY_BIO, 'idle/finish/alarm/timer_1024x1280.mp4', math.floor(os.clock() - self.start_time))
+            video:play(DISPLAY_MAIN, 'idle/finish/alarm/timer_1600x1200.mp4', math.floor(os.clock() - self.start_time))
+            video:play(DISPLAY_HINTS, 'idle/finish/alarm/timer_1024x1280.mp4', math.floor(os.clock() - self.start_time))
+            video:play(DISPLAY_CONSOLE, 'idle/finish/alarm/exit_pass.mp4')
 
             light:alarms()
             light:disable_xray()
@@ -123,6 +127,18 @@ quest = machine.create({
             light:full_lights()
             light:unlock_door()
         end,
+        on_failure = function(self)
+            print('You\'ve lost!')
+            sampler:play('idle/music1_left', 'background')
+            light:full_lights()
+            light:unlock_door()
+        end,
+        on_tick = function(self)
+            if (math.floor(os.clock() - self.start_time) > GAME_TIME_MAX) then
+                print('Time\'s up')
+                self:lose()
+            end
+        end
     }
 })
 REGISTER_STATES("main_quest", quest)
