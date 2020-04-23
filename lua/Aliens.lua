@@ -96,9 +96,6 @@ quest = machine.create({
             print('They woke the zombie!')
             video:play(hints, 'idle/finish/intro/text_standby.mp4')
             zombie:defrost()
-
-            light:power_active()
-            light:enable_xray()
         end,
         on_zombie_translator = function(self)
             zombie:translate()
@@ -152,23 +149,6 @@ power_console = rs485_node.create({
     }
 })
 
-light = rs485_node.create({
-    name = 'light',
-    slave_id = 1,
-    events = {
-        { name = 'full_lights', action_id = 1, from = '*', to = 'idle' },
-        { name = 'no_power', action_id = 2, from = '*', to = 'idle' },
-        { name = 'power_active', action_id = 3, from = '*', to = 'idle' },
-        { name = 'alarms', action_id = 4, from = '*', to = 'idle' },
-        { name = 'lock_door', action_id = 5, from = '*', to = 'idle' },
-        { name = 'unlock_door', action_id = 6, from = '*', to = 'idle' },
-        { name = 'enable_xray', action_id = 7, from = '*', to = 'idle' },
-        { name = 'disable_xray', action_id = 8, from = '*', to = 'idle' },
-        { name = 'force_lapa', action_id = 9, from = '*', to = 'idle' },
-        { name = 'power_console_connected', action_id = 10, from = '*', to = 'idle' },
-    },
-})
-
 boxes = rs485_node.create({
     name = 'boxes',
     slave_id = 2,
@@ -185,36 +165,22 @@ boxes = rs485_node.create({
     }
 })
 
-gestures = rs485_node.create({
-    name = 'gestures',
-    slave_id = 3,
+------------------------------- ROOM 2 -----------------------------------------------
+light = rs485_node.create({
+    name = 'light',
+    slave_id = 1,
     events = {
-        { name = 'reset', action_id = 1, from = '*', to = 'idle' },
-        { name = 'complete', triggered_by_register = 1, action_id = 2, from = 'idle', to = 'completed' },
-        { name = 'left', triggered_by_register = 2, from = 'idle', to = 'idle' },
-        { name = 'right', triggered_by_register = 3, from = 'idle', to = 'idle' },
-        { name = 'up', triggered_by_register = 4, from = 'idle', to = 'idle' },
-        { name = 'down', triggered_by_register = 5, from = 'idle', to = 'idle' },
+        { name = 'full_lights', action_id = 1, from = '*', to = 'idle' },
+        { name = 'no_power', action_id = 2, from = '*', to = 'idle' },
+        { name = 'power_active', action_id = 3, from = '*', to = 'idle' },
+        { name = 'alarms', action_id = 4, from = '*', to = 'idle' },
+        { name = 'lock_door', action_id = 5, from = '*', to = 'idle' },
+        { name = 'unlock_door', action_id = 6, from = '*', to = 'idle' },
+        { name = 'enable_xray', action_id = 7, from = '*', to = 'idle' },
+        { name = 'disable_xray', action_id = 8, from = '*', to = 'idle' },
+        { name = 'force_lapa', action_id = 9, from = '*', to = 'idle' },
+        { name = 'power_console_connected', action_id = 10, from = '*', to = 'idle' },
     },
-    callbacks = {
-        on_completed = function()
-            print('Gestures are resolved')
-        end,
-    }
-})
-
-small_colbs = rs485_node.create({
-    name = 'small_colbs',
-    slave_id = 4,
-    events = {
-        { name = 'reset', action_id = 1, from = '*', to = 'idle' },
-        { name = 'complete', triggered_by_register = 1, from = 'idle', to = 'completed' },
-    },
-    callbacks = {
-        on_completed = function()
-            print('Gestures are resolved')
-        end,
-    }
 })
 
 magnetic_door = rs485_node.create({
@@ -247,6 +213,38 @@ destruction_console = rs485_node.create({
         on_completed = function()
             print('They entered correct code in a console!')
             quest:start_self_destruct()
+        end,
+    }
+})
+
+gestures = rs485_node.create({
+    name = 'gestures',
+    slave_id = 3,
+    events = {
+        { name = 'reset', action_id = 1, from = '*', to = 'idle' },
+        { name = 'complete', triggered_by_register = 1, action_id = 2, from = 'idle', to = 'completed' },
+        { name = 'left', triggered_by_register = 2, from = 'idle', to = 'idle' },
+        { name = 'right', triggered_by_register = 3, from = 'idle', to = 'idle' },
+        { name = 'up', triggered_by_register = 4, from = 'idle', to = 'idle' },
+        { name = 'down', triggered_by_register = 5, from = 'idle', to = 'idle' },
+    },
+    callbacks = {
+        on_completed = function()
+            print('Gestures are resolved')
+        end,
+    }
+})
+
+small_colbs = rs485_node.create({
+    name = 'small_colbs',
+    slave_id = 4,
+    events = {
+        { name = 'reset', action_id = 1, from = '*', to = 'idle' },
+        { name = 'complete', triggered_by_register = 1, from = 'idle', to = 'completed' },
+    },
+    callbacks = {
+        on_completed = function()
+            print('Gestures are resolved')
         end,
     }
 })
@@ -299,6 +297,12 @@ zombie = machine.create({
         end,
         on_hint = function(self, event, from, to, code)
             local codes = {
+                ['A1'] = function()
+                    light:enable_xray()
+                end,
+                ['B1'] = function()
+                    light:power_active()
+                end,
                 ['BAC1'] = function()
                     zombie_video:play('idle/finish/tv/hints/1.mp4')
                 end,
