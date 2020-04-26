@@ -30,9 +30,6 @@ def main():
     t_usb_detector.start()
     t_flask.start()
 
-    # noinspection PyRedeclaration
-    # modbus.running = False
-
 
 if __name__ == '__main__':
     main()

@@ -15,7 +15,7 @@ class ZombieController(object):
         self.main_quest = None
         # noinspection PyBroadException
         try:
-            self.board = Arduino(Arduino.AUTODETECT)
+            self.board = Arduino('COM4')
             self.board.samplingOn(50)
 
             self.mirror_pin: Pin = self.board.digital[ZombieController.PIN_MIRROR]

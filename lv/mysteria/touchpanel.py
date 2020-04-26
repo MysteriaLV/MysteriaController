@@ -92,7 +92,7 @@ class TouchPanel(object):
                 absolute = mapped_y * self.columns + mapped_x
                 letter = self.LETTERS[absolute]
 
-                logging.debug(f"x={x}, y={y}, keypress={data[0]}, mapped to ({mapped_x}, {mapped_y})={letter}")
+                # logging.debug(f"x={x}, y={y}, keypress={data[0]}, mapped to ({mapped_x}, {mapped_y})={letter}")
                 self.touches.append(letter)
 
                 if self.blinker:

@@ -17,9 +17,9 @@ class USBDetector(object):
     def processor(self):
         while True:
             try:
-                usb_drive = win32api.GetVolumeInformation("E:\\")
+                usb_drive = win32api.GetVolumeInformation("D:\\")
                 if usb_drive[0] == "OFFLINE":
-                    print("Device present")
+                    # print("Device present")
 
                     if self.main_quest:
                         self.main_quest['on_zombie_translator'](self.main_quest)

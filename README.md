@@ -11,6 +11,13 @@ Find device with idVendor=0x0eef, idProduct=0x0001
 Install/Replace driver with libusb-win32 (original drivers should be removed)
 
 
+VLC Cache
+---
+(as admin)
+```
+C:\Program Files\VideoLAN\VLC\vlc-cache-gen.exe C:\Program Files\VideoLAN\VLC\plugins
+```
+
 PotPlayer Config
 ===
 ```ini
