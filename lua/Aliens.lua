@@ -92,6 +92,7 @@ quest = machine.create({
 
             zombie_arduino:mirror(true)
             magnetic_door:activated()
+            light:power_active()
         end,
         on_laboratory_access = function(self)
             print('We are in Room2 now.')
@@ -141,7 +142,6 @@ quest = machine.create({
         end
     }
 })
-REGISTER_STATES("main_quest", quest)
 
 ------------------------------- ROOM 1 -----------------------------------------------
 
@@ -196,6 +196,7 @@ light = rs485_node.create({
         { name = 'disable_xray', action_id = 8, from = '*', to = 'idle' },
         { name = 'force_lapa', action_id = 9, from = '*', to = 'idle' },
         { name = 'power_console_connected', action_id = 10, from = '*', to = 'idle' },
+        { name = 'lab_light_on', action_id = 11, from = '*', to = 'idle' },
     },
 })
 
@@ -315,9 +316,11 @@ zombie = machine.create({
             local codes = {
                 ['A1'] = function()
                     light:enable_xray()
+                    zombie_video:play('idle/finish/tv/insert_translator_is.mp4')
                 end,
                 ['B1'] = function()
-                    light:power_active()
+                    light:lab_light_on()
+                    zombie_video:play('idle/finish/tv/insert_translator_is.mp4')
                 end,
                 ['BAC1'] = function()
                     zombie_video:play('idle/finish/tv/hints/1.mp4')
@@ -396,8 +399,9 @@ zombie = machine.create({
     }
 })
 
-REGISTER_CODE_PANEL(zombie, 7) -- VAR, timeout
+REGISTER_STATES("main_quest", quest)
 REGISTER_STATES("hints", zombie)
+REGISTER_CODE_PANEL(zombie, 7) -- VAR, timeout
 sampler = REGISTER_SAMPLER()
 zombie_arduino = REGISTER_ZOMBIE_CONTROLLER(quest)
 zombie_translator = REGISTER_ZOMBIE_TRANSLATOR(quest)
