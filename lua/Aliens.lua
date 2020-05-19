@@ -314,13 +314,13 @@ zombie = machine.create({
         end,
         on_hint = function(self, event, from, to, code)
             local codes = {
-                ['A1'] = function()
+                ['AAA1'] = function()
                     light:enable_xray()
-                    zombie_video:play('idle/finish/tv/insert_translator_is.mp4')
+                    zombie_video:play('video/ru/AAA1.mp4')
                 end,
-                ['B1'] = function()
+                ['BBB1'] = function()
                     light:lab_light_on()
-                    zombie_video:play('idle/finish/tv/insert_translator_is.mp4')
+                    zombie_video:play('video/ru/BBB1.mp4')
                 end,
                 ['BAC1'] = function()
                     zombie_video:play('idle/finish/tv/hints/1.mp4')
