@@ -66,6 +66,11 @@ phrases = {
         'lv': 'Latvian',
         'en': 'Ball colors are equal to the DNA sequence in incubator.'
     },
+    'III1': {
+        'ru': 'У вас должен получиться цельный рисунок цепочки ДНК с последовательностью молекул по цветам.',
+        'lv': 'Latvian',
+        'en': 'You must arrange the tiles to reveal DNA picture, with molecules of different color.'
+    },
     'BCB1': {
         'ru': 'Вторую часть кода от выхода получите у меня.',
         'lv': 'Latvian',

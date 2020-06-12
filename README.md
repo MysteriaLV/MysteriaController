@@ -10,7 +10,11 @@ Run Zadig (as Admin?)
 Find device with idVendor=0x0eef, idProduct=0x0001
 Install/Replace driver with libusb-win32 (original drivers should be removed)
 
-
+Audio Normalize
+---
+```asciidoc
+ffmpeg-normalize * -of . -v -of normalized -ofmt mp3 -ext mp3 -vn -nt rms -c:a mp3 -t -10 -f
+```
 VLC Cache
 ---
 (as admin)
