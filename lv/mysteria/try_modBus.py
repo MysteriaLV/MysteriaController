@@ -25,7 +25,7 @@ SPLAY = True
 
 def BasicConnectivity():
     slaves = []
-    modbus = my_modbus.ModBus(port='COM6')
+    modbus = my_modbus.ModBus(port='COM19')
 
     for slave_id in range(1, SLAVE_COUNT + 1):
         slaves.append(dotmap.DotMap(slave_id=slave_id, reg_count=1, is_ok=True, errors=0))
