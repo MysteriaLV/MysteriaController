@@ -3,11 +3,11 @@ local rs485_node = require('lua/rs485_node')
 
 local GAME_TIME_MAX = 3600
 
-local DISPLAY_MAIN = 2
-local DISPLAY_CIRCUIT = 1
+local DISPLAY_MAIN = 1
+local DISPLAY_CIRCUIT = 2
 local DISPLAY_HINTS = 3
-local DISPLAY_BIO = 5
-local DISPLAY_CONSOLE = 6
+local DISPLAY_BIO = 6
+local DISPLAY_CONSOLE = 5
 
 --noinspection UnusedDef
 quest = machine.create({

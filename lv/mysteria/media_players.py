@@ -36,7 +36,7 @@ class ZombieBox(object):
         self.sparkler = None
 
         self.vlc: Instance = vlc.Instance(
-            ['--no-spu', '--no-osd', '--video-on-top', '--video-y=1', '--video-x=-1200', '--fullscreen'])
+            ['--no-spu', '--no-osd', '--video-on-top', '--video-y=1', '--video-x=-1900', '--fullscreen'])
         self.main_player: vlc.MediaPlayer = self.vlc.media_player_new()
         self.main_player.set_fullscreen(True)
 

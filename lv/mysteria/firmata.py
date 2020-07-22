@@ -1,6 +1,7 @@
 import random
 
 from pyfirmata2 import Arduino, Pin, INPUT
+import logging
 
 
 class ZombieController(object):
@@ -15,7 +16,7 @@ class ZombieController(object):
         self.main_quest = None
         # noinspection PyBroadException
         try:
-            self.board = Arduino('COM8')
+            self.board = Arduino('COM11')
             self.board.samplingOn(50)
 
             self.mirror_pin: Pin = self.board.digital[ZombieController.PIN_MIRROR]
@@ -27,6 +28,7 @@ class ZombieController(object):
             self.button_pin.enable_reporting()
             self.board_missing = False
         except Exception:
+            logging.error("Arduino in ZombieBox is not responding!!!")
             self.board_missing = True
 
     def reset(self):
@@ -65,6 +67,14 @@ class ZombieController(object):
     def big_red_button_pressed(self, data):
         if data > 0.02:
             print(f"Activated on {data}")
-            self.button_pin.disable_reporting()
+            # self.button_pin.disable_reporting()
             if self.main_quest:
                 self.main_quest['on_zombie_activated'](self.main_quest)
+
+
+if __name__ == "__main__":
+    ZombieController()
+    import time
+
+    while True:
+        time.sleep(1)
