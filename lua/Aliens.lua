@@ -132,7 +132,8 @@ quest = machine.create({
         end,
         on_failure = function(self)
             print('You\'ve lost!')
-            sampler:play('audio/intro', 'background')
+            sampler:reset()
+            sampler:play('audio/LongExplosion')
             light:off()
             light:unlock_door()
         end,
