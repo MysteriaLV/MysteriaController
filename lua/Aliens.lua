@@ -133,7 +133,7 @@ quest = machine.create({
         on_failure = function(self)
             print('You\'ve lost!')
             sampler:play('audio/intro', 'background')
-            light:full_lights()
+            light:off()
             light:unlock_door()
         end,
         on_tick = function(self)
@@ -199,6 +199,7 @@ light = rs485_node.create({
         { name = 'force_lapa', action_id = 9, from = '*', to = 'idle' },
         { name = 'power_console_connected', action_id = 10, from = '*', to = 'idle' },
         { name = 'lab_light_on', action_id = 11, from = '*', to = 'idle' },
+        { name = 'off', action_id = 12, from = '*', to = 'idle' },
     },
 })
 
