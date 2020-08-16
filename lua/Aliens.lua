@@ -9,6 +9,8 @@ local DISPLAY_HINTS = 3
 local DISPLAY_BIO = 6
 local DISPLAY_CONSOLE = 5
 
+local LANGUAGE = 'ru'
+
 --noinspection UnusedDef
 quest = machine.create({
     events = {
@@ -27,6 +29,7 @@ quest = machine.create({
             print('Resetting everything to inital states, walking around cleaning etc')
             self.start_time = os.clock();
 
+            language:reset()
             power_console:reset()
             gestures:reset()
             boxes:reset()
@@ -73,18 +76,18 @@ quest = machine.create({
             print('Game is ON!')
             light:lock_door();
 
-            video:play(DISPLAY_HINTS, 'video/ru/room1_hints.mp4')
+            video:play(DISPLAY_HINTS, 'video/' .. LANGUAGE .. '/room1_hints.mp4')
             self.start_time = os.clock();
         end,
         on_power_console_connected = function(self)
-            sampler:play('audio/ru/power_cable_connected')
+            sampler:play('audio/' .. LANGUAGE .. '/power_cable_connected')
             light:power_console_connected()
             -- 20 50 90 70
         end,
         on_powered_on = function(self)
             print('Lights and machinery are on now')
             sampler:play('audio/power', 'background')
-            sampler:play('audio/ru/system_power_on')
+            sampler:play('audio/' .. LANGUAGE .. '/system_power_on')
 
             video:play(DISPLAY_BIO, 'video/displays/5_1024x1280.mp4')
             video:play(DISPLAY_MAIN, 'video/displays/3_1600x1200.mp4')
@@ -107,7 +110,7 @@ quest = machine.create({
         on_destruction_console_access = function(self)
             print('Opening destruction console.')
             destruction_console:activated()
-            sampler:play('audio/ru/data_transmitted')
+            sampler:play('audio/' .. LANGUAGE .. '/data_transmitted')
         end,
         on_self_destruction = function(self)
             print('It\'s the final countdown.')
@@ -175,7 +178,7 @@ boxes = rs485_node.create({
     },
     callbacks = {
         on_completed = function()
-            sampler:play('audio/ru/finish_boxes')
+            sampler:play('audio/' .. LANGUAGE .. '/finish_boxes')
         end,
     }
 })
@@ -308,82 +311,82 @@ zombie = machine.create({
         end,
         on_translate = function()
             print('Zombie talks!')
-            zombie_video:set_idle_files({ 'video/zombie_standby.mp4', 'video/ru/idle/joke_1.mp4', 'video/ru/idle/joke_2.mp4', 'video/ru/idle/joke_3.mp4' })
-            zombie_video:play('video/ru/translator_ready.mp4')
+            zombie_video:set_idle_files({ 'video/zombie_standby.mp4', 'video/' .. LANGUAGE .. '/idle/joke_1.mp4', 'video/' .. LANGUAGE .. '/idle/joke_2.mp4', 'video/' .. LANGUAGE .. '/idle/joke_3.mp4' })
+            zombie_video:play('video/' .. LANGUAGE .. '/translator_ready.mp4')
         end,
         on_hint = function(self, event, from, to, code)
             local codes = {
                 ['AAA1'] = function()
                     light:enable_xray()
-                    zombie_video:play('video/ru/AAA1.mp4')
+                    zombie_video:play('video/' .. LANGUAGE .. '/AAA1.mp4')
                 end,
                 ['BBB1'] = function()
                     light:lab_light_on()
-                    zombie_video:play('video/ru/BBB1.mp4')
+                    zombie_video:play('video/' .. LANGUAGE .. '/BBB1.mp4')
                 end,
                 ['BAC1'] = function()
-                    zombie_video:play('video/ru/BAC1.mp4')
+                    zombie_video:play('video/' .. LANGUAGE .. '/BAC1.mp4')
                 end,
                 ['BAC2'] = function()
-                    zombie_video:play('video/ru/BAC2.mp4')
+                    zombie_video:play('video/' .. LANGUAGE .. '/BAC2.mp4')
                 end,
                 ['BCA1'] = function()
-                    zombie_video:play('video/ru/BCA1.mp4')
+                    zombie_video:play('video/' .. LANGUAGE .. '/BCA1.mp4')
                 end,
                 ['CAC1'] = function()
-                    zombie_video:play('video/ru/CAC1.mp4')
+                    zombie_video:play('video/' .. LANGUAGE .. '/CAC1.mp4')
                 end,
                 ['BCA2'] = function()
-                    zombie_video:play('video/ru/BCA2.mp4')
+                    zombie_video:play('video/' .. LANGUAGE .. '/BCA2.mp4')
                 end,
                 ['CBC1'] = function()
-                    zombie_video:play('video/ru/CBC1.mp4')
+                    zombie_video:play('video/' .. LANGUAGE .. '/CBC1.mp4')
                 end,
                 ['CBC2'] = function()
-                    zombie_video:play('video/ru/CBC2.mp4')
+                    zombie_video:play('video/' .. LANGUAGE .. '/CBC2.mp4')
                 end,
                 ['CBC3'] = function()
-                    zombie_video:play('video/ru/CBC3.mp4')
+                    zombie_video:play('video/' .. LANGUAGE .. '/CBC3.mp4')
                 end,
                 ['ACB1'] = function()
-                    zombie_video:play('video/ru/ACB1.mp4')
+                    zombie_video:play('video/' .. LANGUAGE .. '/ACB1.mp4')
                 end,
                 ['ACB2'] = function()
-                    zombie_video:play('video/ru/ACB2.mp4')
+                    zombie_video:play('video/' .. LANGUAGE .. '/ACB2.mp4')
                 end,
                 ['ACB3'] = function()
-                    zombie_video:play('video/ru/ACB3.mp4')
+                    zombie_video:play('video/' .. LANGUAGE .. '/ACB3.mp4')
                 end,
                 ['CBA1'] = function()
-                    zombie_video:play('video/ru/CBA1.mp4')
+                    zombie_video:play('video/' .. LANGUAGE .. '/CBA1.mp4')
                 end,
                 ['CBA2'] = function()
-                    zombie_video:play('video/ru/CBA2.mp4')
+                    zombie_video:play('video/' .. LANGUAGE .. '/CBA2.mp4')
                 end,
                 ['CBA3'] = function()
-                    zombie_video:play('video/ru/CBA3.mp4')
+                    zombie_video:play('video/' .. LANGUAGE .. '/CBA3.mp4')
                 end,
                 ['ABA1'] = function()
-                    zombie_video:play('video/ru/ABA1.mp4')
+                    zombie_video:play('video/' .. LANGUAGE .. '/ABA1.mp4')
                 end,
                 ['ABA2'] = function()
-                    zombie_video:play('video/ru/ABA2.mp4')
+                    zombie_video:play('video/' .. LANGUAGE .. '/ABA2.mp4')
                 end,
                 ['ABA3'] = function()
-                    zombie_video:play('video/ru/ABA3.mp4')
+                    zombie_video:play('video/' .. LANGUAGE .. '/ABA3.mp4')
                 end,
                 ['BCB1'] = function()
-                    zombie_video:play('video/ru/BCB1.mp4')
+                    zombie_video:play('video/' .. LANGUAGE .. '/BCB1.mp4')
                 end,
                 ['BCB2'] = function()
-                    zombie_video:play('video/ru/BCB2.mp4')
+                    zombie_video:play('video/' .. LANGUAGE .. '/BCB2.mp4')
                 end,
                 ['BCB3'] = function()
-                    zombie_video:play('video/ru/BCB3.mp4')
+                    zombie_video:play('video/' .. LANGUAGE .. '/BCB3.mp4')
                 end,
                 ['31'] = function()
                     -- 3175
-                    zombie_video:play('video/ru/31_exit_code.mp4')
+                    zombie_video:play('video/' .. LANGUAGE .. '/31_exit_code.mp4')
                 end,
             }
 
@@ -392,9 +395,29 @@ zombie = machine.create({
                 code_action()
             else
                 print "Unknown code???"
-                zombie_video:play('video/ru/code_error.mp4')
+                zombie_video:play('video/' .. LANGUAGE .. '/code_error.mp4')
             end
         end
+    }
+})
+
+language = machine.create({
+    events = {
+        { name = 'reset', from = '*', to = 'russian' },
+        { name = 'set_russian', from = '*', to = 'russian' },
+        { name = 'set_latvian', from = '*', to = 'latvian' },
+        { name = 'set_english', from = '*', to = 'english' },
+    },
+    callbacks = {
+        on_russian = function()
+            LANGUAGE = 'ru'
+        end,
+        on_latvian = function()
+            LANGUAGE = 'lv'
+        end,
+        on_english = function()
+            LANGUAGE = 'en'
+        end,
     }
 })
 
