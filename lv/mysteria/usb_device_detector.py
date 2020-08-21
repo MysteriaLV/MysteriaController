@@ -18,7 +18,7 @@ class USBDetector(object):
         while True:
             try:
                 usb_drive = win32api.GetVolumeInformation("D:\\")
-                if usb_drive[0] == "OFFLINE":
+                if usb_drive[0] == "ALIENVOICE":
                     # print("Device present")
 
                     if self.main_quest:
