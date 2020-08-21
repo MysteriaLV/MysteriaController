@@ -37,7 +37,8 @@ class ZombieBox(object):
         self.sparkler = None
 
         self.vlc: Instance = vlc.Instance(
-            ['--no-spu', '--no-osd', '--video-on-top', '--video-y=1', '--video-x=-1900', '--fullscreen'])
+            ['--no-volume-save', '--no-spu', '--no-osd', '--video-on-top', '--video-y=1', '--video-x=-1900',
+             '--fullscreen'])
         self.main_player: vlc.MediaPlayer = self.vlc.media_player_new()
         self.main_player.set_fullscreen(True)
 
@@ -92,7 +93,7 @@ class ZombieBox(object):
 
 
 class Sampler(object):
-    vlc: Instance = vlc.Instance('--no-video')
+    vlc: Instance = vlc.Instance('--no-video --no-volume-save')
 
     def __init__(self):
         self.tag_players: List[MediaPlayer] = []
@@ -121,13 +122,14 @@ class Sampler(object):
 
         player = self._get_sound_tag_player(audio_file)
 
+        if player.is_playing() == 0:
+            player.stop()
+            player.play()
+
         if not group:
             # For one-shot samples quiet the other sounds
             self.pause_backgroud()
-            player.event_manager.event_attach(vlc.EventType.MediaPlayerEndReached, self.reset_volume)
-
-        if player.is_playing() == 0:
-            player.play()
+            player.event_manager().event_attach(vlc.EventType.MediaPlayerEndReached, self.resume_backgroud)
 
         self.tag_players.append(player)
         if group:
@@ -182,9 +184,18 @@ if __name__ == '__main__':
 
     # p = PotPlayer()
     # p.play(2, 'idle/timer_1024x1280.mp4')
-    # time.sleep(4)
-    # p.play(2, 'idle/12.mp4')
+    # # time.sleep(4)
+    # # p.play(2, 'idle/12.mp4')
     # time.sleep(10)
 
     s = Sampler()
-    s.play("ru/hints/AAA1")
+    s.reset()
+
+    s.play('audio/alert', "a")
+    time.sleep(2)
+    print(1)
+    s.play('audio/ru/power_cable_connected')
+    time.sleep(11)
+    print(2)
+    s.play('audio/ru/power_cable_connected')
+    time.sleep(1000)
