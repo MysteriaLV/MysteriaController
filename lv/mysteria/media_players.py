@@ -3,7 +3,7 @@ import shlex
 import subprocess
 import threading
 import time
-from typing import Dict
+from typing import Dict, List
 
 import vlc
 from vlc import MediaPlayer, Instance
@@ -91,7 +91,7 @@ class Sampler(object):
     vlc: Instance = vlc.Instance('--no-video')
 
     def __init__(self):
-        self.tag_players = []
+        self.tag_players: List[MediaPlayer] = []
         self.player_groups: Dict[str, MediaPlayer] = {}
 
     def register_in_lua(self):
@@ -102,12 +102,22 @@ class Sampler(object):
     def _get_sound_tag_player(sound_file) -> MediaPlayer:
         return Sampler.vlc.media_player_new('{}.mp3'.format(sound_file))
 
+    def reset_volume(self):
+        for player in self.tag_players:
+            player.audio_set_volume(100)
+
     def play(self, audio_file, group=None):
         # Stop previous audio if any
         if group and group in self.player_groups:
             self.player_groups[group].stop()
 
         player = self._get_sound_tag_player(audio_file)
+
+        if not group:
+            # For one-shot samples quiet the other sounds
+            for other in self.tag_players:
+                other.audio_set_volume(10)
+            player.event_manager.event_attach(vlc.EventType.MediaPlayerEndReached, self.reset_volume)
 
         if player.is_playing() == 0:
             player.play()
@@ -119,6 +129,9 @@ class Sampler(object):
     def reset(self):
         for player in self.tag_players:
             player.stop()
+
+        self.tag_players.clear()
+        self.player_groups.clear()
 
 
 class PotPlayer(object):
