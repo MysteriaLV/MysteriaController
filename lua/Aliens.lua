@@ -22,7 +22,7 @@ quest = machine.create({
         { name = 'process_dna_samples', from = 'laboratory_access', to = 'destruction_console_access' },
         { name = 'start_self_destruct', from = 'destruction_console_access', to = 'self_destruction' },
         { name = 'win', from = 'self_destruction', to = 'victory' },
-        { name = 'lose', from = { 'powered_on', 'laboratory_access', 'destruction_console_access', 'self_destruction', }, to = 'failure' },
+        { name = 'lose', from = { 'powered_off', 'powered_on', 'laboratory_access', 'destruction_console_access', 'self_destruction', }, to = 'failure' },
     },
     callbacks = {
         on_preparation = function(self)
@@ -268,7 +268,7 @@ small_colbs = rs485_node.create({
     },
     callbacks = {
         on_completed = function()
-            print('Gestures are resolved')
+            print('Small colbs are resolved')
         end,
     }
 })
