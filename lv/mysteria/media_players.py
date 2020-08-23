@@ -29,7 +29,8 @@ def memoize(f):
 
 
 class ZombieBox(object):
-    def __init__(self):
+    def __init__(self, sampler):
+        self.sampler = sampler
         self.idle_media_files = ['idle/nothing.jpg']
         self.needs_next_video = False
         self.zombie_fsm = None
@@ -52,6 +53,7 @@ class ZombieBox(object):
 
     def play_next_idle(self):
         self.play(random.choice(self.idle_media_files))
+        self.sampler.resume_backgroud()
 
     def register_in_lua(self, hints_fsm, sparkler):
         self.sparkler: ZombieController = sparkler
@@ -70,6 +72,8 @@ class ZombieBox(object):
 
     def play(self, media_file):
         self.needs_next_video = False
+
+        self.sampler.pause_backgroud()
 
         self.main_player.set_media(self.vlc.media_new(media_file))
         self.main_player.play()
@@ -102,9 +106,13 @@ class Sampler(object):
     def _get_sound_tag_player(sound_file) -> MediaPlayer:
         return Sampler.vlc.media_player_new('{}.mp3'.format(sound_file))
 
-    def reset_volume(self):
-        for player in self.tag_players:
-            player.audio_set_volume(100)
+    def pause_backgroud(self):
+        if 'background' in self.player_groups:
+            self.player_groups['background'].pause()
+
+    def resume_backgroud(self):
+        if 'background' in self.player_groups:
+            self.player_groups['background'].play()
 
     def play(self, audio_file, group=None):
         # Stop previous audio if any
@@ -115,8 +123,7 @@ class Sampler(object):
 
         if not group:
             # For one-shot samples quiet the other sounds
-            for other in self.tag_players:
-                other.audio_set_volume(10)
+            self.pause_backgroud()
             player.event_manager.event_attach(vlc.EventType.MediaPlayerEndReached, self.reset_volume)
 
         if player.is_playing() == 0:
@@ -173,8 +180,11 @@ if __name__ == '__main__':
     # # z.play('idle/11.mp4')
     # time.sleep(200)
 
-    p = PotPlayer()
-    p.play(2, 'idle/timer_1024x1280.mp4')
+    # p = PotPlayer()
+    # p.play(2, 'idle/timer_1024x1280.mp4')
     # time.sleep(4)
     # p.play(2, 'idle/12.mp4')
-    time.sleep(10)
+    # time.sleep(10)
+
+    s = Sampler()
+    s.play("ru/hints/AAA1")

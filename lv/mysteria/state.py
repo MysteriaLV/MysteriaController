@@ -18,7 +18,7 @@ class GameState(object):
         self.modbus = modbus
         self.usb_detector = usb_detector
         self.sampler = Sampler()
-        self.zombie_box = ZombieBox()
+        self.zombie_box = ZombieBox(self.sampler)
         self.zombie_controller = ZombieController()
         self.pot_player = PotPlayer()
         self.fsms = {}
