@@ -1,10 +1,13 @@
 import os
+from typing import Optional
 
 import flask_sijax
 from flask import Flask, render_template, g
 
+from mysteria.state import GameState
+
 app = Flask(__name__)
-app.game_state = None
+app.game_state: Optional[GameState] = None
 
 app.config["SIJAX_STATIC_PATH"] = os.path.join('.', os.path.dirname(__file__), 'static/js/sijax/')
 flask_sijax.Sijax(app)

@@ -142,6 +142,9 @@ quest = machine.create({
                 print('Time\'s up')
                 self:lose()
             end
+        end,
+        get_game_time = function(self)
+            return math.floor(os.clock() - self.start_time)
         end
     }
 })

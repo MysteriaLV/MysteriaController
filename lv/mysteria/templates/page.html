@@ -3,7 +3,7 @@
 <head>
     <script type="text/javascript" src="/static/js/jquery.min.js"></script>
     <script type="text/javascript" src="/static/js/sijax/sijax.js"></script>
-    <script type="text/javascript">        {{ g.sijax.get_js()|safe }}    </script>
+    <script type="text/javascript">{{ g.sijax.get_js()|safe }}</script>
     <style>
         div, h1 {
             box-shadow: 0 0 15px #282828
@@ -101,36 +101,36 @@
 <body>
 <h1 id="flash"></h1>
 
-<h1>State machines</h1>
+<h1>State machines (Time: {{ state.game_time }})</h1>
 {% for fsm_name in state.fsms %}
-{% set fsm = state.fsms[fsm_name] %}
-<div id="fsm.{{ fsm }}">
-    <span class="fsm.name">{{ fsm_name }}: {{ fsm.current }}</span>
-    <ul>
-        {% for event in fsm.events %}
-        <li><a class="button" onclick="Sijax.request('fire_event_fsm', ['{{ fsm_name }}', '{{ event }}'])"><span>{{ event }}</span></a>
-        </li>
-        {% endfor %}
-    </ul>
-</div>
+    {% set fsm = state.fsms[fsm_name] %}
+    <div id="fsm.{{ fsm }}">
+        <span class="fsm.name">{{ fsm_name }}: {{ fsm.current }}</span>
+        <ul>
+            {% for event in fsm.events|sort %}
+                <li><a class="button" onclick="Sijax.request('fire_event_fsm', ['{{ fsm_name }}', '{{ event }}'])"><span>{{ event }}</span></a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
 {% endfor %}
 
 
 <h1>Peripherals</h1>
 {% for slave_id in state.modbus.slaves %}
-{% set slave = state.modbus.slaves[slave_id] %}
-<div id="slave.{{ slave_id }}">
-    <span class="slave.name">{{ slave.name }}: {{ slave.fsm.current }}</span>
-    <span class="slave.errors">Remote errors: {{ state.modbus.get_remote_errors(slave) }}</span>
-    <span class="slave.errors">Local errors: {{ slave.errors }}</span>
-    <span class="slave.data">Current data: {{ slave.current_data.registers }}</span>
-    <ul>
-        {% for event in slave.fsm.events %}
-        <li><a class="button" onclick="Sijax.request('fire_event_modbus_fsm', ['{{ slave_id }}', '{{ event }}'])"><span>{{ event }}</span></a>
-        </li>
-        {% endfor %}
-    </ul>
-</div>
+    {% set slave = state.modbus.slaves[slave_id] %}
+    <div id="slave.{{ slave_id }}">
+        <span class="slave.name">{{ slave.name }}: {{ slave.fsm.current }}</span>
+        <span class="slave.errors">Remote errors: {{ state.modbus.get_remote_errors(slave) }}</span>
+        <span class="slave.errors">Local errors: {{ slave.errors }}</span>
+        <span class="slave.data">Current data: {{ slave.current_data.registers }}</span>
+        <ul>
+            {% for event in slave.fsm.events|sort %}
+                <li><a class="button" onclick="Sijax.request('fire_event_modbus_fsm', ['{{ slave_id }}', '{{ event }}'])"><span>{{ event }}</span></a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
 {% endfor %}
 
 <h1>Computer controls</h1>

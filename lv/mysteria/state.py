@@ -54,3 +54,7 @@ class GameState(object):
 
     def fire_event(self, fsm_name, event):
         return self.fsms[fsm_name][event](self.fsms[fsm_name])
+
+    @property
+    def game_time(self):
+        return time.strftime('%H:%M:%S', time.gmtime(self.fsms["main_quest"]['get_game_time']))
