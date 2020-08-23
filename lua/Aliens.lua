@@ -428,6 +428,7 @@ language = machine.create({
 
 REGISTER_STATES("main_quest", quest)
 REGISTER_STATES("hints", zombie)
+REGISTER_STATES("language", language)
 REGISTER_CODE_PANEL(zombie, 7) -- VAR, timeout
 sampler = REGISTER_SAMPLER()
 zombie_arduino = REGISTER_ZOMBIE_CONTROLLER(quest)

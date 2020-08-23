@@ -57,4 +57,4 @@ class GameState(object):
 
     @property
     def game_time(self):
-        return time.strftime('%H:%M:%S', time.gmtime(self.fsms["main_quest"]['get_game_time']))
+        return time.strftime('%H:%M:%S', time.gmtime(self.fsms["main_quest"]['get_game_time'](self.fsms["main_quest"])))
