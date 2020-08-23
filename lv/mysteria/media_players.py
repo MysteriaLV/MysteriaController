@@ -107,11 +107,13 @@ class Sampler(object):
     def _get_sound_tag_player(sound_file) -> MediaPlayer:
         return Sampler.vlc.media_player_new('{}.mp3'.format(sound_file))
 
-    def pause_backgroud(self):
+    # noinspection PyUnusedLocal
+    def pause_backgroud(self, *args):
         if 'background' in self.player_groups:
             self.player_groups['background'].pause()
 
-    def resume_backgroud(self):
+    # noinspection PyUnusedLocal
+    def resume_backgroud(self, *args):
         if 'background' in self.player_groups:
             self.player_groups['background'].play()
 
@@ -191,7 +193,7 @@ if __name__ == '__main__':
     s = Sampler()
     s.reset()
 
-    s.play('audio/alert', "a")
+    s.play('audio/alert', "background")
     time.sleep(2)
     print(1)
     s.play('audio/ru/power_cable_connected')
