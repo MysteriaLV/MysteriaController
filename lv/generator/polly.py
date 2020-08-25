@@ -119,7 +119,24 @@ phrases = {
     'translator_ready': {
         'ru': '1, 2, 3… Проверка… Компьютер идентифицировал ваш язык как русский. Активирована функция синхронного перевода. Теперь вы сможете понимать капрала.',
         'lv': 'Latvian',
-        'en': '1, 2, 3… Testing… Computer identified your language as English. Activating synchronous translation. Now you can understand the corporal.'}
+        'en': '1, 2, 3… Testing… Computer identified your language as English. Activating synchronous translation. Now you can understand the corporal.'},
+    'finish_boxes': {
+        'ru': 'Странно, что вы получили доступы ко всем индивидуальным отсекам. Наверно у вас высокий уровень авторизации.',
+        'lv': 'Latvian',
+        'en': "I'm surprised that you have access to all maintenance lockers. You must have management authorization."},
+    'power_cable_connected': {
+        'ru': 'Обнаружено напряжение на первичных обмотках повышающего трансформатора. Ожидаю коммутации с энегросистемой корабля.',
+        'lv': 'Latvian',
+        'en': "Voltage detected on the primary coils of the step-up transformer. Waiting for connection to the ship's power system"},
+    'system_power_on': {
+        'ru': 'Бортовая системя корабля МС-14 приветствует новую группу лаборантов. Предыдущая группы прибыла сюда чщщщзззщщщчч дней назад. Кроме вас, на борту находится. Живых - 0, в гибернации - 1, других форм жизни - 4. Классификация - невозможна. Соблюдайте чистоту возле биореакторов.',
+        'lv': 'Latvian',
+        'en': "Welcome to the MS-14 spacecraft. The previous group of laboratory technicians arrived here <static> days ago. Current spacecraft population: 0 sentient lifeforms, 1 lifeform in hibernation, 4 classification unknown. Please keep the bioreactors clean."
+    },
+    'data_transmitted': {
+        'ru': 'Это полковник Уотсон! Что за чертовщина творится на этом корабле. Что за безумные данные вы передали? Такие эксперименты уже 3 столетия как запрещены! Взрывайте эту лоханку к свиньям собачьим и валите оттуда!',
+        'lv': 'Latvian',
+        'en': 'This is Colonel Watson! What the hell is going on up there?! The data you transmitted is insane!! Experiments like that have been banned for three centuries! Blow that spaceship to kingdom come and get out of there!'},
 }
 
 polly_client = boto3.Session(
