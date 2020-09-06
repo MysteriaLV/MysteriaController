@@ -1,7 +1,11 @@
 local machine = require('lua/statemachine')
 local rs485_node = require('lua/rs485_node')
 
-local GAME_TIME_MAX = 3600
+local GAME_TIME_WARN_1 = 60 * 30
+local GAME_TIME_WARN_2 = 60 * 45
+local GAME_TIME_WARN_3 = 60 * 50
+local GAME_TIME_WARN_4 = 60 * 55
+local GAME_TIME_MAX = 60 * 60
 
 local DISPLAY_MAIN = 1
 local DISPLAY_CIRCUIT = 2
@@ -23,6 +27,10 @@ quest = machine.create({
         { name = 'start_self_destruct', from = 'destruction_console_access', to = 'self_destruction' },
         { name = 'win', from = 'self_destruction', to = 'victory' },
         { name = 'lose', from = { 'powered_off', 'powered_on', 'laboratory_access', 'destruction_console_access', 'self_destruction', }, to = 'failure' },
+        { name = 'last_warning', from = 'powered_off', to = 'powered_off' },
+        { name = 'last_warning', from = 'powered_on', to = 'powered_on' },
+        { name = 'last_warning', from = 'laboratory_access', to = 'laboratory_access' },
+        { name = 'last_warning', from = 'destruction_console_access', to = 'destruction_console_access' },
     },
     callbacks = {
         on_preparation = function(self)
@@ -116,13 +124,30 @@ quest = machine.create({
             print('It\'s the final countdown.')
             sampler:play('audio/alert', 'background')
 
-            video:play(DISPLAY_BIO, 'video/alarm/timer_1024x1280.mp4', math.floor(os.clock() - self.start_time))
-            video:play(DISPLAY_MAIN, 'video/alarm/timer_1600x1200.mp4', math.floor(os.clock() - self.start_time))
-            video:play(DISPLAY_HINTS, 'video/alarm/timer_1024x1280.mp4', math.floor(os.clock() - self.start_time))
+            video:play(DISPLAY_BIO, 'video/alarm/timer_1024x1280.mp4', self:get_game_time())
+            video:play(DISPLAY_MAIN, 'video/alarm/timer_1600x1200.mp4', self:get_game_time())
+            video:play(DISPLAY_HINTS, 'video/alarm/timer_1024x1280.mp4', self:get_game_time())
             video:play(DISPLAY_CONSOLE, 'video/alarm/exit_pass.mp4')
 
             light:alarms()
             light:disable_xray()
+        end,
+        warning_1 = function(self)
+            print('30 minutes left')
+        end,
+        warning_2 = function(self)
+            print('15 minutes left')
+        end,
+        warning_3 = function(self)
+            print('10 minutes left')
+        end,
+        on_last_warning = function(self)
+            print('5 minutes left')
+            video:play(DISPLAY_BIO, 'video/alarm/timer_1024x1280.mp4', self:get_game_time())
+            video:play(DISPLAY_MAIN, 'video/alarm/timer_1600x1200.mp4', self:get_game_time())
+            video:play(DISPLAY_HINTS, 'video/alarm/timer_1024x1280.mp4', self:get_game_time())
+
+            light:alarms()
         end,
         on_victory = function(self)
             print('You won!')
@@ -138,7 +163,22 @@ quest = machine.create({
             light:unlock_door()
         end,
         on_tick = function(self)
-            if (math.floor(os.clock() - self.start_time) > GAME_TIME_MAX) then
+            local game_time = self:get_game_time()
+
+            if (game_time == GAME_TIME_WARN_1) then
+                self:warning_1()
+            end
+            if (game_time == GAME_TIME_WARN_2) then
+                self:warning_2()
+            end
+            if (game_time == GAME_TIME_WARN_3) then
+                self:warning_3()
+            end
+            if (game_time == GAME_TIME_WARN_4) then
+                self:last_warning()
+            end
+
+            if (game_time > GAME_TIME_MAX) then
                 print('Time\'s up')
                 self:lose()
             end
@@ -314,6 +354,9 @@ zombie = machine.create({
         on_gibberish = function()
             zombie_video:play('video/zombie_translator_missing.mp4')
         end,
+        on_active = function()
+            code_panel:clear()
+        end,
         on_translate = function()
             print('Zombie talks!')
             zombie_video:set_idle_files({ 'video/zombie_standby.mp4', 'video/' .. LANGUAGE .. '/idle/joke_1.mp4', 'video/' .. LANGUAGE .. '/idle/joke_2.mp4', 'video/' .. LANGUAGE .. '/idle/joke_3.mp4' })
@@ -429,7 +472,7 @@ language = machine.create({
 REGISTER_STATES("main_quest", quest)
 REGISTER_STATES("hints", zombie)
 REGISTER_STATES("language", language)
-REGISTER_CODE_PANEL(zombie, 7) -- VAR, timeout
+code_panel = REGISTER_CODE_PANEL(zombie, 7) -- VAR, timeout
 sampler = REGISTER_SAMPLER()
 zombie_arduino = REGISTER_ZOMBIE_CONTROLLER(quest)
 zombie_translator = REGISTER_ZOMBIE_TRANSLATOR(quest)

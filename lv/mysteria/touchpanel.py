@@ -39,14 +39,17 @@ class TouchPanel(object):
 
         # use the first/default configuration
         self.device.set_configuration()
-        logging.info("Found TouchPanel {} {}, split {}x{}".format(self.device.manufacturer, self.device.product,
-                                                                  rows, columns))
+        logging.info(f"Found TouchPanel {self.device.manufacturer} {self.device.product}, split {rows}x{columns}")
         # first endpoint
         self.endpoint = self.device[0][(0, 0)][0]
 
     def register_code_panel_lua(self, code_panel, timeout):
         self.code_panel = code_panel
         self.code_timeout = timeout
+        return self
+
+    def clear(self):
+        self.touches.clear()
 
     def processor(self):
         if not self.device:
@@ -113,13 +116,13 @@ class TouchPanel(object):
 
         if time.time() - self.code_panel_input_start_time > self.code_timeout:
             self.code_panel_input_start_time = None
-            self.touches.clear()
+            self.clear()
             return
 
         if self.touches[-1:][0] == 'X':
             code = ''.join(self.touches[:-1])
             self.code_panel_input_start_time = None
-            self.touches.clear()
+            self.clear()
 
             if code:
                 logging.info(f"Executing hint {code}")
