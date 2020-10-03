@@ -37,7 +37,6 @@ quest = machine.create({
             print('Resetting everything to inital states, walking around cleaning etc')
             self.start_time = os.clock();
 
-            language:reset()
             power_console:reset()
             gestures:reset()
             boxes:reset()
@@ -133,16 +132,16 @@ quest = machine.create({
             light:disable_xray()
         end,
         warning_1 = function(self)
-            print('30 minutes left')
+            sampler:play('audio/30min')
         end,
         warning_2 = function(self)
-            print('15 minutes left')
+            sampler:play('audio/15min')
         end,
         warning_3 = function(self)
-            print('10 minutes left')
+            sampler:play('audio/10min')
         end,
         on_last_warning = function(self)
-            print('5 minutes left')
+            sampler:play('audio/5min')
             video:play(DISPLAY_BIO, 'video/alarm/timer_1024x1280.mp4', self:get_game_time())
             video:play(DISPLAY_MAIN, 'video/alarm/timer_1600x1200.mp4', self:get_game_time())
             video:play(DISPLAY_HINTS, 'video/alarm/timer_1024x1280.mp4', self:get_game_time())
@@ -158,7 +157,7 @@ quest = machine.create({
         on_failure = function(self)
             print('You\'ve lost!')
             sampler:reset()
-            sampler:play('audio/LongExplosion')
+            sampler:play('audio/game_over')
             light:off()
             light:unlock_door()
         end,
@@ -359,7 +358,8 @@ zombie = machine.create({
         end,
         on_translate = function()
             print('Zombie talks!')
-            zombie_video:set_idle_files({ 'video/zombie_standby.mp4', 'video/' .. LANGUAGE .. '/idle/joke_1.mp4', 'video/' .. LANGUAGE .. '/idle/joke_2.mp4', 'video/' .. LANGUAGE .. '/idle/joke_3.mp4' })
+--            zombie_video:set_idle_files({ 'video/zombie_standby.mp4', 'video/' .. LANGUAGE .. '/idle/joke_1.mp4', 'video/' .. LANGUAGE .. '/idle/joke_2.mp4', 'video/' .. LANGUAGE .. '/idle/joke_3.mp4' })
+            zombie_video:set_idle_files({ 'video/zombie_standby.mp4' })
             zombie_video:play('video/' .. LANGUAGE .. '/translator_ready.mp4')
         end,
         on_hint = function(self, event, from, to, code)
@@ -429,9 +429,6 @@ zombie = machine.create({
                 ['BCB2'] = function()
                     zombie_video:play('video/' .. LANGUAGE .. '/BCB2.mp4')
                 end,
-                ['BCB3'] = function()
-                    zombie_video:play('video/' .. LANGUAGE .. '/BCB3.mp4')
-                end,
                 ['31'] = function()
                     -- 3175
                     zombie_video:play('video/' .. LANGUAGE .. '/31_exit_code.mp4')
@@ -451,7 +448,6 @@ zombie = machine.create({
 
 language = machine.create({
     events = {
-        { name = 'reset', from = '*', to = 'russian' },
         { name = 'set_russian', from = '*', to = 'russian' },
         { name = 'set_latvian', from = '*', to = 'latvian' },
         { name = 'set_english', from = '*', to = 'english' },
@@ -480,4 +476,5 @@ zombie_video = REGISTER_VLC(zombie, zombie_arduino)
 video = REGISTER_POTPLAYER()
 
 --Fire off main initialization machine
+language:set_russian()
 quest:restart()
