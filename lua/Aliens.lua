@@ -347,7 +347,7 @@ zombie = machine.create({
     },
     callbacks = {
         on_defrosting = function()
-            zombie_video:set_idle_files({ 'video/zombie_standby.mp4' })
+            zombie_video:set_idle_files({ 'video/zombie_standby_keys.mp4' })
             zombie_video:play('video/zombie_defrosting.mp4')
         end,
         on_gibberish = function()
@@ -359,7 +359,7 @@ zombie = machine.create({
         on_translate = function()
             print('Zombie talks!')
 --            zombie_video:set_idle_files({ 'video/zombie_standby.mp4', 'video/' .. LANGUAGE .. '/idle/joke_1.mp4', 'video/' .. LANGUAGE .. '/idle/joke_2.mp4', 'video/' .. LANGUAGE .. '/idle/joke_3.mp4' })
-            zombie_video:set_idle_files({ 'video/zombie_standby.mp4' })
+            zombie_video:set_idle_files({ 'video/zombie_standby_keys.mp4' })
             zombie_video:play('video/' .. LANGUAGE .. '/translator_ready.mp4')
         end,
         on_hint = function(self, event, from, to, code)
