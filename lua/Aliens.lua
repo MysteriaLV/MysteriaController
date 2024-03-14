@@ -7,11 +7,11 @@ local GAME_TIME_WARN_3 = 60 * 50
 local GAME_TIME_WARN_4 = 60 * 55
 local GAME_TIME_MAX = 60 * 60
 
-local DISPLAY_MAIN = 1
-local DISPLAY_CIRCUIT = 2
-local DISPLAY_HINTS = 3
-local DISPLAY_BIO = 6
+local DISPLAY_BIO = 2
+local DISPLAY_MAIN = 3
+local DISPLAY_CIRCUIT = 4
 local DISPLAY_CONSOLE = 5
+local DISPLAY_HINTS = 6
 
 local LANGUAGE = 'ru'
 

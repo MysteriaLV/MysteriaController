@@ -38,37 +38,45 @@ MainWindowState=129
 VideoWindowHeight=-1
 VideoWindowWidth=-1
 ```
-#### DISPLAY1
+
+#### DISPLAY1 (not used, VLC hardcoded position)
 ```ini
 [Positions]
-MainX=0
+MainX=-1900
 MainY=0
 ```
 
 #### DISPLAY2
 ```ini
 [Positions]
-MainX=2880
+MainX=-768
 MainY=0
 ```
 
 #### DISPLAY3
 ```ini
 [Positions]
-MainX=4160
+MainX=0
+MainY=0
+```
+
+#### DISPLAY4
+```ini
+[Positions]
+MainX=1280
 MainY=0
 ```
 
 #### DISPLAY5
 ```ini
 [Positions]
-MainX=1860
+MainX=2560
 MainY=0
 ```
 
 #### DISPLAY6
 ```ini
 [Positions]
-MainX=-1000
+MainX=3840
 MainY=0
 ```

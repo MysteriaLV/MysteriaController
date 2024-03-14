@@ -1,3 +1,5 @@
+import configparser
+import os
 import random
 import shlex
 import subprocess
@@ -37,7 +39,7 @@ class ZombieBox(object):
         self.sparkler = None
 
         self.vlc: Instance = vlc.Instance(
-            ['--no-volume-save', '--no-spu', '--no-osd', '--video-on-top', '--video-y=1', '--video-x=-1900',
+            ['--no-volume-save', '--no-spu', '--no-osd', '--video-on-top', '--video-y=1', '--video-x=-3000',
              '--fullscreen'])
         self.main_player: vlc.MediaPlayer = self.vlc.media_player_new()
         self.main_player.set_fullscreen(True)
@@ -145,20 +147,53 @@ class Sampler(object):
         self.player_groups.clear()
 
 
+import configparser
+import os
+import subprocess
+import shlex
+
 class PotPlayer(object):
+    SETTINGS_TO_UPDATE = {
+        "Settings": {
+            "AutoDownloadFile": "0",
+            "CheckAutoUpdate": "0",
+            "RestoreLastState": "1",
+            "StartScreenSize": "5",
+            "RepeatPlay2": "2"
+        },
+        "Positions": {
+            "IsZoomFull": "1",
+            "MainWindowState": "129",
+            "VideoWindowHeight": "-1",
+            "VideoWindowWidth": "-1",
+            "MainY": "0"
+        }
+    }
 
     def __init__(self):
         self.pot_players = dict()
-        self.PLAYER_EXE = "PotPlayer_DISPLAY{display_number}.exe"
-        self.PLAYER_RUN_CMD = '"C:\\Program Files\\DAUM\PotPlayer\\PotPlayer_DISPLAY{display_number}.exe" "{media_file}" /seek={offset} /new'
-        # self.PLAYER_RUN_CMD = '"C:\\Program Files\\DAUM\PotPlayer\\PotPlayerMini64.exe" "{media_file}" /new /seek={offset}'
+
         self.DISPLAYS = [2, 3, 4, 5, 6]
+
+        self.APPDATA_ROAMING_PATH = r"C:\Users\Mysteria\AppData\Roaming"
+        self.MAIN_X_VALUES = {
+            2: "-768",
+            3: "0",
+            4: "1280",
+            5: "2560",
+            6: "3840"
+        }
+
+        self.POT_PLAYER_PATH = r"C:\Program Files\DAUM\PotPlayer"
+        self.PLAYER_EXE_NAME_TEMPLATE = "PotPlayer_DISPLAY{display_number}.exe"
+        self.PLAYER_RUN_CMD = f'"{os.path.join(self.POT_PLAYER_PATH, self.PLAYER_EXE_NAME_TEMPLATE)}"' + ' "{media_file}" /seek={offset} /new'
 
     def register_in_lua(self):
         return self
 
     def stop(self, display_number):
-        subprocess.run(f"taskkill /im {self.PLAYER_EXE.format(display_number=display_number)} /f")
+        exe_name = self.PLAYER_EXE_NAME_TEMPLATE.format(display_number=display_number)
+        subprocess.run(["taskkill", "/im", exe_name, "/f"], stderr=subprocess.PIPE)
 
     def play(self, display_number, media_file, offset=0):
         self.stop(display_number)
@@ -173,9 +208,37 @@ class PotPlayer(object):
     def reset(self):
         for i in self.DISPLAYS:
             self.stop(i)
+            self.update_ini_file(i)
+
+    def update_ini_file(self, display_number):
+        file_path = os.path.join(self.APPDATA_ROAMING_PATH, f"PotPlayer_DISPLAY{display_number}", f"PotPlayer_DISPLAY{display_number}.ini")
+
+        config = configparser.ConfigParser()
+        config.optionxform = str    # make it case sensitive
+        config.read(file_path, encoding='utf-16')
+
+        # Удаляем секцию 'SimpleOpen', если она есть
+        config.remove_section('SimpleOpen')
+
+        # Обновляем значения в соответствующих секциях
+        for section, settings in self.SETTINGS_TO_UPDATE.items():
+            if not config.has_section(section):
+                config.add_section(section)
+            for key, value in settings.items():
+                config.set(section, key, value)
+
+        # Устанавливаем соответствующее значение MainX
+        config.set("Positions", "MainX", str(self.MAIN_X_VALUES[display_number]))
+
+        # Сохраняем изменения
+        with open(file_path, "w", encoding='utf-16') as configfile:
+            config.write(configfile, space_around_delimiters=False)
+
+        print(f"File {file_path} updated successfully!")
 
 
 if __name__ == '__main__':
+    pass
     # z = ZombieBox()
     # z.start()
     # time.sleep(4)
@@ -183,21 +246,22 @@ if __name__ == '__main__':
     # z.idle_media_files = ['idle/11.mp4', 'idle/12.mp4']
     # # z.play('idle/11.mp4')
     # time.sleep(200)
-
+    #
     # p = PotPlayer()
+    # p.reset()
     # p.play(2, 'idle/timer_1024x1280.mp4')
     # # time.sleep(4)
     # # p.play(2, 'idle/12.mp4')
     # time.sleep(10)
-
-    s = Sampler()
-    s.reset()
-
-    s.play('audio/alert', "background")
-    time.sleep(2)
-    print(1)
-    s.play('audio/ru/power_cable_connected')
-    time.sleep(11)
-    print(2)
-    s.play('audio/ru/power_cable_connected')
-    time.sleep(1000)
+    #
+    # s = Sampler()
+    # s.reset()
+    #
+    # s.play('audio/alert', "background")
+    # time.sleep(2)
+    # print(1)
+    # s.play('audio/ru/power_cable_connected')
+    # time.sleep(11)
+    # print(2)
+    # s.play('audio/ru/power_cable_connected')
+    # time.sleep(1000)

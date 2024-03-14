@@ -10,6 +10,12 @@
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/lv" isTestSource="false" />
     </content>
+    <content url="file://$USER_HOME$/AppData/Roaming/PotPlayer_DISPLAY1" />
+    <content url="file://$USER_HOME$/AppData/Roaming/PotPlayer_DISPLAY2" />
+    <content url="file://$USER_HOME$/AppData/Roaming/PotPlayer_DISPLAY3" />
+    <content url="file://$USER_HOME$/AppData/Roaming/PotPlayer_DISPLAY4" />
+    <content url="file://$USER_HOME$/AppData/Roaming/PotPlayer_DISPLAY5" />
+    <content url="file://$USER_HOME$/AppData/Roaming/PotPlayer_DISPLAY6" />
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
