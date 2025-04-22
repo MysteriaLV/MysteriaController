@@ -13,6 +13,8 @@ logging.basicConfig(
     datefmt='%M:%S'
 )
 
+import sentry_sdk
+sentry_sdk.init("https://d775b9ceba69431fb18a33f9c522825e@eu.glitchtip.com/3", shutdown_timeout=30)
 
 def main():
     modbus = ModBus(port='COM19')

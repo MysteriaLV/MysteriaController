@@ -15,3 +15,6 @@ python-vlc
 ipaddress
 dotmap
 schedule
+
+sentry-sdk
+urllib3<2.0 # due to old OpenSSL
