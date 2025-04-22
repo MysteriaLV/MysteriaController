@@ -1,6 +1,9 @@
 import logging
 import threading
 
+import sentry_sdk
+from sentry_sdk.integrations.logging import LoggingIntegration
+
 from mysteria.my_modbus import ModBus
 from mysteria.state import GameState
 from mysteria.touchpanel import TouchPanel
@@ -13,8 +16,17 @@ logging.basicConfig(
     datefmt='%M:%S'
 )
 
-import sentry_sdk
-sentry_sdk.init("https://d775b9ceba69431fb18a33f9c522825e@eu.glitchtip.com/3", shutdown_timeout=30)
+# Set up Sentry to IGNORE logging.error() from being reported
+sentry_logging = LoggingIntegration(
+    level=logging.INFO,           # Capture INFO and above as breadcrumbs
+    event_level=logging.CRITICAL  # Only send CRITICAL logs to Sentry
+)
+
+sentry_sdk.init(
+    dsn="https://XXX@eu.glitchtip.com/3",
+    integrations=[sentry_logging],
+    shutdown_timeout=30
+)
 
 def main():
     modbus = ModBus(port='COM19')
