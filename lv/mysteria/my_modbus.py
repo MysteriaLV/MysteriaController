@@ -5,6 +5,7 @@ import time
 from collections import namedtuple
 
 import schedule
+import sentry_sdk
 from pymodbus.client.sync import ModbusSerialClient, ModbusTcpClient
 from pymodbus.constants import Defaults
 from pymodbus.exceptions import ConnectionException, ModbusException
@@ -55,6 +56,11 @@ class ModBus(object):
         except (IndexError, struct.error, ModbusException, ConnectionException) as e:
             logging.exception(e, exc_info=False)
             slave.errors += 1
+
+            if slave.errors == 100:
+                sentry_sdk.set_context("slave", {field: getattr(slave, field) for field in slave._fields})
+                sentry_sdk.capture_exception(e)
+
             return None
 
     def write_action_register(self, value, slave):
@@ -76,6 +82,11 @@ class ModBus(object):
         except (IndexError, struct.error, ModbusException, ConnectionException) as e:
             logging.exception(e, exc_info=False)
             slave.errors += 1
+
+            if slave.errors == 100:
+                sentry_sdk.set_context("slave", {field: getattr(slave, field) for field in slave._fields})
+                sentry_sdk.capture_exception(e)
+
             return False
 
     def processor(self):
