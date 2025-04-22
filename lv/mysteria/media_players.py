@@ -5,6 +5,8 @@ import shlex
 import subprocess
 import threading
 import time
+import sentry_sdk
+from pathlib import Path
 from typing import Dict, List
 
 import vlc
@@ -147,11 +149,6 @@ class Sampler(object):
         self.player_groups.clear()
 
 
-import configparser
-import os
-import subprocess
-import shlex
-
 class PotPlayer(object):
     SETTINGS_TO_UPDATE = {
         "Settings": {
@@ -175,7 +172,7 @@ class PotPlayer(object):
 
         self.DISPLAYS = [2, 3, 4, 5, 6]
 
-        self.APPDATA_ROAMING_PATH = r"C:\Users\Mysteria\AppData\Roaming"
+        self.APPDATA_ROAMING_PATH = Path(r"C:\Users\Mysteria\AppData\Roaming")
         self.MAIN_X_VALUES = {
             2: "-768",
             3: "0",
@@ -208,30 +205,42 @@ class PotPlayer(object):
     def reset(self):
         for i in self.DISPLAYS:
             self.stop(i)
-            self.update_ini_file(i)
+            self._update_ini_file(i)
 
-    def update_ini_file(self, display_number):
-        file_path = os.path.join(self.APPDATA_ROAMING_PATH, f"PotPlayer_DISPLAY{display_number}", f"PotPlayer_DISPLAY{display_number}.ini")
+    def _update_ini_file(self, display_number):
+        file_path = self.APPDATA_ROAMING_PATH / f"PotPlayer_DISPLAY{display_number}" / f"PotPlayer_DISPLAY{display_number}.ini"
 
         config = configparser.ConfigParser()
-        config.optionxform = str    # make it case sensitive
-        config.read(file_path, encoding='utf-16')
+        config.optionxform = str  # make it case sensitive
 
-        # Удаляем секцию 'SimpleOpen', если она есть
+        try:
+            config.read(file_path, encoding='utf-16')
+        except UnicodeError:
+            sentry_sdk.capture_message(f"PotPlayer {display_number} got garbled. Recreating")
+
+            # File got messed up, run PotPlayer so it can create a new one
+            if file_path.exists():
+                file_path.unlink()
+
+            self.play(display_number, f"video/prepare/{display_number}.jpg")
+            self.stop(display_number)
+            config.read(file_path, encoding='utf-16')
+
+        # Remove the 'SimpleOpen' section if it exists
         config.remove_section('SimpleOpen')
 
-        # Обновляем значения в соответствующих секциях
+        # Update or add new settings to the configuration
         for section, settings in self.SETTINGS_TO_UPDATE.items():
             if not config.has_section(section):
                 config.add_section(section)
             for key, value in settings.items():
                 config.set(section, key, value)
 
-        # Устанавливаем соответствующее значение MainX
+        # Update specific positional value
         config.set("Positions", "MainX", str(self.MAIN_X_VALUES[display_number]))
 
-        # Сохраняем изменения
-        with open(file_path, "w", encoding='utf-16') as configfile:
+        # Save changes to the INI file
+        with file_path.open("w", encoding='utf-16') as configfile:
             config.write(configfile, space_around_delimiters=False)
 
         print(f"File {file_path} updated successfully!")
