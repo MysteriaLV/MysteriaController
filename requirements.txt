@@ -26,4 +26,4 @@ websockets==8.1
 Werkzeug==0.14.1
 
 sentry-sdk
-urllib3<2.0 # due to old OpenSSL
+urllib3<3.0 # due to old OpenSSL
