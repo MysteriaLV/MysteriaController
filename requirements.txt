@@ -3,7 +3,7 @@ click==6.7
 dotmap==1.2.20
 Flask==1.0.2
 Flask-Sijax==0.4.1
-future==0.16.0
+future==1.0.0
 ipaddress==1.0.22
 itsdangerous==0.24
 Jinja2==2.10
