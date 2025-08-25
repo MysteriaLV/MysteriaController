@@ -9,6 +9,7 @@ import sentry_sdk
 from pymodbus.client.sync import ModbusSerialClient, ModbusTcpClient
 from pymodbus.constants import Defaults
 from pymodbus.exceptions import ConnectionException, ModbusException
+from pymodbus.pdu import ExceptionResponse
 
 ACTION_REGISTER = 0
 
@@ -119,7 +120,8 @@ class ModBus(object):
     def read_and_react(self, slave):
         try:
             slave.current_data = self.read_registers(slave)
-            if not slave.current_data:
+
+            if not slave.current_data or isinstance(slave.current_data, ExceptionResponse):
                 raise ConnectionException
 
             if slave.last_data:
