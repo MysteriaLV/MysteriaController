@@ -6,7 +6,7 @@ Flask-Sijax==0.4.1
 future==0.16.0
 ipaddress==1.0.22
 itsdangerous==0.24
-Jinja2==2.10
+Jinja2==3.1.6
 lupa>=1.7
 MarkupSafe
 pyFirmata2==2.0.1
